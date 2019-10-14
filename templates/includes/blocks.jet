@@ -1,0 +1,22 @@
+{{block messages()}}
+    {{if isset(messageSuccess) && messageSuccess}}
+        <div class="alert alert-success" role="alert">{{messageSuccess}}</div>
+    {{end}}
+
+    {{if isset(messageError) && messageError}}
+        <div class="alert alert-danger" role="alert">{{messageError}}</div>
+    {{end}}
+
+    {{if isset(messageWarning) && messageWarning}}
+        <div class="alert alert-warning" role="alert">{{messageWarning}}</div>
+    {{end}}
+
+    {{if isset(messageInfo) && messageInfo}}
+        <div class="alert alert-info" role="alert">{{messageInfo}}</div>
+    {{end}}
+{{end}}
+
+
+{{block navigationItem(title="", href="")}}
+<a class="dropdown-item {{if hasPrefix(navigationRoute, href)}}active{{end}}" href="{{href}}">{{title}}</a>
+{{end}}

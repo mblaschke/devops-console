@@ -1,0 +1,25 @@
+application:
+
+  kubernetes:
+    environments:
+      - name: dev
+        description: Development
+        template: "{env}-{app}"
+
+      - name: test
+        description: Testing
+        template: "{env}-{app}"
+
+      - name: play
+        description: Playground
+        template: "{env}-{app}"
+
+      - name: team
+        description: Team environment
+        template: "team-{team}-{app}"
+        quota: "team"
+
+      - name: user
+        description: Personal environment
+        template: "user-{user}-{app}"
+        quota: "user"

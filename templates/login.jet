@@ -1,0 +1,10 @@
+{{extends "layouts/login.jet"}}
+{{import "includes/blocks.jet"}}
+
+{{block title()}}Login{{end}}
+
+{{block documentBody()}}
+  <form action="/login" method="post">
+    <button type="submit" class="btn btn-primary w-100 p-3">Login via Azure OAuth</button>
+  </form>
+{{end}}

@@ -1,0 +1,11 @@
+/bindata.go
+/static/js/*.js
+/static/js/*.js.map
+/static/dist/*
+!/static/dist/.gitkeep
+/templates/includes/react.jet
+/*.env
+/vendor/
+/public/dist/*
+/react/node_modules
+/devops-console

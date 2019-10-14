@@ -1,0 +1,58 @@
+{{extends "layouts/application.jet"}}
+{{import "includes/blocks.jet"}}
+
+{{block title()}}{{if isset(title) && title}}{{title}}{{end}}{{end}}
+
+{{block documentBody()}}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">general</li>
+        <li class="breadcrumb-item active">about</li>
+    </ol>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-terminal"></i>
+            /devops/console <span class="version">v{{appVersion}}</span>
+        </div>
+        <div class="card-body">
+            <p><i>self service for DevOps people</i></p>
+
+            <p>
+                created by:
+                <ul>
+                    <li>Markus Blaschke</li>
+                    <li>Vibin Ittiachan</li>
+                    <li>Jonathan Buerkle</li>
+                    <li>Thomas Renger</li>
+                    <li>Marc Ritter</li>
+                    <li>Michael Kowatsch</li>
+                </ul>
+            </p>
+
+            <p>
+                <dl>
+                    <dd>Backend</dd>
+                    <dt>
+                        <ul>
+                            <li><a href="https://golang.org/">{{runtimeVersion}}</a></li>
+                            <li><a href="https://github.com/kataras/iris">Iris {{irisVersion}}</a></li>
+                            <li><a href="https://github.com/Azure/azure-sdk-for-go">AzureSDK {{azureSdkVersion}}</a></li>
+                        </ul>
+                    </dt>
+                    <dd>Frontend</dd>
+                    <dt>
+                        <ul>
+                            <li><a href="https://getbootstrap.com/">bootstrap</a></li>
+                            <li><a href="https://reactjs.org/">react</a></li>
+                            <li><a href="https://startbootstrap.com/templates/sb-admin/">SB-Admin</a></li>
+                            <li><a href="https://fontawesome.com/">FontAwesome</a></li>
+                        </ul>
+                    </dt>
+                </dl>
+            </p>
+        </div>
+    </div>
+
+    <div id="root"></div>
+
+{{end}}

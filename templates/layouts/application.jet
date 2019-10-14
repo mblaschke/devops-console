@@ -1,0 +1,29 @@
+{{import "includes/blocks.jet"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{include "includes/html-header.jet"}}
+</head>
+<body class="hide-search">
+  <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand mr-1" href="/"><i class="fas fa-terminal"></i> /devops/console</a>
+    {{include "includes/navbar-search.jet"}}
+    {{include "includes/navbar-right.jet"}}
+  </nav>
+
+<main role="main">
+  <div id="wrapper">
+    {{include "includes/sidebar.jet"}}
+
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        {{yield messages()}}
+        {{block documentBody()}}{{end}}
+      </div>
+    </div>
+  </div>
+</main>
+  {{include "includes/react.jet"}}
+  {{include "includes/html-footer.jet"}}
+</body>
+</html>

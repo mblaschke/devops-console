@@ -1,0 +1,782 @@
+package main
+
+import (
+	"devops-console/models"
+	"devops-console/models/formdata"
+	"devops-console/models/response"
+	"devops-console/services"
+	"errors"
+	"fmt"
+	"github.com/dustin/go-humanize"
+	"github.com/kataras/iris"
+	"github.com/prometheus/client_golang/prometheus"
+	v1 "k8s.io/api/core/v1"
+	v1Networking "k8s.io/api/networking/v1"
+	v1Rbac "k8s.io/api/rbac/v1"
+	"k8s.io/api/settings/v1alpha1"
+	"regexp"
+	"strings"
+)
+
+type ApplicationKubernetes struct {
+	*Server
+}
+
+func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernetes) {
+	service = &services.Kubernetes{}
+
+	if c.config.App.Kubernetes.Namespace.Filter.Access != "" {
+		service.Filter.Namespace = regexp.MustCompile(c.config.App.Kubernetes.Namespace.Filter.Access)
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context) {
+
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "downloadKubeconfig"}).Inc()
+
+	ctx.Header("ContentType", "text/yaml")
+	ctx.Header("Content-Disposition", "attachment; filename=\"kubeconfig.yaml\"")
+	ctx.ViewData("config", c.config)
+	ctx.View("kubeconfig.jet")
+}
+
+func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context) {
+	service := c.serviceKubernetes()
+	nodes, err := service.Nodes()
+	if err != nil {
+		c.respondError(ctx, errors.New("Unable to contact Kubernetes cluster"))
+		return
+	}
+
+	ret := []response.KubernetesCluster{}
+
+	for _, node := range nodes.Items {
+		row := response.KubernetesCluster{
+			Name:              node.Name,
+			Version:           node.Status.NodeInfo.KubeletVersion,
+			SpecMachineCPU:    node.Status.Capacity.Cpu().String(),
+			SpecMachineMemory: humanize.Bytes(uint64(node.Status.Capacity.Memory().Value())),
+			Status:            fmt.Sprintf("%v", node.Status.Phase),
+			Created:           node.CreationTimestamp.UTC().String(),
+			CreatedAgo:        humanize.Time(node.CreationTimestamp.UTC()),
+		}
+
+		for _, val := range node.Status.Conditions {
+			if val.Reason == "KubeletReady" {
+				row.Status = fmt.Sprintf("%v", val.Type)
+			}
+		}
+
+		for _, item := range node.Status.Addresses {
+			if item.Type == "InternalIP" {
+				row.InternalIp = item.Address
+			}
+		}
+
+		if val, ok := node.Labels["kubernetes.io/role"]; ok {
+			row.Role = val
+		}
+
+		if _, ok := node.Labels["node-role.kubernetes.io/master"]; ok {
+			row.Role = "master"
+		}
+
+		if val, ok := node.Labels["kubernetes.io/arch"]; ok {
+			row.SpecArch = val
+		}
+
+		if val, ok := node.Labels["kubernetes.io/os"]; ok {
+			row.SpecOS = val
+		}
+
+		if val, ok := node.Labels["failure-domain.beta.kubernetes.io/region"]; ok {
+			row.SpecRegion = val
+		}
+
+		if val, ok := node.Labels["failure-domain.beta.kubernetes.io/zone"]; ok {
+			row.SpecZone = val
+		}
+
+		if val, ok := node.Labels["beta.kubernetes.io/instance-type"]; ok {
+			row.SpecInstance = val
+		}
+
+		ret = append(ret, row)
+	}
+
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "listCluster"}).Inc()
+
+	ctx.JSON(ret)
+}
+
+func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context) {
+	service := services.Kubernetes{}
+	nsList, err := service.NamespaceList()
+	if err != nil {
+		c.respondError(ctx, errors.New("Unable to contact Kubernetes cluster"))
+		return
+	}
+
+	ret := []response.KubernetesNamespace{}
+
+	for _, namespaceNative := range nsList {
+		namespace := models.KubernetesNamespace{&namespaceNative}
+
+		if !c.kubernetesNamespaceAccessAllowed(ctx, namespace) {
+			continue
+		}
+
+		namespaceParts := strings.Split(namespace.Name, "-")
+		environment := ""
+		if len(namespaceParts) > 2 {
+			environment = namespaceParts[0]
+		}
+
+		row := response.KubernetesNamespace{
+			Name:        namespace.Name,
+			Environment: environment,
+			Status:      fmt.Sprintf("%v", namespace.Status.Phase),
+			Created:     namespace.CreationTimestamp.UTC().String(),
+			CreatedAgo:  humanize.Time(namespace.CreationTimestamp.UTC()),
+			Deleteable:  c.kubernetesNamespaceDeleteAllowed(ctx, &namespace),
+			Settings:    namespace.SettingsExtract(c.config.Kubernetes),
+		}
+
+		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description]; ok {
+			row.Description = val
+		}
+
+		if val, ok := namespace.Labels["team"]; ok {
+			row.OwnerTeam = val
+		}
+
+		if val, ok := namespace.Labels["user"]; ok {
+			row.OwnerUser = val
+		}
+
+		ret = append(ret, row)
+	}
+
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "listNamespace"}).Inc()
+
+	ctx.JSON(ret)
+}
+
+func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context) {
+	var namespaceName string
+	var kubernetesEnvironment *models.AppConfigKubernetesEnvironment
+
+	user := c.getUserOrStop(ctx)
+
+	formData := formdata.KubernetesNamespaceCreate{}
+	err := ctx.ReadJSON(&formData)
+	if err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	if formData.Settings == nil || formData.Description == nil || formData.App == nil || formData.Environment == nil || formData.Team == nil {
+		c.respondError(ctx, errors.New("Invalid form data"))
+		return
+	}
+
+	username := user.Username
+
+	if !regexp.MustCompile(c.config.App.Kubernetes.Namespace.Validation.App).MatchString(*formData.App) {
+		c.respondError(ctx, errors.New("Invalid app value"))
+		return
+	}
+
+	labels := map[string]string{
+		c.config.App.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
+	}
+
+	// validation
+	nsSettings, validationMessages := c.validateSettings(*formData.Settings)
+	if len(validationMessages) >= 1 {
+		c.respondError(ctx, errors.New(strings.Join(validationMessages, "\n")))
+		return
+	}
+
+	// check if environment is allowed
+	environmentAllowed := false
+	for _, env := range c.config.App.Kubernetes.Environments {
+		if env.Name == *formData.Environment {
+			environmentAllowed = true
+			kubernetesEnvironment = &env
+			break
+		}
+	}
+	if !environmentAllowed || kubernetesEnvironment == nil {
+		c.respondError(ctx, errors.New(fmt.Sprintf("Environment \"%s\" not allowed in this cluster", *formData.Environment)))
+		return
+	}
+
+	// team filter check
+	if !regexp.MustCompile(c.config.App.Kubernetes.Namespace.Validation.Team).MatchString(*formData.Team) {
+		c.respondError(ctx, errors.New("Invalid team value"))
+		return
+	}
+
+	// membership check
+	if !user.IsMemberOf(*formData.Team) {
+		c.respondError(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", *formData.Team)))
+		return
+	}
+
+	// quota check
+	switch kubernetesEnvironment.Quota {
+	case "team":
+		// quota check
+		if err := c.checkNamespaceTeamQuota(*formData.Team); err != nil {
+			c.respondError(ctx, errors.New(fmt.Sprintf("Error: %v", err)))
+			return
+		}
+	case "user":
+		// quota check
+		if err := c.checkNamespaceUserQuota(username); err != nil {
+			c.respondError(ctx, errors.New(fmt.Sprintf("Error: %v", err)))
+			return
+		}
+
+		labels[c.config.App.Kubernetes.Namespace.Labels.User] = strings.ToLower(username)
+	}
+
+	// build namespace name
+	namespaceName = kubernetesEnvironment.Template
+	namespaceName = strings.Replace(namespaceName, "{env}", kubernetesEnvironment.Name, -1)
+	namespaceName = strings.Replace(namespaceName, "{user}", username, -1)
+	namespaceName = strings.Replace(namespaceName, "{team}", *formData.Team, -1)
+	namespaceName = strings.Replace(namespaceName, "{app}", *formData.App, -1)
+
+	// namespace filtering
+	namespaceName = strings.ToLower(namespaceName)
+	namespaceName = strings.Replace(namespaceName, "_", "", -1)
+
+	labels[c.config.App.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
+
+	// set name label
+	labels[c.config.App.Kubernetes.Namespace.Labels.Name] = namespaceName
+
+	namespace := models.KubernetesNamespace{&v1.Namespace{}}
+	namespace.Name = namespaceName
+	namespace.SetLabels(labels)
+	namespace.SettingsApply(nsSettings, c.config.Kubernetes)
+
+	if namespace.Annotations == nil {
+		namespace.Annotations = map[string]string{}
+	}
+
+	if formData.Description != nil {
+		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+	}
+
+	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace) {
+		c.respondError(ctx, errors.New(fmt.Sprintf("Access to namespace \"%s\" denied", namespace.Name)))
+		return
+	}
+
+	service := c.serviceKubernetes()
+
+	// check if already exists
+	existingNs, _ := service.NamespaceGet(namespace.Name)
+	if existingNs != nil && existingNs.GetUID() != "" {
+		message := ""
+		if existingNsTeam, ok := existingNs.Labels["team"]; ok {
+			message = fmt.Sprintf("Namespace \"%s\" already exists (owned by team \"%s\")", namespace.Name, existingNsTeam)
+		} else if existingNsUser, ok := existingNs.Labels["user"]; ok {
+			message = fmt.Sprintf("Namespace \"%s\" already exists (owned by user \"%s\")", namespace.Name, existingNsUser)
+		} else {
+			message = fmt.Sprintf("Namespace \"%s\" already exists", namespace.Name)
+		}
+
+		c.respondError(ctx, errors.New(message))
+		return
+	}
+
+	// Namespace creation
+	if newNamespace, err := service.NamespaceCreate(*namespace.Namespace); newNamespace != nil && err == nil {
+		if err := c.updateNamespaceSettings(ctx, &models.KubernetesNamespace{newNamespace}); err != nil {
+			c.respondError(ctx, err)
+			return
+		}
+	} else {
+		c.respondError(ctx, err)
+		return
+	}
+
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "createNamespace"}).Inc()
+	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" created", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" created", namespace.Name))
+
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Namespace \"%s\" created", namespace.Name),
+	}
+
+	ctx.JSON(resp)
+}
+
+func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context) {
+	namespaceName := ctx.Params().GetString("namespace")
+
+	if namespaceName == "" {
+		c.respondError(ctx, errors.New("Invalid namespace"))
+		return
+	}
+
+	service := services.Kubernetes{}
+
+	// get namespace
+	namespace, err := c.getNamespace(ctx, namespaceName)
+	if err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	if !c.kubernetesNamespaceDeleteAllowed(ctx, namespace) {
+		c.respondError(ctx, errors.New(fmt.Sprintf("Deletion of namespace \"%s\" denied", namespace.Namespace)))
+		return
+	}
+
+	if err := service.NamespaceDelete(namespace.Name); err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name))
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "deleteNamepace"}).Inc()
+
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name),
+	}
+
+	ctx.JSON(resp)
+}
+
+func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context) {
+	namespaceName := ctx.Params().GetString("namespace")
+
+	if namespaceName == "" {
+		c.respondError(ctx, errors.New("Invalid namespace"))
+		return
+	}
+
+	service := services.Kubernetes{}
+
+	formData := formdata.KubernetesNamespaceCreate{}
+	err := ctx.ReadJSON(&formData)
+	if err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	// get namespace
+	namespace, err := c.getNamespace(ctx, namespaceName)
+	if err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	// description
+	if namespace.Annotations == nil {
+		namespace.Annotations = map[string]string{}
+	}
+	if formData.Description != nil {
+		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+	}
+
+	// labels
+	if formData.Settings != nil {
+		nsSettings, validationMessages := c.validateSettings(*formData.Settings)
+		if len(validationMessages) >= 1 {
+			c.respondError(ctx, errors.New(strings.Join(validationMessages, "\n")))
+			return
+		}
+
+		namespace.SettingsApply(nsSettings, c.config.Kubernetes)
+	}
+
+	// update
+	if _, err := service.NamespaceUpdate(namespace.Namespace); err != nil {
+		c.respondError(ctx, errors.New(fmt.Sprintf("Update of namespace \"%s\" failed: %v", namespace.Name, err)))
+		return
+	}
+
+	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" updated", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" updated", namespace.Name))
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "updateNamepace"}).Inc()
+
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Namespace \"%s\" updated", namespace.Name),
+	}
+
+	ctx.JSON(resp)
+}
+
+func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context) {
+	namespaceName := ctx.Params().GetString("namespace")
+
+	if namespaceName == "" {
+		c.respondError(ctx, errors.New("Invalid namespace"))
+		return
+	}
+
+	// get namespace
+	namespace, err := c.getNamespace(ctx, namespaceName)
+	if err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	if namespace, err = c.updateNamespace(namespace); err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	if err := c.kubernetesNamespacePermissionsUpdate(ctx, namespace); err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	if err := c.updateNamespaceObjects(namespace); err != nil {
+		c.respondError(ctx, err)
+		return
+	}
+
+	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name))
+	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "resetSettings"}).Inc()
+
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name),
+	}
+
+	ctx.JSON(resp)
+}
+
+func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace) (*models.KubernetesNamespace, error) {
+	doUpdate := false
+	service := services.Kubernetes{}
+
+	// add env label
+	if _, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; !ok {
+		parts := strings.Split(namespace.Name, "-")
+
+		if len(parts) > 1 {
+			namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment] = parts[0]
+			doUpdate = true
+		}
+	}
+
+	if doUpdate {
+		if _, err := service.NamespaceUpdate(namespace.Namespace); err != nil {
+			return namespace, err
+		}
+	}
+
+	return namespace, nil
+}
+
+func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Context, namespace models.KubernetesNamespace) bool {
+	user := c.getUserOrStop(ctx)
+
+	username := strings.ToLower(user.Username)
+	username = strings.Replace(username, "_", "", -1)
+
+	// USER namespace
+	regexpUser := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
+	if regexpUser.MatchString(namespace.Name) {
+		return true
+	}
+
+	if val, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; ok {
+		if val == user.Username {
+			return true
+		}
+	}
+
+	// ENV namespace (team labels)
+	for _, team := range user.Teams {
+		if val, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+			if val == team.Name {
+				return true
+			}
+		}
+	}
+
+	// TEAM namespace
+	teamsQuoted := []string{}
+	for _, team := range user.Teams {
+		teamsQuoted = append(teamsQuoted, regexp.QuoteMeta(team.Name))
+	}
+
+	regexpTeamStr := fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.Team, "("+strings.Join(teamsQuoted, "|")+")")
+	regexpTeam := regexp.MustCompile(regexpTeamStr)
+	if regexpTeam.MatchString(namespace.Name) {
+		return true
+	}
+
+	return false
+}
+
+func (c *ApplicationKubernetes) kubernetesNamespaceDeleteAllowed(ctx iris.Context, namespace *models.KubernetesNamespace) bool {
+	ret := regexp.MustCompile(c.config.App.Kubernetes.Namespace.Filter.Delete).MatchString(namespace.Name)
+
+	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Immortal]; ok {
+		if val == "true" {
+			ret = false
+		}
+	}
+
+	if !c.kubernetesNamespaceCheckOwnership(ctx, namespace) {
+		ret = false
+	}
+
+	return ret
+}
+
+func (c *ApplicationKubernetes) kubernetesNamespaceCheckOwnership(ctx iris.Context, namespace *models.KubernetesNamespace) bool {
+	user := c.getUserOrStop(ctx)
+
+	username := user.Username
+
+	if labelUserVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; ok {
+		if labelUserVal == username {
+			return true
+		}
+	} else if labelTeamVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+		// Team rolebinding
+		if _, err := user.GetTeam(labelTeamVal); err == nil {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (c *ApplicationKubernetes) updateNamespaceSettings(ctx iris.Context, namespace *models.KubernetesNamespace) (error error) {
+	if err := c.kubernetesNamespacePermissionsUpdate(ctx, namespace); err != nil {
+		return err
+	}
+
+	if err := c.updateNamespaceObjects(namespace); err != nil {
+		return err
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Context, namespace *models.KubernetesNamespace) (error error) {
+	service := services.Kubernetes{}
+
+	if !c.kubernetesNamespaceAccessAllowed(ctx, *namespace) {
+		return errors.New(fmt.Sprintf("Namespace \"%s\" not owned by current user", namespace.Name))
+	}
+
+	user := c.getUserOrStop(ctx)
+	username := user.Username
+	k8sUsername := user.Id
+
+	if labelUserVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; c.config.App.Kubernetes.Namespace.Role.Private && ok {
+		if labelUserVal == username {
+			// User rolebinding
+			role := c.config.App.Kubernetes.Namespace.Role.User
+			if _, err := service.RoleBindingCreateNamespaceUser(namespace.Name, username, k8sUsername, role); err != nil {
+				return errors.New(fmt.Sprintf("Error: %v", err))
+			}
+		} else {
+			return errors.New(fmt.Sprintf("Namespace \"%s\" not owned by current user", namespace.Name))
+		}
+	} else if labelTeamVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+		// Team rolebinding
+		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
+			for _, permission := range namespaceTeam.K8sPermissions {
+				if _, err := service.RoleBindingCreateNamespaceTeam(namespace.Name, labelTeamVal, permission); err != nil {
+					return errors.New(fmt.Sprintf("Error: %v", err))
+				}
+			}
+		}
+	} else {
+		return errors.New(fmt.Sprintf("Namespace \"%s\" cannot be resetted, labels not found", namespace.Name))
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.KubernetesNamespace) (error error) {
+	var kubeObjectList *models.KubernetesObjectList
+	service := services.Kubernetes{}
+
+	if environment, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; ok {
+		if configObjects, ok := c.config.App.Kubernetes.ObjectsList[environment]; ok {
+			kubeObjectList = configObjects
+		}
+	}
+
+	// if empty, try default
+	if kubeObjectList == nil {
+		if configObjects, ok := c.config.App.Kubernetes.ObjectsList["_default"]; ok {
+			kubeObjectList = configObjects
+		}
+	}
+
+	if kubeObjectList != nil {
+		for _, kubeObject := range kubeObjectList.ConfigMaps {
+			error = service.NamespaceEnsureConfigMap(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ConfigMap))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.ServiceAccounts {
+			error = service.NamespaceEnsureServiceAccount(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ServiceAccount))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.Roles {
+			error = service.NamespaceEnsureRole(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.Role))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.RoleBindings {
+			error = service.NamespaceEnsureRoleBindings(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.RoleBinding))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.NetworkPolicies {
+			error = service.NamespaceEnsureNetworkPolicy(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Networking.NetworkPolicy))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.LimitRanges {
+			error = service.NamespaceEnsureLimitRange(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.LimitRange))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.PodPresets {
+			error = service.NamespaceEnsurePodPreset(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1alpha1.PodPreset))
+			if error != nil {
+				return
+			}
+		}
+
+		for _, kubeObject := range kubeObjectList.ResourceQuotas {
+			error = service.NamespaceEnsureResourceQuota(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ResourceQuota))
+			if error != nil {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) checkNamespaceTeamQuota(team string) (err error) {
+	var count int
+	quota := c.config.App.Kubernetes.Namespace.Quota.Team
+
+	if quota <= 0 {
+		// no quota
+		return
+	}
+
+	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.Team, regexp.QuoteMeta(team)))
+
+	service := services.Kubernetes{}
+	count, err = service.NamespaceCount(regexp)
+	if err != nil {
+		return
+	}
+
+	if count >= quota {
+		// quota exceeded
+		err = errors.New(fmt.Sprintf("Team namespace quota of %v namespaces exceeded ", quota))
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) checkNamespaceUserQuota(username string) (err error) {
+	var count int
+	quota := c.config.App.Kubernetes.Namespace.Quota.User
+
+	if quota <= 0 {
+		// no quota
+		return
+	}
+
+	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
+
+	service := services.Kubernetes{}
+	count, err = service.NamespaceCount(regexp)
+	if err != nil {
+		return
+	}
+
+	if count >= quota {
+		// quota exceeded
+		err = errors.New(fmt.Sprintf("Personal namespace quota of %v namespaces exceeded ", quota))
+	}
+
+	return
+}
+
+func (c *ApplicationKubernetes) validateSettings(formSettingList map[string]string) (ret map[string]string, validationMsgs []string) {
+	validationMsgs = []string{}
+
+	for _, setting := range c.config.Kubernetes.Namespace.Settings {
+		settingValue := ""
+
+		if val, ok := formSettingList[setting.Name]; ok {
+			settingValue = val
+		}
+
+		if !setting.Validation.Validate(settingValue) {
+			validationMsgs = append(validationMsgs, fmt.Sprintf("Validation of \"%s\" failed (%v)", setting.Label, setting.Validation.HumanizeString()))
+		}
+
+		if val := setting.Transformation.Transform(settingValue); val != nil {
+			formSettingList[setting.Name] = *val
+		} else {
+			validationMsgs = append(validationMsgs, fmt.Sprintf("Parsing of \"%s\" failed", setting.Label))
+		}
+	}
+
+	ret = formSettingList
+
+	return
+}
+
+func (c *ApplicationKubernetes) getNamespace(ctx iris.Context, namespaceName string) (namespace *models.KubernetesNamespace, err error) {
+	if namespaceName == "" {
+		return nil, errors.New("Invalid namespace")
+	}
+
+	service := services.Kubernetes{}
+	namespaceNative, err := service.NamespaceGet(namespaceName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	namespace = &models.KubernetesNamespace{namespaceNative}
+
+	if !c.kubernetesNamespaceAccessAllowed(ctx, *namespace) {
+		return nil, errors.New(fmt.Sprintf("Access to namespace \"%s\" denied", namespace.Name))
+	}
+
+	return
+}

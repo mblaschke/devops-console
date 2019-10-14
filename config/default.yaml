@@ -1,0 +1,256 @@
+application:
+  session:
+    type: {{env "SESSION_TYPE" | default "internal" | toJson }}
+    expiry: {{env "SESSION_EXPIRY" | default "168h" | toJson }}
+
+    cookieName: {{env "SESSION_COOKIE_NAME" | default "csid" | toJson }}
+
+    internal: {}
+
+    secureCookie:
+      hashKey: {{env "SESSION_SECURECOOKIE_HASHKEY" | default "F11JJT1PWFfcPbcnltjMeiFSEZOt3F3I" | toJson }}
+      blockKey: {{env "SESSION_SECURECOOKIE_BLOCKKEY" | default "XDC0RgG55pPRQLb!" | toJson }}
+
+  oauth:
+    provider: {{env "OAUTH_PROVIDER" | toJson }}
+    usernamePrefix: {{env "OAUTH_USERNAME_PREFIX" | toJson }}
+    groupPrefix: {{env "OAUTH_GROUPS_PREFIX" | default "oidc:"  | toJson }}
+    redirectUrl: {{env "OAUTH_REDIRECT_URL" | default "oidc:" | toJson }}
+
+    azuread:
+      tenant: {{env "OAUTH_AZUREAD_TENANT" | toJson }}
+      clientId: {{env "OAUTH_CLIENT_ID" | toJson }}
+      clientSecret: {{env "OAUTH_CLIENT_SECRET" | toJson }}
+
+      endpointAuth: {{env "OAUTH_ENDPOINT_AUTH" | toJson }}
+      endpointToken: {{env "OAUTH_ENDPOINT_TOKEN" | toJson }}
+
+    filter:
+      usernameWhitelist: {{env "OAUTH_USERNAME_FILTER_WHITELIST" | toJson }}
+      usernameBlacklist: {{env "OAUTH_USERNAME_FILTER_BLACKLIST" | toJson }}
+
+  notification:
+    slack:
+      webhook: {{env "NOTIFICATION_SLACK_WEBHOOK" | toJson }}
+      channel: {{env "NOTIFICATION_SLACK_CHANNEL" | toJson }}
+      message: {{env "NOTIFICATION_SLACK_MESSAGE" | default "%s: %s" | toJson }}
+
+  kubernetes:
+    objectsPath: ./config/kubernetes
+
+    environments:
+    - name: dev
+      description: Development
+      template: "{env}-{app}"
+
+    namespace:
+      filter:
+        access: {{env "K8S_NAMESPACE_ACCESS_FILTER" | default "^(dev|test|int|isa|load|play|prod|team|user)\\-([a-zA-Z0-9]+\\-[a-zA-Z0-9]+|[a-zA-Z0-9]+)$" | toJson }}
+        delete: {{env "K8S_NAMESPACE_DELETE_FILTER" | default "^(team|user)\\-.*$" | toJson }}
+        user: {{env "K8S_NAMESPACE_USER_FILTER" | default "^user\\-%s\\-" | toJson }}
+        team: {{env "K8S_NAMESPACE_TEAM_FILTER" | default "^team\\-%s\\-" | toJson }}
+
+      validation:
+        app: {{env "K8S_NAMESPACE_VALIDATION_APP" | default "^[a-zA-Z0-9][-a-zA-Z0-9]{2,}$" | toJson }}
+        team: {{env "K8S_NAMESPACE_VALIDATION_TEAM" | default "^[a-zA-Z0-9]{3,}$" | toJson }}
+
+      annotations:
+        description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
+        immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
+
+      labels:
+        name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}
+        user: {{env "K8S_LABEL_USER" | default "user" | toJson }}
+        team: {{env "K8S_LABEL_TEAM" | default "team" | toJson }}
+        environment: {{env "K8S_LABEL_ENV" | default "env" | toJson }}
+
+      role:
+        team: {{env "K8S_TEAM_NAMESPACEROLE" | default "admin" | toJson }}
+        user: {{env "K8S_USER_NAMESPACEROLE" | default "admin" | toJson }}
+        private: {{env "K8S_USER_NAMESPACEROLE_PRIVATE" |default "true" }}
+
+    quota:
+      user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | toJson }}
+      team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | toJson }}
+
+
+settings:
+  vault:
+    url: {{env "AZURE_VAULT_URL" | toJson }}
+
+  user:
+  - name: SshPubKey
+    label: SSH Public Key
+    type: input
+    validation:
+      regexp: "^ssh-(rsa|dsa) .+"
+  team:
+  - name: AlertingSlackApi
+    label: Slack/Mattermost Integration URL
+    type: input
+    validation:
+      regexp: "^https://.+"
+  - name: AlertingPagerdutyApi
+    label: Pagerduty API key
+    type: input
+
+azure:
+  resourcegroup:
+    validation:
+      regexp: "^(.+)-rg$"
+
+    tags:
+    - name: foobar
+      label: Tag Foobar
+      type: input
+      validation:
+        regexp: "^.+$"
+      tags:
+        service: "foobar"
+    - name: ttl
+      label: Auto delete (ttl)
+      type: input
+      format: timestamp
+      default: "31d"
+      tags:
+        service: "foobar"
+      transformation:
+        convert: "timestamp"
+
+kubernetes:
+    namespace:
+      settings:
+      - name: foobar
+        k8stype: label
+        k8sname: example.com/foobar-l
+        label: Foobar
+        type: input
+        validation:
+          regexp: "^.+$"
+      - name: barfoo
+        k8stype: annotation
+        k8sname: janitor/ttl
+        label: Auto delete
+        description: TTL until namespace is deleted (eg. 6h, 7d, 31d, 2w)
+        type: input
+        default: "31d"
+        validation:
+          regexp: "^[0-9]+[hdw]$"
+          required: true
+      - name: servicemesh
+        k8stype: annotation
+        k8sname: sidecar.istio.io/inject
+        label: Enable ServiceMesh
+        type: checkbox
+        default: "true"
+
+permissions:
+  default:
+    teams:
+    - devteam0
+    - devteam5
+
+  user:
+    blascma:
+      teams:
+      - devteam1
+      - devteam2
+      - devteam3
+
+    userfoo:
+      teams:
+      - devteam1
+      - devteam2
+      - devteam3
+
+  group:
+    "bargroup":
+      teams:
+      - devteam5
+      - devteam8
+
+    "foogroup":
+      teams:
+      - devteam6
+
+    "bazgroup":
+      teams:
+      - devteam7
+
+  team:
+    devteam0:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789000"
+        serviceaccounts:
+        - name: tiller
+          namespace: foobar
+        - name: tiller
+          namespace: foobar2
+        clusterrole: admin
+      azureroleassignment:
+      - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
+        role: contributor
+
+    devteam1:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789000"
+        clusterrole: admin
+
+    devteam2:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789002"
+        clusterrole: admin
+      - name: "view"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789004"
+        - "cf805c30-f000-baar-foba-123456789005"
+        - "cf805c30-f000-baar-foba-123456789006"
+        clusterrole: admin
+
+    devteam3:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789003"
+        clusterrole: admin
+
+    devteam4:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789004"
+        clusterrole: admin
+
+    devteam5:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789005"
+        clusterrole: admin
+
+    devteam6:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789006"
+        clusterrole: admin
+
+    devteam7:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789007"
+        clusterrole: admin
+
+    devteam8:
+      rolebinding:
+      - name: "general"
+        groups:
+        - "cf805c30-f000-baar-foba-123456789006"
+        clusterrole: admin
