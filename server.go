@@ -49,7 +49,7 @@ func NewServer(pathList []string) *Server {
 		// Path displays the request path
 		Path: true,
 		// Query appends the url query to the Path.
-		Query: true,
+		Query: false,
 		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
 		// will be added to the logs.
 		MessageContextKeys: []string{"userIdentification"},
