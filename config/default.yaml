@@ -38,10 +38,7 @@ application:
   kubernetes:
     objectsPath: ./config/kubernetes
 
-    environments:
-    - name: dev
-      description: Development
-      template: "{env}-{app}"
+    environments: []
 
     namespace:
       filter:
@@ -78,179 +75,26 @@ settings:
   vault:
     url: {{env "AZURE_VAULT_URL" | toJson }}
 
-  user:
-  - name: SshPubKey
-    label: SSH Public Key
-    type: input
-    validation:
-      regexp: "^ssh-(rsa|dsa) .+"
-  team:
-  - name: AlertingSlackApi
-    label: Slack/Mattermost Integration URL
-    type: input
-    validation:
-      regexp: "^https://.+"
-  - name: AlertingPagerdutyApi
-    label: Pagerduty API key
-    type: input
+  user: []
+  team: []
 
 azure:
   resourcegroup:
     validation:
       regexp: "^(.+)-rg$"
 
-    tags:
-    - name: foobar
-      label: Tag Foobar
-      type: input
-      validation:
-        regexp: "^.+$"
-      tags:
-        service: "foobar"
-    - name: ttl
-      label: Auto delete (ttl)
-      type: input
-      format: timestamp
-      default: "31d"
-      tags:
-        service: "foobar"
-      transformation:
-        convert: "timestamp"
+    tags: []
+
 
 kubernetes:
-    namespace:
-      settings:
-      - name: foobar
-        k8stype: label
-        k8sname: example.com/foobar-l
-        label: Foobar
-        type: input
-        validation:
-          regexp: "^.+$"
-      - name: barfoo
-        k8stype: annotation
-        k8sname: janitor/ttl
-        label: Auto delete
-        description: TTL until namespace is deleted (eg. 6h, 7d, 31d, 2w)
-        type: input
-        default: "31d"
-        validation:
-          regexp: "^[0-9]+[hdw]$"
-          required: true
-      - name: servicemesh
-        k8stype: annotation
-        k8sname: sidecar.istio.io/inject
-        label: Enable ServiceMesh
-        type: checkbox
-        default: "true"
+  namespace:
+    settings: []
 
 permissions:
   default:
-    teams:
-    - devteam0
-    - devteam5
+    teams: []
 
-  user:
-    blascma:
-      teams:
-      - devteam1
-      - devteam2
-      - devteam3
+  user: {}
+  group: {}
+  team: {}
 
-    userfoo:
-      teams:
-      - devteam1
-      - devteam2
-      - devteam3
-
-  group:
-    "bargroup":
-      teams:
-      - devteam5
-      - devteam8
-
-    "foogroup":
-      teams:
-      - devteam6
-
-    "bazgroup":
-      teams:
-      - devteam7
-
-  team:
-    devteam0:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789000"
-        serviceaccounts:
-        - name: tiller
-          namespace: foobar
-        - name: tiller
-          namespace: foobar2
-        clusterrole: admin
-      azureroleassignment:
-      - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
-        role: contributor
-
-    devteam1:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789000"
-        clusterrole: admin
-
-    devteam2:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789002"
-        clusterrole: admin
-      - name: "view"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789004"
-        - "cf805c30-f000-baar-foba-123456789005"
-        - "cf805c30-f000-baar-foba-123456789006"
-        clusterrole: admin
-
-    devteam3:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789003"
-        clusterrole: admin
-
-    devteam4:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789004"
-        clusterrole: admin
-
-    devteam5:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789005"
-        clusterrole: admin
-
-    devteam6:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789006"
-        clusterrole: admin
-
-    devteam7:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789007"
-        clusterrole: admin
-
-    devteam8:
-      rolebinding:
-      - name: "general"
-        groups:
-        - "cf805c30-f000-baar-foba-123456789006"
-        clusterrole: admin
