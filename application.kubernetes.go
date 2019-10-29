@@ -10,10 +10,10 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/kataras/iris"
 	"github.com/prometheus/client_golang/prometheus"
-	v1 "k8s.io/api/core/v1"
-	v1Networking "k8s.io/api/networking/v1"
-	v1Rbac "k8s.io/api/rbac/v1"
-	"k8s.io/api/settings/v1alpha1"
+	coreV1 "k8s.io/api/core/v1"
+	networkingV1 "k8s.io/api/networking/v1"
+	rbacV1 "k8s.io/api/rbac/v1"
+	settingsV1alpha1 "k8s.io/api/settings/v1alpha1"
 	"regexp"
 	"strings"
 )
@@ -259,7 +259,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context) {
 	// set name label
 	labels[c.config.App.Kubernetes.Namespace.Labels.Name] = namespaceName
 
-	namespace := models.KubernetesNamespace{&v1.Namespace{}}
+	namespace := models.KubernetesNamespace{&coreV1.Namespace{}}
 	namespace.Name = namespaceName
 	namespace.SetLabels(labels)
 	namespace.SettingsApply(nsSettings, c.config.Kubernetes)
@@ -616,56 +616,56 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 
 	if kubeObjectList != nil {
 		for _, kubeObject := range kubeObjectList.ConfigMaps {
-			error = c.serviceKubernetes().NamespaceEnsureConfigMap(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ConfigMap))
+			error = c.serviceKubernetes().NamespaceEnsureConfigMap(namespace.Name, kubeObject.Name, kubeObject.Object.(*coreV1.ConfigMap))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.ServiceAccounts {
-			error = c.serviceKubernetes().NamespaceEnsureServiceAccount(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ServiceAccount))
+			error = c.serviceKubernetes().NamespaceEnsureServiceAccount(namespace.Name, kubeObject.Name, kubeObject.Object.(*coreV1.ServiceAccount))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.Roles {
-			error = c.serviceKubernetes().NamespaceEnsureRole(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.Role))
+			error = c.serviceKubernetes().NamespaceEnsureRole(namespace.Name, kubeObject.Name, kubeObject.Object.(*rbacV1.Role))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.RoleBindings {
-			error = c.serviceKubernetes().NamespaceEnsureRoleBindings(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.RoleBinding))
+			error = c.serviceKubernetes().NamespaceEnsureRoleBindings(namespace.Name, kubeObject.Name, kubeObject.Object.(*rbacV1.RoleBinding))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.NetworkPolicies {
-			error = c.serviceKubernetes().NamespaceEnsureNetworkPolicy(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Networking.NetworkPolicy))
+			error = c.serviceKubernetes().NamespaceEnsureNetworkPolicy(namespace.Name, kubeObject.Name, kubeObject.Object.(*networkingV1.NetworkPolicy))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.LimitRanges {
-			error = c.serviceKubernetes().NamespaceEnsureLimitRange(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.LimitRange))
+			error = c.serviceKubernetes().NamespaceEnsureLimitRange(namespace.Name, kubeObject.Name, kubeObject.Object.(*coreV1.LimitRange))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.PodPresets {
-			error = c.serviceKubernetes().NamespaceEnsurePodPreset(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1alpha1.PodPreset))
+			error = c.serviceKubernetes().NamespaceEnsurePodPreset(namespace.Name, kubeObject.Name, kubeObject.Object.(*settingsV1alpha1.PodPreset))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.ResourceQuotas {
-			error = c.serviceKubernetes().NamespaceEnsureResourceQuota(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ResourceQuota))
+			error = c.serviceKubernetes().NamespaceEnsureResourceQuota(namespace.Name, kubeObject.Name, kubeObject.Object.(*coreV1.ResourceQuota))
 			if error != nil {
 				return
 			}
