@@ -66,9 +66,9 @@ application:
         user: {{env "K8S_USER_NAMESPACEROLE" | default "admin" | toJson }}
         private: {{env "K8S_USER_NAMESPACEROLE_PRIVATE" |default "true" }}
 
-    quota:
-      user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | toJson }}
-      team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | toJson }}
+      quota:
+        user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
+        team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
 
 
 settings:
