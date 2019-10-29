@@ -112,8 +112,7 @@ func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context) {
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context) {
-	service := services.Kubernetes{}
-	nsList, err := service.NamespaceList()
+	nsList, err := c.serviceKubernetes().NamespaceList()
 	if err != nil {
 		c.respondError(ctx, errors.New("Unable to contact Kubernetes cluster"))
 		return
@@ -326,8 +325,6 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context) {
 		return
 	}
 
-	service := services.Kubernetes{}
-
 	// get namespace
 	namespace, err := c.getNamespace(ctx, namespaceName)
 	if err != nil {
@@ -340,7 +337,7 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context) {
 		return
 	}
 
-	if err := service.NamespaceDelete(namespace.Name); err != nil {
+	if err := c.serviceKubernetes().NamespaceDelete(namespace.Name); err != nil {
 		c.respondError(ctx, err)
 		return
 	}
@@ -363,8 +360,6 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context) {
 		c.respondError(ctx, errors.New("Invalid namespace"))
 		return
 	}
-
-	service := services.Kubernetes{}
 
 	formData := formdata.KubernetesNamespaceCreate{}
 	err := ctx.ReadJSON(&formData)
@@ -400,7 +395,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context) {
 	}
 
 	// update
-	if _, err := service.NamespaceUpdate(namespace.Namespace); err != nil {
+	if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 		c.respondError(ctx, errors.New(fmt.Sprintf("Update of namespace \"%s\" failed: %v", namespace.Name, err)))
 		return
 	}
@@ -459,7 +454,6 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context) {
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace) (*models.KubernetesNamespace, error) {
 	doUpdate := false
-	service := services.Kubernetes{}
 
 	// add env label
 	if _, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; !ok {
@@ -472,7 +466,7 @@ func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesName
 	}
 
 	if doUpdate {
-		if _, err := service.NamespaceUpdate(namespace.Namespace); err != nil {
+		if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 			return namespace, err
 		}
 	}
@@ -570,8 +564,6 @@ func (c *ApplicationKubernetes) updateNamespaceSettings(ctx iris.Context, namesp
 }
 
 func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Context, namespace *models.KubernetesNamespace) (error error) {
-	service := services.Kubernetes{}
-
 	if !c.kubernetesNamespaceAccessAllowed(ctx, *namespace) {
 		return errors.New(fmt.Sprintf("Namespace \"%s\" not owned by current user", namespace.Name))
 	}
@@ -584,7 +576,7 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 		if labelUserVal == username {
 			// User rolebinding
 			role := c.config.App.Kubernetes.Namespace.Role.User
-			if _, err := service.RoleBindingCreateNamespaceUser(namespace.Name, username, k8sUsername, role); err != nil {
+			if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceUser(namespace.Name, username, k8sUsername, role); err != nil {
 				return errors.New(fmt.Sprintf("Error: %v", err))
 			}
 		} else {
@@ -594,7 +586,7 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 		// Team rolebinding
 		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
 			for _, permission := range namespaceTeam.K8sPermissions {
-				if _, err := service.RoleBindingCreateNamespaceTeam(namespace.Name, labelTeamVal, permission); err != nil {
+				if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceTeam(namespace.Name, labelTeamVal, permission); err != nil {
 					return errors.New(fmt.Sprintf("Error: %v", err))
 				}
 			}
@@ -608,7 +600,6 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 
 func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.KubernetesNamespace) (error error) {
 	var kubeObjectList *models.KubernetesObjectList
-	service := services.Kubernetes{}
 
 	if environment, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; ok {
 		if configObjects, ok := c.config.App.Kubernetes.ObjectsList[environment]; ok {
@@ -625,56 +616,56 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 
 	if kubeObjectList != nil {
 		for _, kubeObject := range kubeObjectList.ConfigMaps {
-			error = service.NamespaceEnsureConfigMap(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ConfigMap))
+			error = c.serviceKubernetes().NamespaceEnsureConfigMap(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ConfigMap))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.ServiceAccounts {
-			error = service.NamespaceEnsureServiceAccount(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ServiceAccount))
+			error = c.serviceKubernetes().NamespaceEnsureServiceAccount(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ServiceAccount))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.Roles {
-			error = service.NamespaceEnsureRole(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.Role))
+			error = c.serviceKubernetes().NamespaceEnsureRole(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.Role))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.RoleBindings {
-			error = service.NamespaceEnsureRoleBindings(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.RoleBinding))
+			error = c.serviceKubernetes().NamespaceEnsureRoleBindings(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Rbac.RoleBinding))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.NetworkPolicies {
-			error = service.NamespaceEnsureNetworkPolicy(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Networking.NetworkPolicy))
+			error = c.serviceKubernetes().NamespaceEnsureNetworkPolicy(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1Networking.NetworkPolicy))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.LimitRanges {
-			error = service.NamespaceEnsureLimitRange(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.LimitRange))
+			error = c.serviceKubernetes().NamespaceEnsureLimitRange(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.LimitRange))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.PodPresets {
-			error = service.NamespaceEnsurePodPreset(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1alpha1.PodPreset))
+			error = c.serviceKubernetes().NamespaceEnsurePodPreset(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1alpha1.PodPreset))
 			if error != nil {
 				return
 			}
 		}
 
 		for _, kubeObject := range kubeObjectList.ResourceQuotas {
-			error = service.NamespaceEnsureResourceQuota(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ResourceQuota))
+			error = c.serviceKubernetes().NamespaceEnsureResourceQuota(namespace.Name, kubeObject.Name, kubeObject.Object.(*v1.ResourceQuota))
 			if error != nil {
 				return
 			}
@@ -695,8 +686,7 @@ func (c *ApplicationKubernetes) checkNamespaceTeamQuota(team string) (err error)
 
 	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.Team, regexp.QuoteMeta(team)))
 
-	service := services.Kubernetes{}
-	count, err = service.NamespaceCount(regexp)
+	count, err = c.serviceKubernetes().NamespaceCount(regexp)
 	if err != nil {
 		return
 	}
@@ -720,8 +710,7 @@ func (c *ApplicationKubernetes) checkNamespaceUserQuota(username string) (err er
 
 	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
 
-	service := services.Kubernetes{}
-	count, err = service.NamespaceCount(regexp)
+	count, err = c.serviceKubernetes().NamespaceCount(regexp)
 	if err != nil {
 		return
 	}
@@ -765,8 +754,7 @@ func (c *ApplicationKubernetes) getNamespace(ctx iris.Context, namespaceName str
 		return nil, errors.New("Invalid namespace")
 	}
 
-	service := services.Kubernetes{}
-	namespaceNative, err := service.NamespaceGet(namespaceName)
+	namespaceNative, err := c.serviceKubernetes().NamespaceGet(namespaceName)
 
 	if err != nil {
 		return nil, err
