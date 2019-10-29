@@ -26,10 +26,11 @@ var (
 )
 
 var opts struct {
-	Config      []string `long:"config" env:"CONFIG" description:"Path to config file" default:"./config/default.yaml"`
+	Config      []string `long:"config" env:"CONFIG" description:"Path to config file" default:"./config/default.yaml" env-delim:":"`
 	ServerBind  string `long:"server-bind" env:"SERVER_BIND" description:"Server address" default:":9000"`
 	MetricsBind string `long:"metrics-bind" env:"METRICS_BIND" description:"Server address" default:":9001"`
 	DumpConfig  bool   `long:"dump-config" description:"Dump config"`
+	Debug  bool   `long:"debug" description:"Enable debug mode"`
 }
 
 func main() {

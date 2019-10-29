@@ -49,7 +49,7 @@ func NewServer(pathList []string) *Server {
 		// Path displays the request path
 		Path: true,
 		// Query appends the url query to the Path.
-		Query: false,
+		Query: opts.Debug,
 		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
 		// will be added to the logs.
 		MessageContextKeys: []string{"userIdentification"},
@@ -293,9 +293,11 @@ func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
 	s := c.session.Start(ctx)
 	userJson := s.GetString("user")
 
-	if val := os.Getenv("DEBUG_SESSION_USER"); val != "" {
-		s.Set("user", "DEBUG_SESSION_USER")
-		userJson = val
+	if opts.Debug {
+		if val := os.Getenv("DEBUG_SESSION_USER"); val != "" {
+			s.Set("user", "DEBUG_SESSION_USER")
+			userJson = val
+		}
 	}
 
 	user, err = models.UserCreateFromJson(userJson, &c.config)
