@@ -396,10 +396,10 @@ class K8sNamespace extends BaseComponent {
                                     <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
                                     <td>
                                         {(() => {
-                                            switch (row.Status) {
-                                                case "Terminating":
+                                            switch (row.Status.toLowerCase()) {
+                                                case "terminating":
                                                     return <span className="badge badge-danger">{this.highlight(row.Status)}</span>;
-                                                case "Active":
+                                                case "active":
                                                     return <span className="badge badge-success">{this.highlight(row.Status)}</span>;
                                                 default:
                                                     return <span className="badge badge-warning">{this.highlight(row.Status)}</span>;
