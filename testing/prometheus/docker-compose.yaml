@@ -1,0 +1,32 @@
+version: '3.4'
+services:
+
+  ###########################
+  # PROMETHEUS
+  ###########################
+  prometheus:
+    image: prom/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention=600d"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.external-url=http://prometheus.admin.achenar.net"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./etc/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - ./etc/prometheus.alerts.yaml:/etc/prometheus/prometheus.alerts.yaml:ro
+
+  ###########################
+  # ALERTMANGER
+  ###########################
+  alertmanager:
+    image: prom/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./etc/alertmanager.yaml:/etc/alertmanager/alertmanager.yml:ro

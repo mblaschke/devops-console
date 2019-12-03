@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/kataras/iris"
+	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 	"math/rand"
 	"regexp"

@@ -1,11 +1,14 @@
 package main
 
-import "github.com/kataras/iris"
+import (
+	iris "github.com/kataras/iris/v12"
+)
 
 func (c *Server) initRoutes() {
 	c.logger.Infof(" - init app routes")
 
 	applicationKubernetes := ApplicationKubernetes{Server: c}
+	applicationAlertmanager := ApplicationAlertmanager{Server: c}
 	applicationAzure := ApplicationAzure{Server: c}
 	applicationSettings := ApplicationSettings{Server: c}
 	applicationGeneral := ApplicationGeneral{Server: c}
@@ -24,7 +27,7 @@ func (c *Server) initRoutes() {
 	c.app.Post("/api/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
 	c.app.Post("/api/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
 
-	c.app.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "Settings", "about.jet") })
+	c.app.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
 
 	c.app.Get("/kubernetes/cluster", func(ctx iris.Context) { c.react(ctx, "Kubernetes Cluster") })
 	c.app.Get("/api/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
@@ -36,10 +39,19 @@ func (c *Server) initRoutes() {
 	c.app.Put("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
 	c.app.Post("/api/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
 
+
 	c.app.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
 
 	c.app.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
 	c.app.Post("/api/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
+
+	c.app.Get("/alertmanager/alerts", func(ctx iris.Context) { c.react(ctx, "Alertmanager alerts") })
+	c.app.Get("/alertmanager/silences", func(ctx iris.Context) { c.react(ctx, "Alertmanager silences") })
+
+	c.app.Get("/api/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
+	c.app.Get("/api/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
+	c.app.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
+
 
 	c.logger.Infof(" - init static file handler")
 

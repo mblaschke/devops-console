@@ -1,10 +1,8 @@
 import React from 'react';
 import $ from 'jquery';
-import onClickOutside from 'react-onclickoutside'
 
 import BaseComponent from './BaseComponent';
 import Spinner from './Spinner';
-import Breadcrumb from './Breadcrumb';
 
 class GeneralStats extends BaseComponent {
     constructor(props) {

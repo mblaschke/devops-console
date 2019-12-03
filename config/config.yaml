@@ -180,3 +180,12 @@ permissions:
           groups:
             - "cf805c30-f000-baar-foba-123456789006"
           clusterrole: admin
+
+alertmanager:
+  instances:
+  - name: dev
+    url: http://localhost:9093/
+  - name: int
+    url: http://localhost:9093/
+  - name: prod
+    url: http://localhost:9093/

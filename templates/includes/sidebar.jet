@@ -24,6 +24,17 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-fw fa-folder"></i>
+          <span>Alertmanager</span>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+        {{yield navigationItem(title="Alerts", href="/alertmanager/alerts")}}
+        {{yield navigationItem(title="Silences", href="/alertmanager/silences")}}
+        </div>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-fw fa-folder"></i>
           <span>General</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">

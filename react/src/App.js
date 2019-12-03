@@ -4,6 +4,8 @@ import BaseComponent from './BaseComponent';
 import K8sCluster from './K8sCluster';
 import K8sNamespace from './K8sNamespace';
 import AzureResourceGroups from './AzureResourceGroups';
+import AlertmanagerAlerts from "./AlertmanagerAlerts";
+import AlertmanagerSilences from "./AlertmanagerSilences";
 import Settings from './Settings';
 import GeneralStats from './GeneralStats';
 import $ from "jquery";
@@ -224,9 +226,14 @@ class App extends BaseComponent {
                     <div className="globalmessages">{this.renderGlobalMessages()}</div>
                     <Route path="/kubernetes/cluster" component={K8sCluster} />
                     <Route path="/kubernetes/namespaces" component={K8sNamespace} />
+
+                    <Route path="/azure/resourcegroup" component={AzureResourceGroups} />
+
+                    <Route path="/alertmanager/alerts" component={AlertmanagerAlerts} />
+                    <Route path="/alertmanager/silences" component={AlertmanagerSilences} />
+
                     <Route path="/general/settings" component={Settings} />
                     <Route path="/general/about" component={GeneralStats} />
-                    <Route path="/azure/resourcegroup" component={AzureResourceGroups} />
                 </div>
             </Router>
         )

@@ -98,3 +98,4 @@ permissions:
   group: {}
   team: {}
 
+alertmanager: {}

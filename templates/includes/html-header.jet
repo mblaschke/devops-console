@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
     <link rel="shortcut icon" href="/static/img/favicon.png?ver={{appVersion}}">
-    <title>{{block title()}}{{end}} - /devops/console</title>
+    <title>{{block title()}}{{ isset(title) ? title : "" }}{{end}} - /devops/console</title>
     <link rel="stylesheet" href="/static/dist/sb-admin/sb-admin.css?ver={{appVersion}}">
     <link rel="stylesheet" href="/static/dist/sb-admin/fontawesome.css?ver={{appVersion}}">
     <link rel="stylesheet" href="/static/css/app.css?ver={{appVersion}}">

@@ -1,7 +1,4 @@
 {{extends "layouts/application.jet"}}
-{{import "includes/blocks.jet"}}
-
-{{block title()}}{{if isset(title) && title}}{{title}}{{end}}{{end}}
 
 {{block documentBody()}}
 <div id="root"></div>

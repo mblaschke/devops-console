@@ -1,0 +1,19 @@
+groups:
+
+  #############################
+  # Probe
+  #############################
+
+  - name: test
+    rules:
+      - alert: Test alert
+        expr: |-
+          vector(0)
+        for: 1s
+        labels:
+          severity: warning
+          type: probe
+          team: devteam1
+        annotations:
+          summary: "Failed probe:"
+          description: "{{ $labels.job }}: {{ $labels.instance }} failed"

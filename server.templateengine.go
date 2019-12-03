@@ -2,7 +2,7 @@ package main
 
 import (
 	azureSdkVersion "github.com/Azure/azure-sdk-for-go/version"
-	"github.com/kataras/iris"
+	iris "github.com/kataras/iris/v12"
 	"runtime"
 )
 

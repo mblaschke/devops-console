@@ -3,7 +3,7 @@ package main
 import (
 	"devops-console/models/response"
 	"github.com/dustin/go-humanize"
-	"github.com/kataras/iris"
+	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 	"runtime"
 	"time"
@@ -84,6 +84,12 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context) {
 
 	// kubernetes
 	ret.Kubernetes = c.config.Kubernetes
+
+	// Alertmanager
+	ret.Alertmanager.Instances = []string{}
+	for _, alertmanagerInstance := range c.config.Alertmanager.Instances {
+		ret.Alertmanager.Instances = append(ret.Alertmanager.Instances, alertmanagerInstance.Name)
+	}
 
 	ctx.JSON(ret)
 }
