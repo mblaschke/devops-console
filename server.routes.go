@@ -45,12 +45,13 @@ func (c *Server) initRoutes() {
 	c.app.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
 	c.app.Post("/api/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
 
-	c.app.Get("/alertmanager/alerts", func(ctx iris.Context) { c.react(ctx, "Alertmanager alerts") })
-	c.app.Get("/alertmanager/silences", func(ctx iris.Context) { c.react(ctx, "Alertmanager silences") })
+	c.app.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
 
 	c.app.Get("/api/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
 	c.app.Get("/api/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
 	c.app.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
+	c.app.Post("/api/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
+	c.app.Put("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
 
 
 	c.logger.Infof(" - init static file handler")

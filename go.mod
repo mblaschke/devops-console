@@ -63,7 +63,7 @@ require (
 	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9 // indirect
 	github.com/karrick/tparse/v2 v2.7.1
 	github.com/kataras/iris/v12 v12.0.1
-	github.com/klauspost/compress v1.9.3 // indirect
+	github.com/klauspost/compress v1.9.4 // indirect
 	github.com/marstr/goalias v0.0.0-20180416201319-8dff9a14db64 // indirect
 	github.com/marstr/guid v1.1.0 // indirect
 	github.com/marstr/randname v0.0.0-20181206212954-d5b0f288ab8c // indirect
@@ -98,9 +98,9 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.mongodb.org/mongo-driver v1.1.3 // indirect
 	golang.org/x/crypto v0.0.0-20191202143827-86a70503ff7e // indirect
-	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
+	golang.org/x/net v0.0.0-20191204025024-5ee1b9f4859a // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9 // indirect
+	golang.org/x/sys v0.0.0-20191204072324-ce4227a45e2e // indirect
 	golang.org/x/tools v0.0.0-20191202203127-2b6af5f9ace7 // indirect
 	google.golang.org/grpc v1.22.1 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect

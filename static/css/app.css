@@ -354,3 +354,10 @@ table.table thead th {
     90% { transform: skewX(0deg); }
     100% { transform: skewX(0deg); }
 }
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 650px;
+        margin: 1.75rem auto;
+    }
+}
