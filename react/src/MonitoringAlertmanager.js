@@ -318,6 +318,30 @@ class MonitoringAlertmanager extends BaseComponent {
         return ret;
     }
 
+    buildFooter(rows) {
+        let statsList = {};
+        // collect
+        rows.map((row) => {
+            if (!statsList[row.status.state]) {
+                statsList[row.status.state] = 0;
+            }
+
+            statsList[row.status.state]++;
+        });
+
+        // to text
+        let footerElements = [];
+        for (var i in statsList) {
+            footerElements.push(`${i}: ${statsList[i]}`)
+        }
+
+        let footerLine = footerElements.join(", ");
+
+        return (
+            <span>{footerLine}</span>
+        )
+    }
+
     transformTime(time) {
         return (
             <span>
@@ -338,7 +362,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         let self = this;
         let alerts = this.getAlertList();
-        let silcenes = this.getSilenceList();
+        let silences = this.getSilenceList();
         let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
 
         return (
@@ -421,7 +445,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             </tbody>
                         </table>
                     </div>
-                    <div className="card-footer small text-muted"></div>
+                    <div className="card-footer small text-muted">{this.buildFooter(alerts)}</div>
                 </div>
 
                 <div className="card mb-3">
@@ -473,7 +497,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             </tr>
                             </thead>
                             <tbody>
-                            {silcenes.map((row) =>
+                            {silences.map((row) =>
                                 <tr>
                                     <td>
                                         {this.highlight(row.comment)}
@@ -521,7 +545,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             </tbody>
                         </table>
                     </div>
-                    <div className="card-footer small text-muted"></div>
+                    <div className="card-footer small text-muted">{this.buildFooter(silences)}</div>
                 </div>
 
                 <MonitoringAlertmanagerModalSilenceDelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
