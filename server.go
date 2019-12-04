@@ -243,6 +243,7 @@ func (c *Server) before(ctx iris.Context) {
 	ctx.Header("X-Frame-Options", "SAMEORIGIN")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
+	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")
 
 	// view information
 	ctx.ViewData("navigationRoute", ctx.GetCurrentRoute().Path())

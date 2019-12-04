@@ -1,5 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
+import moment from 'moment';
 
 import BaseComponent from './BaseComponent';
 import Spinner from './Spinner';
@@ -317,6 +318,15 @@ class MonitoringAlertmanager extends BaseComponent {
         return ret;
     }
 
+    transformTime(time) {
+        return (
+            <span>
+                {moment(time, moment.ISO_8601).fromNow()}<br/>
+                <small>{this.highlight(time)}</small>
+            </span>
+        )
+    }
+
     render() {
         if (this.state.isStartup) {
             return (
@@ -354,6 +364,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                 <col width="200rem"/>
                                 <col width="200rem"/>
                                 <col width="200rem"/>
+                                <col width="200rem"/>
                                 <col width="80rem"/>
                             </colgroup>
                             <thead>
@@ -361,7 +372,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                 <th>Alert</th>
                                 <th>Labels</th>
                                 <th>Started</th>
-                                <th>Updated</th>
+                                <th>Last update</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -371,7 +382,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                 <tr>
                                     <td>
                                         <strong>{this.highlight(row.annotations.summary)}</strong><br />
-                                        {this.highlight(row.annotations.description)}
+                                        <small>{this.highlight(row.annotations.description)}</small>
                                     </td>
                                     <td>
                                         {Object.entries(row.labels).map((item) =>
@@ -381,17 +392,13 @@ class MonitoringAlertmanager extends BaseComponent {
                                             </span>
                                         )}
                                     </td>
-                                    <td>
-                                        {this.highlight(row.startsAt)}
-                                    </td>
-                                    <td>
-                                        {this.highlight(row.updatedAt)}
-                                    </td>
+                                    <td>{this.transformTime(row.startsAt)}</td>
+                                    <td>{this.transformTime(row.updatedAt)}</td>
                                     <td>
                                         {(() => {
                                             switch (row.status.state) {
                                                 case "active":
-                                                    return <span className="badge badge-danger">{this.highlight(row.status.state)}</span>
+                                                    return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
                                                 case "suppressed":
                                                     return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
                                                 default:
@@ -447,15 +454,16 @@ class MonitoringAlertmanager extends BaseComponent {
                                 <col width="200rem"/>
                                 <col width="200rem"/>
                                 <col width="200rem"/>
+                                <col width="100rem"/>
+                                <col width="100rem"/>
                                 <col width="80rem"/>
                             </colgroup>
                             <thead>
                             <tr>
                                 <th>Alert</th>
                                 <th>Matchers</th>
-                                <th>Creator</th>
-                                <th>Started</th>
-                                <th>Ends at</th>
+                                <th>From</th>
+                                <th>Until</th>
                                 <th></th>
                                 <th className="toolbox">
                                     <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
@@ -467,7 +475,11 @@ class MonitoringAlertmanager extends BaseComponent {
                             <tbody>
                             {silcenes.map((row) =>
                                 <tr>
-                                    <td>{this.highlight(row.comment)}</td>
+                                    <td>
+                                        {this.highlight(row.comment)}
+                                        <br/>
+                                        <i><small>created: {this.highlight(row.createdBy)}</small></i>
+                                    </td>
                                     <td>
                                         {row.matchers.map((item) =>
                                             <span>
@@ -476,14 +488,13 @@ class MonitoringAlertmanager extends BaseComponent {
                                             </span>
                                         )}
                                     </td>
-                                    <td>{this.highlight(row.createdBy)}</td>
-                                    <td>{this.highlight(row.startsAt)}</td>
-                                    <td>{this.highlight(row.endsAt)}</td>
+                                    <td>{this.transformTime(row.startsAt)}</td>
+                                    <td>{this.transformTime(row.endsAt)}</td>
                                     <td>
                                         {(() => {
                                             switch (row.status.state) {
                                                 case "active":
-                                                    return <span className="badge success">{this.highlight(row.status.state)}</span>
+                                                    return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
                                                 case "expired":
                                                     return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
                                                 default:
