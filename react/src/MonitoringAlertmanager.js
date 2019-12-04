@@ -6,6 +6,7 @@ import Spinner from './Spinner';
 import Breadcrumb from './Breadcrumb';
 import MonitoringAlertmanagerModalSilenceDelete from "./MonitoringAlertmanagerModalSilenceDelete";
 import MonitoringAlertmanagerModalSilenceEdit from "./MonitoringAlertmanagerModalSilenceEdit";
+import * as utils from "./utils";
 
 class MonitoringAlertmanager extends BaseComponent {
     constructor(props) {
@@ -13,8 +14,6 @@ class MonitoringAlertmanager extends BaseComponent {
 
         this.state = {
             isStartup: true,
-            alerts: [],
-            silences: [],
             config: {
                 User: {
                     Username: '',
@@ -23,6 +22,13 @@ class MonitoringAlertmanager extends BaseComponent {
                 Alertmanager: {
                     Instances: []
                 },
+            },
+            alerts: [],
+            silences: [],
+            filter: {
+                silence: {
+                    expired: false
+                }
             },
             instance: "",
             selectedSilence: false,
@@ -251,11 +257,63 @@ class MonitoringAlertmanager extends BaseComponent {
 
     getAlertList() {
         let ret = this.state.alerts ? this.state.alerts : [];
+
+        if (this.state.searchValue !== "") {
+            let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+            let re = new RegExp(term, "i");
+
+            ret = ret.filter((row) => {
+                if (row.annotations.summary.search(re) !== -1) return true;
+                if (row.annotations.description.search(re) !== -1) return true;
+                if (row.startsAt.search(re) !== -1) return true;
+                if (row.updatedAt.search(re) !== -1) return true;
+                if (row.status.state.search(re) !== -1) return true;
+
+                if (row.labels) {
+                    for(var i in row.labels) {
+                        if (row.labels[i].search(re) !== -1) return true;
+                    }
+                }
+
+
+                return false;
+            });
+        }
+
         return ret;
     }
 
     getSilenceList() {
         let ret = this.state.silences ? this.state.silences : [];
+
+        if (this.state.searchValue !== "") {
+            let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+            let re = new RegExp(term, "i");
+
+            ret = ret.filter((row) => {
+                if (row.comment.search(re) !== -1) return true;
+                if (row.createdBy.search(re) !== -1) return true;
+                if (row.startsAt.search(re) !== -1) return true;
+                if (row.endsAt.search(re) !== -1) return true;
+                if (row.status.state.search(re) !== -1) return true;
+
+                if (row.matchers) {
+                    for(var i in row.matchers) {
+                        if (row.matchers[i].value.search(re) !== -1) return true;
+                    }
+                }
+
+                return false;
+            });
+        }
+
+        if (!this.state.filter.silence.expired) {
+            ret = ret.filter((row) => {
+                if (row.status.state !== "expired") return true;
+                return false;
+            });
+        }
+
         return ret;
     }
 
@@ -312,30 +370,32 @@ class MonitoringAlertmanager extends BaseComponent {
                             {alerts.map((row) =>
                                 <tr>
                                     <td>
-                                        <strong>{row.annotations.summary}</strong><br />
-                                        {row.annotations.description}
+                                        <strong>{this.highlight(row.annotations.summary)}</strong><br />
+                                        {this.highlight(row.annotations.description)}
                                     </td>
                                     <td>
                                         {Object.entries(row.labels).map((item) =>
                                             <span>
-                                                <span className="badge badge-secondary">{item[0]}: {item[1]}</span>
+                                                <span className="badge badge-secondary">{item[0]}: {this.highlight(item[1])}</span>
                                                 <br />
                                             </span>
                                         )}
                                     </td>
                                     <td>
-                                        {row.startsAt}
+                                        {this.highlight(row.startsAt)}
                                     </td>
                                     <td>
-                                        {row.updatedAt}
+                                        {this.highlight(row.updatedAt)}
                                     </td>
                                     <td>
                                         {(() => {
                                             switch (row.status.state) {
                                                 case "active":
-                                                    return <span className="badge badge-danger">active</span>
+                                                    return <span className="badge badge-danger">{this.highlight(row.status.state)}</span>
                                                 case "suppressed":
-                                                    return <span className="badge badge-warning">suppressed</span>
+                                                    return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                                default:
+                                                    return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
                                             }
                                         })()}
                                     </td>
@@ -362,11 +422,22 @@ class MonitoringAlertmanager extends BaseComponent {
                         <i className="fas fa-bell-slash"></i>
                         Silences
                         <div className="toolbox">
-                            <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
-                                {instances.map((row) =>
-                                    <option key={row} value={row}>{row}</option>
-                                )}
-                            </select>
+                            <div className="form-group row">
+                                <div className="col">
+                                    <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
+                                           checked={this.getValueCheckbox("filter.silence.expired")}
+                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
+                                    <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
+                                </div>
+
+                                <div className="col">
+                                    <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
+                                        {instances.map((row) =>
+                                            <option key={row} value={row}>{row}</option>
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="card-body">
@@ -396,25 +467,27 @@ class MonitoringAlertmanager extends BaseComponent {
                             <tbody>
                             {silcenes.map((row) =>
                                 <tr>
-                                    <td>{row.comment}</td>
+                                    <td>{this.highlight(row.comment)}</td>
                                     <td>
                                         {row.matchers.map((item) =>
                                             <span>
-                                                <span className="badge badge-secondary">{item.name}: {item.value}</span>
+                                                <span className="badge badge-secondary">{item.name}: {this.highlight(item.value)}</span>
                                                 <br />
                                             </span>
                                         )}
                                     </td>
-                                    <td>{row.createdBy}</td>
-                                    <td>{row.startsAt}</td>
-                                    <td>{row.endsAt}</td>
+                                    <td>{this.highlight(row.createdBy)}</td>
+                                    <td>{this.highlight(row.startsAt)}</td>
+                                    <td>{this.highlight(row.endsAt)}</td>
                                     <td>
                                         {(() => {
                                             switch (row.status.state) {
                                                 case "active":
-                                                    return <span className="badge success">active</span>
+                                                    return <span className="badge success">{this.highlight(row.status.state)}</span>
                                                 case "expired":
-                                                    return <span className="badge badge-warning">expired</span>
+                                                    return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                                default:
+                                                    return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
                                             }
                                         })()}
                                     </td>

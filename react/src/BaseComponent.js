@@ -1,6 +1,8 @@
 import React from 'react';
 import { Component } from 'react';
 import $ from 'jquery';
+import * as utils from "./utils";
+import _ from 'lodash';
 
 class BaseComponent extends Component {
 
@@ -61,5 +63,35 @@ class BaseComponent extends Component {
         }
     }
 
+    getValue(field) {
+        return _.get(this.state, field);
+    }
+
+    setValue(field, event) {
+        let value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
+
+        var state = this.state;
+        _.set(state, field, value);
+        this.setState(state);
+    }
+
+    getValueCheckbox(field) {
+        return utils.translateValueToCheckbox(_.get(this.state, field));
+    }
+
+    setValueCheckbox(field, event) {
+        let value = event.target.type === 'checkbox' ? event.target.checked : String(event.target.value);
+
+        var state = this.state;
+        _.set(state, field, value);
+        this.setState(state);
+    }
+
+    handleSearchChange(event) {
+        this.setState({
+            searchValue: event.target.value
+        });
+    }
 }
+
 export default BaseComponent;

@@ -177,30 +177,6 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         }
     }
 
-    getValue(field) {
-        return _.get(this.state, field);
-    }
-
-    setValue(field, event) {
-        let value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
-
-        var state = this.state;
-        _.set(state, field, value);
-        this.setState(state);
-    }
-
-    getValueCheckbox(field) {
-        return utils.translateValueToCheckbox(_.get(this.state.silence, field));
-    }
-
-    setValueCheckbox(field, event) {
-        let value = event.target.type === 'checkbox' ? event.target.checked : String(event.target.value);
-
-        var state = this.state;
-        _.set(state.silence, field, value);
-        this.setState(state);
-    }
-
     deleteMatcher(num) {
         var state = this.state;
         state.silence.matchers.splice(num, 1 );

@@ -215,12 +215,6 @@ class K8sNamespace extends BaseComponent {
         }, 200);
     }
 
-    handleSearchChange(event) {
-        this.setState({
-            searchValue: event.target.value
-        });
-    }
-
     handleDescriptionEditClose() {
         this.setState({
             namespaceDescriptionEdit: false,
