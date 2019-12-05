@@ -411,7 +411,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                     <td>
                                         {Object.entries(row.labels).map((item) =>
                                             <span>
-                                                <span className="badge badge-secondary">{item[0]}: {this.highlight(item[1])}</span>
+                                                <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
                                                 <br />
                                             </span>
                                         )}
@@ -454,11 +454,13 @@ class MonitoringAlertmanager extends BaseComponent {
                         Silences
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col">
-                                    <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
-                                           checked={this.getValueCheckbox("filter.silence.expired")}
-                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
-                                    <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
+                                <div className="form-group col">
+                                    <div className="form-check">
+                                        <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
+                                               checked={this.getValueCheckbox("filter.silence.expired")}
+                                               onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
+                                        <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
+                                    </div>
                                 </div>
 
                                 <div className="col">
@@ -507,7 +509,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                     <td>
                                         {row.matchers.map((item) =>
                                             <span>
-                                                <span className="badge badge-secondary">{item.name}: {this.highlight(item.value)}</span>
+                                                <span className="badge badge-secondary">{item.name}={this.highlight(item.value)}</span>
                                                 <br />
                                             </span>
                                         )}
