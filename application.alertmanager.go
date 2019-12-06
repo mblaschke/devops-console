@@ -36,9 +36,9 @@ func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context) {
 	params := alert.NewGetAlertsParams()
 	params.SetFilter(filter)
 	alerts, err := client.Alert.GetAlerts(params)
-
 	if err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	alerts = c.filterAlerts(ctx, alerts)
@@ -54,9 +54,9 @@ func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context) {
 	params := silence.NewGetSilencesParams()
 	params.SetFilter(filter)
 	silences, err := client.Silence.GetSilences(params)
-
 	if err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	silences = c.filterSilences(ctx, silences)
@@ -73,16 +73,19 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context) {
 	silenceResp, err := client.Silence.GetSilence(getParams)
 	if err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	if !c.checkSilenceAccess(ctx, user,  silenceResp.Payload) {
 		c.respondError(ctx, errors.New("Access to silence denied"))
+		return
 	}
 
 	deleteParams := silence.NewDeleteSilenceParams()
 	deleteParams.SilenceID = strfmt.UUID(*silenceResp.Payload.ID)
 	if _, err := client.Silence.DeleteSilence(deleteParams); err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	ctx.JSON("true")
@@ -97,10 +100,12 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context) {
 	silenceResp, err := client.Silence.GetSilence(getParams)
 	if err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	if !c.checkSilenceAccess(ctx, user,  silenceResp.Payload) {
 		c.respondError(ctx, errors.New("Access to silence denied"))
+		return
 	}
 
 	formData := c.getSilenceFormData(ctx)
@@ -112,6 +117,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context) {
 	}
 	if _, err := client.Silence.PostSilences(postParams); err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	ctx.JSON("true")
@@ -132,14 +138,24 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context) {
 	}
 	if _, err := client.Silence.PostSilences(postParams); err != nil {
 		c.respondError(ctx, err)
+		return
 	}
 
 	ctx.JSON("true")
 }
 
 func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata.AlertmanagerForm {
+	var err error
+
 	formData := &formdata.AlertmanagerForm{}
 	if err := ctx.ReadJSON(&formData); err != nil {
+		c.respondError(ctx, err)
+		return nil
+	}
+
+	// validate
+	formData, err = formData.Validate()
+	if err != nil {
 		c.respondError(ctx, err)
 		return nil
 	}

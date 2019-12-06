@@ -331,8 +331,11 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                         </colgroup>
                                         <thead>
                                             <tr>
-                                                <th>Match</th>
-                                                <th>Filter</th>
+                                                <th colspan="4">Matchers <small>(Alerts affected by this silence)</small></th>
+                                            </tr>
+                                            <tr>
+                                                <th>Label</th>
+                                                <th>Value</th>
                                                 <th></th>
                                                 <th>
                                                     <button type="button" className="btn btn-secondary btn-sm" onClick={this.addMatcher.bind(this)}>
