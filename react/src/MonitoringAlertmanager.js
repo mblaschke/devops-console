@@ -503,12 +503,13 @@ class MonitoringAlertmanager extends BaseComponent {
                                 <small>{this.highlight(row.annotations.description)}</small>
                             </td>
                             <td>
+                                <ul className="alertmanager-label">
                                 {Object.entries(row.labels).map((item) =>
-                                    <span>
-                                                    <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
-                                                    <br />
-                                                </span>
+                                        <li>
+                                            <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                        </li>
                                 )}
+                                </ul>
                             </td>
                             <td>{this.transformTime(row.startsAt)}</td>
                             <td>{this.transformTime(row.updatedAt)}</td>

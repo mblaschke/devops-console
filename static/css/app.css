@@ -36,7 +36,8 @@ dt a {
     font-weight: normal;
 }
 
-.alertmanager-matcher {
+.alertmanager-matcher,
+alertmanager-label {
     list-style: none;
     padding: 0;
     margin: 0;
