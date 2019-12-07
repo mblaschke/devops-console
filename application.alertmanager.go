@@ -18,8 +18,6 @@ type ApplicationAlertmanager struct {
 }
 
 func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *alertmanager.Alertmanager {
-	// todo: check access
-
 	client, err := c.config.Alertmanager.GetAlertmanagerInstance(name)
 	if err != nil {
 		c.respondError(ctx, err)

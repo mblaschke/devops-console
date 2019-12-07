@@ -26,9 +26,14 @@ class MonitoringAlertmanager extends BaseComponent {
             },
             alerts: [],
             silences: [],
+            loadingAlerts: true,
+            loadingSilences: true,
             filter: {
                 silence: {
                     expired: false
+                },
+                alert: {
+                    suppressed: true
                 }
             },
             instance: "",
@@ -51,6 +56,11 @@ class MonitoringAlertmanager extends BaseComponent {
             return
         }
 
+        this.setState({
+            loadingAlerts: true,
+        });
+
+
         let jqxhr = $.get({
             url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/alerts/'
         }).done((jqxhr) => {
@@ -60,7 +70,8 @@ class MonitoringAlertmanager extends BaseComponent {
 
             this.setState({
                 alerts: jqxhr,
-                isStartup: false
+                isStartup: false,
+                loadingAlerts: false,
             });
         });
 
@@ -72,6 +83,10 @@ class MonitoringAlertmanager extends BaseComponent {
             return
         }
 
+        this.setState({
+            loadingSilences: true,
+        });
+
         let jqxhr = $.get({
             url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/silences/'
         }).done((jqxhr) => {
@@ -81,7 +96,8 @@ class MonitoringAlertmanager extends BaseComponent {
 
             this.setState({
                 silences: jqxhr,
-                isStartup: false
+                isStartup: false,
+                loadingSilences: false,
             });
         });
 
@@ -163,7 +179,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         this.refreshHandler = setTimeout(() =>{
             this.refresh();
-        }, 10000);
+        }, 15000);
     }
 
     handleInstanceChange(event) {
@@ -281,6 +297,13 @@ class MonitoringAlertmanager extends BaseComponent {
             });
         }
 
+        if (!this.state.filter.alert.suppressed) {
+            ret = ret.filter((row) => {
+                if (row.status.state !== "suppressed") return true;
+                return false;
+            });
+        }
+
         return ret;
     }
 
@@ -351,6 +374,18 @@ class MonitoringAlertmanager extends BaseComponent {
         )
     }
 
+    renderMatch(matcher) {
+        if (matcher.isRegexp) {
+            return (
+                <li><span className="badge badge-secondary">{matcher.name}=~{this.highlight(matcher.value)}</span></li>
+            )
+        } else {
+            return (
+               <li><span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span></li>
+            )
+        }
+    }
+
     render() {
         if (this.state.isStartup) {
             return (
@@ -360,9 +395,6 @@ class MonitoringAlertmanager extends BaseComponent {
             )
         }
 
-        let self = this;
-        let alerts = this.getAlertList();
-        let silences = this.getSilenceList();
         let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
 
         return (
@@ -374,78 +406,30 @@ class MonitoringAlertmanager extends BaseComponent {
                         <i className="fas fa-bell"></i>
                         Alerts
                         <div className="toolbox">
-                            <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
-                                {instances.map((row) =>
-                                    <option key={row} value={row}>{row}</option>
-                                )}
-                            </select>
+                            <div className="form-group row">
+                                <div className="form-inline col">
+                                    <div className="form-check">
+                                        <input type="checkbox" className="form-check-input" id="alertFilterSuppressed"
+                                               checked={this.getValueCheckbox("filter.alert.suppressed")}
+                                               onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")}/>
+                                        <label className="form-check-label" htmlFor="alertFilterSuppressed">Suppressed</label>
+                                    </div>
+                                </div>
+
+                                <div className="col">
+                                    <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
+                                        {instances.map((row) =>
+                                            <option key={row} value={row}>{row}</option>
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="card-body">
-                        <table className="table table-hover table-sm">
-                            <colgroup>
-                                <col width="*"/>
-                                <col width="200rem"/>
-                                <col width="200rem"/>
-                                <col width="200rem"/>
-                                <col width="200rem"/>
-                                <col width="80rem"/>
-                            </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Alert</th>
-                                <th>Labels</th>
-                                <th>Started</th>
-                                <th>Last update</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {alerts.map((row) =>
-                                <tr>
-                                    <td>
-                                        <strong>{this.highlight(row.annotations.summary)}</strong><br />
-                                        <small>{this.highlight(row.annotations.description)}</small>
-                                    </td>
-                                    <td>
-                                        {Object.entries(row.labels).map((item) =>
-                                            <span>
-                                                <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
-                                                <br />
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td>{this.transformTime(row.startsAt)}</td>
-                                    <td>{this.transformTime(row.updatedAt)}</td>
-                                    <td>
-                                        {(() => {
-                                            switch (row.status.state) {
-                                                case "active":
-                                                    return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
-                                                case "suppressed":
-                                                    return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                                default:
-                                                    return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                            }
-                                        })()}
-                                    </td>
-                                    <td className="toolbox">
-                                        {(() => {
-                                            switch (row.status.state) {
-                                                case "active":
-                                                    return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
-                                                                Silence
-                                                            </button>
-                                            }
-                                        })()}
-                                    </td>
-                                </tr>
-                            )}
-                            </tbody>
-                        </table>
+                    <div className="card-body scrollable spinner-area">
+                        {this.renderAlerts()}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(alerts)}</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(this.state.alerts)}</div>
                 </div>
 
                 <div className="card mb-3">
@@ -454,7 +438,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Silences
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="form-group col">
+                                <div className="form-inline col">
                                     <div className="form-check">
                                         <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
                                                checked={this.getValueCheckbox("filter.silence.expired")}
@@ -473,87 +457,169 @@ class MonitoringAlertmanager extends BaseComponent {
                             </div>
                         </div>
                     </div>
-                    <div className="card-body">
-                        <table className="table table-hover table-sm">
-                            <colgroup>
-                                <col width="*"/>
-                                <col width="200rem"/>
-                                <col width="200rem"/>
-                                <col width="200rem"/>
-                                <col width="100rem"/>
-                                <col width="100rem"/>
-                                <col width="80rem"/>
-                            </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Alert</th>
-                                <th>Matchers</th>
-                                <th>From</th>
-                                <th>Until</th>
-                                <th></th>
-                                <th className="toolbox">
-                                    <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
-                                        <i className="fas fa-plus"></i>
-                                    </button>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {silences.map((row) =>
-                                <tr>
-                                    <td>
-                                        {this.highlight(row.comment)}
-                                        <br/>
-                                        <i><small>created: {this.highlight(row.createdBy)}</small></i>
-                                    </td>
-                                    <td>
-                                        {row.matchers.map((item) =>
-                                            <span>
-                                                <span className="badge badge-secondary">{item.name}={this.highlight(item.value)}</span>
-                                                <br />
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td>{this.transformTime(row.startsAt)}</td>
-                                    <td>{this.transformTime(row.endsAt)}</td>
-                                    <td>
-                                        {(() => {
-                                            switch (row.status.state) {
-                                                case "active":
-                                                    return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
-                                                case "expired":
-                                                    return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                                default:
-                                                    return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                            }
-                                        })()}
-                                    </td>
-                                    <td className="toolbox">
-                                        <div className="btn-group" role="group">
-                                            <button id="btnGroupDrop1" type="button"
-                                                    className="btn btn-secondary dropdown-toggle"
-                                                    data-toggle="dropdown" aria-haspopup="true"
-                                                    aria-expanded="false">
-                                                Action
-                                            </button>
-                                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                <a className="dropdown-item" onClick={self.silenceEdit.bind(self, row)}>Edit</a>
-                                                <a className="dropdown-item" onClick={self.silenceDelete.bind(self, row)}>Delete</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                            </tbody>
-                        </table>
+                    <div className="card-body scrollable spinner-area">
+                        {this.renderSilences()}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(silences)}</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(this.state.silences)}</div>
                 </div>
 
                 <MonitoringAlertmanagerModalSilenceDelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
                 <MonitoringAlertmanagerModalSilenceEdit instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceEdit.bind(this)} />
             </div>
         );
+    }
+
+    renderAlerts() {
+        let alerts = this.getAlertList();
+
+        return (
+            <div>
+                <Spinner active={this.state.loadingAlerts}/>
+
+                <table className="table table-hover table-sm">
+                    <colgroup>
+                        <col width="*"/>
+                        <col width="200rem"/>
+                        <col width="200rem"/>
+                        <col width="200rem"/>
+                        <col width="200rem"/>
+                        <col width="80rem"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Alert</th>
+                        <th>Labels</th>
+                        <th>Started</th>
+                        <th>Last update</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {alerts.map((row) =>
+                        <tr>
+                            <td>
+                                <strong>{this.highlight(row.annotations.summary)}</strong><br />
+                                <small>{this.highlight(row.annotations.description)}</small>
+                            </td>
+                            <td>
+                                {Object.entries(row.labels).map((item) =>
+                                    <span>
+                                                    <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                                    <br />
+                                                </span>
+                                )}
+                            </td>
+                            <td>{this.transformTime(row.startsAt)}</td>
+                            <td>{this.transformTime(row.updatedAt)}</td>
+                            <td>
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
+                                        case "suppressed":
+                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                        default:
+                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                    }
+                                })()}
+                            </td>
+                            <td className="toolbox">
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
+                                                Silence
+                                            </button>
+                                    }
+                                })()}
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    renderSilences() {
+        let silences = this.getSilenceList();
+
+        return (
+            <div>
+                <Spinner active={this.state.loadingSilences}/>
+
+                <table className="table table-hover table-sm">
+                    <colgroup>
+                        <col width="*"/>
+                        <col width="200rem"/>
+                        <col width="200rem"/>
+                        <col width="200rem"/>
+                        <col width="100rem"/>
+                        <col width="100rem"/>
+                        <col width="80rem"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Alert</th>
+                        <th>Matchers</th>
+                        <th>From</th>
+                        <th>Until</th>
+                        <th></th>
+                        <th className="toolbox">
+                            <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
+                                <i className="fas fa-plus"></i>
+                            </button>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {silences.map((row) =>
+                        <tr>
+                            <td>
+                                {this.highlight(row.comment)}
+                                <br/>
+                                <i><small>created: {this.highlight(row.createdBy)}</small></i>
+                            </td>
+                            <td>
+                                {row.matchers.map((item) =>
+                                    <ul className="alertmanager-matcher">{this.renderMatch(item)}</ul>
+                                )}
+                            </td>
+                            <td>{this.transformTime(row.startsAt)}</td>
+                            <td>{this.transformTime(row.endsAt)}</td>
+                            <td>
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
+                                        case "expired":
+                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                        default:
+                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                    }
+                                })()}
+                            </td>
+                            <td className="toolbox">
+                                <div className="btn-group" role="group">
+                                    <button id="btnGroupDrop1" type="button"
+                                            className="btn btn-secondary dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                        <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
+        )
     }
 }
 
