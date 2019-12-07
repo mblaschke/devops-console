@@ -81,6 +81,7 @@ permissions:
   user:
     blascma:
       teams:
+        - devteam1
         - devteam3
 
     userfoo:

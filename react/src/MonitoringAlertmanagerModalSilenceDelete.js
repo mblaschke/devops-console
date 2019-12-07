@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 import BaseComponent from './BaseComponent';
 
-class AlertmanagerSilenceModalDelete extends BaseComponent {
+class MonitoringAlertmanagerModalSilenceDelete extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -89,5 +89,5 @@ class AlertmanagerSilenceModalDelete extends BaseComponent {
     }
 }
 
-export default AlertmanagerSilenceModalDelete;
+export default MonitoringAlertmanagerModalSilenceDelete;
 

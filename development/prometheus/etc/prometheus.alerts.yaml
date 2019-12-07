@@ -1,0 +1,47 @@
+groups:
+
+  #############################
+  # Probe
+  #############################
+
+  - name: devteam1
+    rules:
+      - alert: Test alert devteam1
+        expr: |-
+          vector(0)
+        for: 1s
+        labels:
+          severity: warning
+          type: probe
+          team: devteam1
+        annotations:
+          summary: "Failed probe:"
+          description: "{{ $labels.job }}: {{ $labels.instance }} failed"
+
+  - name: devteam3
+    rules:
+      - alert: Test alert devteam3
+        expr: |-
+          vector(0)
+        for: 1s
+        labels:
+          severity: warning
+          type: probe
+          team: devteam3
+        annotations:
+          summary: "Failed probe:"
+          description: "{{ $labels.job }}: {{ $labels.instance }} failed"
+
+  - name: devteam5
+    rules:
+      - alert: Test alert devteam5
+        expr: |-
+          vector(0)
+        for: 1s
+        labels:
+          severity: warning
+          type: probe
+          team: devteam5
+        annotations:
+          summary: "Failed probe:"
+          description: "{{ $labels.job }}: {{ $labels.instance }} failed"

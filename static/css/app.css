@@ -24,12 +24,23 @@ body {
     right: 1rem;
     top: .25rem;
     padding: 0;
+}
 
+.card-body.scrollable {
+    max-height: 30rem;
+    overflow: scroll;
 }
 
 dd a,
 dt a {
     font-weight: normal;
+}
+
+.alertmanager-matcher,
+alertmanager-label {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 body.hide-search #global-search-form {
@@ -222,6 +233,10 @@ table.table thead th {
     border-radius: 0.1rem !important;
 }
 
+.spinner-area {
+    position: relative;
+}
+
 .spinner-wrapper {
     position: fixed;
     z-index: 999;
@@ -230,6 +245,10 @@ table.table thead th {
     right: 0px;
     bottom: 0px;
     background-color: rgba(0,123,255,0.2);
+}
+
+.spinner-area .spinner-wrapper {
+    position: absolute;
 }
 
 .spinner {
@@ -353,4 +372,27 @@ table.table thead th {
     80% { transform: skewX(1deg); }
     90% { transform: skewX(0deg); }
     100% { transform: skewX(0deg); }
+}
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 650px;
+        margin: 1.75rem auto;
+    }
+}
+
+.blinking {
+    animation: blinker 2s ease-in-out infinite;
+}
+
+@keyframes blinker {
+    65% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    35% {
+        opacity: 1;
+    }
 }

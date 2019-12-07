@@ -4,8 +4,7 @@ import BaseComponent from './BaseComponent';
 import K8sCluster from './K8sCluster';
 import K8sNamespace from './K8sNamespace';
 import AzureResourceGroups from './AzureResourceGroups';
-import AlertmanagerAlerts from "./AlertmanagerAlerts";
-import AlertmanagerSilences from "./AlertmanagerSilences";
+import MonitoringAlertmanager from "./MonitoringAlertmanager";
 import Settings from './Settings';
 import GeneralStats from './GeneralStats';
 import $ from "jquery";
@@ -229,8 +228,7 @@ class App extends BaseComponent {
 
                     <Route path="/azure/resourcegroup" component={AzureResourceGroups} />
 
-                    <Route path="/alertmanager/alerts" component={AlertmanagerAlerts} />
-                    <Route path="/alertmanager/silences" component={AlertmanagerSilences} />
+                    <Route path="/monitoring/alertmanager" component={MonitoringAlertmanager} />
 
                     <Route path="/general/settings" component={Settings} />
                     <Route path="/general/about" component={GeneralStats} />

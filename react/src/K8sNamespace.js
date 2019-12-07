@@ -46,7 +46,6 @@ class K8sNamespace extends BaseComponent {
 
         window.App.enableSearch();
 
-
         $(document).on('show.bs.modal', ".modal", this.disableRefresh.bind(this));
         $(document).on('hide.bs.modal', ".modal", this.refresh.bind(this));
     }
@@ -214,12 +213,6 @@ class K8sNamespace extends BaseComponent {
         setTimeout(() => {
             $("#editQuestion").modal('hide');
         }, 200);
-    }
-
-    handleSearchChange(event) {
-        this.setState({
-            searchValue: event.target.value
-        });
     }
 
     handleDescriptionEditClose() {
