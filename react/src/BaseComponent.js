@@ -68,7 +68,12 @@ class BaseComponent extends Component {
     }
 
     setValue(field, event) {
-        let value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
+        let value = false;
+        if (event.target) {
+            value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
+        } else {
+            value = event;
+        }
 
         var state = this.state;
         _.set(state, field, value);
