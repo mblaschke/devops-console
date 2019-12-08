@@ -105,6 +105,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 	}
 
 	formData := c.getSilenceFormData(ctx)
+	formData.Silence.CreatedBy = silenceResp.Payload.CreatedBy
 
 	postParams := silence.NewPostSilencesParams()
 	postParams.Silence = &alertmanagerModels.PostableSilence{
