@@ -3,6 +3,7 @@ package formdata
 import (
 	"errors"
 	"github.com/prometheus/alertmanager/api/v2/models"
+	"time"
 )
 
 type (
@@ -32,6 +33,13 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 		return nil, errors.New("Invalid or empty endsAt")
 	}
 
+	// check if time range is correct
+	startsAt := time.Time(*ret.Silence.StartsAt)
+	endsAt := time.Time(*ret.Silence.EndsAt)
+	if startsAt.After(endsAt) {
+		return nil, errors.New("startsAt must be before endsAt")
+	}
+
 	matcherList := models.Matchers{}
 	for _, matcher := range a.Silence.Matchers {
 		if (matcher.Name == nil || *matcher.Name == "" ) && (matcher.Value == nil || *matcher.Value == "") {
@@ -58,13 +66,6 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 	if len(ret.Silence.Matchers) == 0 {
 		return nil, errors.New("At least one matcher needed")
 	}
-
-	// validate by alertmanager (client-side)
-	err = ret.Silence.Validate(nil)
-	if err != nil {
-		return nil, err
-	}
-
 
 	return
 }
