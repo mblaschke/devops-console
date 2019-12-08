@@ -139,43 +139,56 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             return
         }
 
-        if (!this.props.silence || this.props.silence.id !== nextProps.silence.id) {
-            // make copy
-            let silence = JSON.parse(JSON.stringify(nextProps.silence));
+        // avoid react updating the form data (internal id)
+        if (nextProps.silence.__id__ && this.props.silence && this.props.silence.__id__) {
+            if (nextProps.silence.__id__ === this.props.silence.__id__) {
+                return;
+            }
+        }
 
-            let team = this.state.team;
+        // avoid react updating the form data item id (external id)
+        if (nextProps.silence.id && this.props.silence && this.props.silence.id) {
+            if (nextProps.silence.id === this.props.silence.id) {
+                return;
+            }
+        }
 
-            try {
-                if (silence.matchers) {
-                    let matcherTeam = false;
-                    let matchersFiltered = [];
-                    silence.matchers.map((matcher) => {
-                        if (matcher.name === "team") {
-                            matcherTeam = matcher.value;
-                        } else {
-                            matchersFiltered.push(matcher);
+
+        // make copy
+        let silence = JSON.parse(JSON.stringify(nextProps.silence));
+
+        let team = this.state.team;
+
+        try {
+            if (silence.matchers) {
+                let matcherTeam = false;
+                let matchersFiltered = [];
+                silence.matchers.map((matcher) => {
+                    if (matcher.name === "team") {
+                        matcherTeam = matcher.value;
+                    } else {
+                        matchersFiltered.push(matcher);
+                    }
+                });
+                silence.matchers = matchersFiltered;
+
+                if (matcherTeam) {
+                    this.props.config.Teams.map((row, value) => {
+                        if (row.Name === matcherTeam) {
+                            team = matcherTeam;
                         }
                     });
-                    silence.matchers = matchersFiltered;
-
-                    if (matcherTeam) {
-                        this.props.config.Teams.map((row, value) => {
-                            if (row.Name === matcherTeam) {
-                                team = matcherTeam;
-                            }
-                        });
-                    }
                 }
+            }
 
-            } catch {}
+        } catch {}
 
-            // set to state
-            this.setState({
-                silence: silence,
-                team: team,
-                reload: false
-            });
-        }
+        // set to state
+        this.setState({
+            silence: silence,
+            team: team,
+            reload: false
+        });
     }
 
     deleteMatcher(num) {
