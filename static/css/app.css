@@ -43,6 +43,10 @@ alertmanager-label {
     margin: 0;
 }
 
+.reltime {
+    color: #95999c;
+}
+
 body.hide-search #global-search-form {
     visibility: collapse !important;
 }

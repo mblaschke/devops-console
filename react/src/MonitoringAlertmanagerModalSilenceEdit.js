@@ -230,6 +230,17 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             return true;
         });
 
+        let reltime = (time) => {
+            let val = moment(time, moment.ISO_8601).fromNow();
+            if (val === "a few seconds ago" || val === "a few seconds") {
+                val = "now";
+            }
+
+            return (
+                <span class="reltime">({val})</span>
+            )
+        };
+
         return (
             <div>
                 <form method="post">
@@ -259,7 +270,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                     </div>
 
                                     <div className="form-group">
-                                        <label htmlFor="inputNsDescription" className="inputRg">Starts at</label>
+                                        <label htmlFor="inputNsDescription" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
                                         <div className="form-row">
                                             <div className="form-group col-md-10">
                                                 <input className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
@@ -291,7 +302,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                     </div>
 
                                     <div className="form-group">
-                                        <label htmlFor="inputNsDescription" className="inputRg">Ends at</label>
+                                        <label htmlFor="inputNsDescription" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
                                         <div className="form-row">
                                             <div className="form-group col-md-10">
                                                 <input className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
