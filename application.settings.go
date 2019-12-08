@@ -192,7 +192,7 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 		}
 	}
 
-	c.auditLog(ctx, fmt.Sprintf("Updated team \"%s\" settings", team))
+	c.auditLog(ctx, fmt.Sprintf("Updated team \"%s\" settings", team), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "settings", "type": "updateTeam"}).Inc()
 
 	resp := response.GeneralMessage{

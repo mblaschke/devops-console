@@ -306,7 +306,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "createNamespace"}).Inc()
 	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" created", namespace.Name))
-	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" created", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" created", namespace.Name), 1)
 
 	resp := response.GeneralMessage{
 		Message: fmt.Sprintf("Namespace \"%s\" created", namespace.Name),
@@ -341,7 +341,7 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context, user *model
 	}
 
 	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name))
-	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "deleteNamepace"}).Inc()
 
 	resp := response.GeneralMessage{
@@ -399,7 +399,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	}
 
 	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" updated", namespace.Name))
-	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" updated", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" updated", namespace.Name), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "updateNamepace"}).Inc()
 
 	resp := response.GeneralMessage{
@@ -440,7 +440,7 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 	}
 
 	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name))
-	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name))
+	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "resetSettings"}).Inc()
 
 	resp := response.GeneralMessage{

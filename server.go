@@ -181,7 +181,7 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 		Message: fmt.Sprintf("Error: %v", err),
 	}
 
-	c.auditLog(ctx, response.Message)
+	c.auditLog(ctx, response.Message, 1)
 
 	ctx.StatusCode(iris.StatusBadRequest)
 	ctx.JSON(response)
@@ -190,14 +190,14 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 	panic(ctx)
 }
 
-func (c *Server) auditLog(ctx iris.Context, message string) {
+func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 	username := "*anonymous*"
 	user, _ := c.getUser(ctx)
 	if user != nil {
 		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
 	}
 
-	c.logger.Infof("AUDIT: user[%s]: %s", username, message)
+	c.logger.InfoDepth(depth, fmt.Sprintf("AUDIT: user[%s]: %s", username, message))
 }
 
 func (c *Server) notificationMessage(ctx iris.Context, message string) {

@@ -214,11 +214,11 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	if formData.Personal {
 		response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name)
 		c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name))
-		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name))
+		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name), 1)
 	} else {
 		response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name)
 		c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
-		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
+		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
 	}
 
 	ctx.JSON(response)
