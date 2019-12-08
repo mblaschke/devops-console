@@ -2,7 +2,9 @@ package formdata
 
 import (
 	"errors"
+	"fmt"
 	"github.com/prometheus/alertmanager/api/v2/models"
+	"strings"
 	"time"
 )
 
@@ -68,4 +70,17 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 	}
 
 	return
+}
+
+func (a *AlertmanagerForm) ToString(id string) (ret string) {
+	parts := []string{}
+
+	commentParts := strings.SplitN(*a.Silence.Comment, "\n", 2)
+	title := strings.TrimSpace(commentParts[0])
+	parts = append(parts, fmt.Sprintf("\"%v\" [id:%v]", title, id))
+
+	parts = append(parts, fmt.Sprintf("startsAt:%v", time.Time(*a.Silence.StartsAt).String()))
+	parts = append(parts, fmt.Sprintf("endsAt:%v", time.Time(*a.Silence.EndsAt).String()))
+
+	return strings.Join(parts, " ")
 }

@@ -120,7 +120,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 		}
 	}
 
-	c.auditLog(ctx, "Updated personal settings")
+	c.auditLog(ctx, "Updated personal settings", 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "settings", "type": "updatePersonal"}).Inc()
 
 	resp := response.GeneralMessage{

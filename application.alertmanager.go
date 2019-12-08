@@ -85,6 +85,12 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 		return
 	}
 
+	team := ""
+	if val := c.getSilenceMatcherTeam(ctx, user, silenceResp.Payload); val != nil {
+		team = *val
+	}
+	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" deleted", *silenceResp.Payload.ID, team))
+
 	ctx.JSON("true")
 }
 
@@ -117,6 +123,8 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		return
 	}
 
+	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" updated", formData.ToString(*silenceResp.Payload.ID), formData.Team))
+
 	ctx.JSON("true")
 }
 
@@ -132,10 +140,14 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 	postParams.Silence = &alertmanagerModels.PostableSilence{
 		Silence: formData.Silence,
 	}
-	if _, err := client.Silence.PostSilences(postParams); err != nil {
+
+	silenceResp, err := client.Silence.PostSilences(postParams)
+	if err != nil {
 		c.respondError(ctx, err)
 		return
 	}
+
+	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" created", formData.ToString(silenceResp.Payload.SilenceID), formData.Team))
 
 	ctx.JSON("true")
 }
@@ -220,15 +232,24 @@ func (c *ApplicationAlertmanager) filterSilences(ctx iris.Context, silences *sil
 	return silences
 }
 
+func (c *ApplicationAlertmanager) getSilenceMatcherTeam(ctx iris.Context, user *models.User, row *alertmanagerModels.GettableSilence) (team *string) {
+	for _, matcher := range row.Matchers {
+		if matcher.Name != nil && matcher.Value != nil {
+			if *matcher.Name == "team" {
+				team = matcher.Value
+			}
+		}
+	}
+
+	return
+}
+
 func (c *ApplicationAlertmanager) checkSilenceAccess(ctx iris.Context, user *models.User, row *alertmanagerModels.GettableSilence) (status bool) {
 	status = false
 
-	for _, matcher := range row.Matchers {
-		if matcher.Name != nil && matcher.Value != nil {
-			if *matcher.Name == "team" && user.IsMemberOf(*matcher.Value) {
-				status = true
-			}
-		}
+	team := c.getSilenceMatcherTeam(ctx, user, row)
+	if team != nil && user.IsMemberOf(*team) {
+		status = true
 	}
 
 	return
