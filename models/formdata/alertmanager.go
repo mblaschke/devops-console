@@ -59,5 +59,12 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 		return nil, errors.New("At least one matcher needed")
 	}
 
+	// validate by alertmanager (client-side)
+	err = ret.Silence.Validate(nil)
+	if err != nil {
+		return nil, err
+	}
+
+
 	return
 }
