@@ -24,7 +24,7 @@ type ApplicationAzure struct {
 	*Server
 }
 
-func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context) {
+func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models.User) {
 	wg := sync.WaitGroup{}
 
 	azureContext := context.Background()
@@ -39,7 +39,6 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context) {
 	}
 
 	subscriptionId := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	user := c.getUserOrStop(ctx)
 
 	// validate name
 	if !c.config.Azure.ResourceGroup.Validation.Validate(formData.Name) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"devops-console/models"
 	"devops-console/models/response"
 	"github.com/dustin/go-humanize"
 	iris "github.com/kataras/iris/v12"
@@ -13,7 +14,7 @@ type ApplicationGeneral struct {
 	*Server
 }
 
-func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context) {
+func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context, user *models.User) {
 	systemStats := response.NewGeneralStats("System stats")
 	systemStats.Add("Golang runtime", runtime.Version())
 	systemStats.Add("Architecture", runtime.GOARCH)
@@ -50,9 +51,7 @@ func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context) {
 	ctx.JSON(ret)
 }
 
-func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context) {
-	user := c.getUserOrStop(ctx)
-
+func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.User) {
 	ret := response.ResponseConfig{}
 	ret.User.Username = user.Username
 

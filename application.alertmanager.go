@@ -26,7 +26,7 @@ func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *aler
 	return client
 }
 
-func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context) {
+func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
 
 	filter := []string{}
@@ -44,7 +44,7 @@ func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context) {
 	ctx.JSON(alerts.Payload)
 }
 
-func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context) {
+func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
 
 	filter := []string{}
@@ -62,9 +62,8 @@ func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context) {
 	ctx.JSON(silences.Payload)
 }
 
-func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context) {
+func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
-	user := c.getUserOrStop(ctx)
 
 	getParams := silence.NewGetSilenceParams()
 	getParams.SilenceID = strfmt.UUID(ctx.Params().GetString("silence"))
@@ -89,9 +88,8 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context) {
 	ctx.JSON("true")
 }
 
-func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context) {
+func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
-	user := c.getUserOrStop(ctx)
 
 	getParams := silence.NewGetSilenceParams()
 	getParams.SilenceID = strfmt.UUID(ctx.Params().GetString("silence"))
@@ -121,9 +119,8 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context) {
 	ctx.JSON("true")
 }
 
-func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context) {
+func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
-	user := c.getUserOrStop(ctx)
 
 	formData := c.getSilenceFormData(ctx)
 

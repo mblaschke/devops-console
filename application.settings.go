@@ -21,9 +21,8 @@ type ApplicationSettings struct {
 	vaultClient *keyvault.BaseClient
 }
 
-func (c *ApplicationSettings) Get(ctx iris.Context) {
+func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 	var ret models.SettingsOverall
-	user := c.getUserOrStop(ctx)
 
 	var wgFetch sync.WaitGroup
 	var wgProcess sync.WaitGroup
@@ -72,9 +71,8 @@ func (c *ApplicationSettings) Get(ctx iris.Context) {
 	ctx.JSON(ret)
 }
 
-func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context) {
+func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User) {
 	var err error
-	user := c.getUserOrStop(ctx)
 
 	formData := formdata.GeneralSettings{}
 	err = ctx.ReadJSON(&formData)
@@ -133,9 +131,8 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context) {
 	ctx.JSON(resp)
 }
 
-func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context) {
+func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User) {
 	var err error
-	user := c.getUserOrStop(ctx)
 
 	team := ctx.Params().GetString("team")
 	if team == "" {

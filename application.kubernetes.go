@@ -32,7 +32,7 @@ func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernete
 	return
 }
 
-func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context) {
+func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context, user *models.User) {
 
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "downloadKubeconfig"}).Inc()
 
@@ -42,7 +42,7 @@ func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context) {
 	ctx.View("kubeconfig.jet")
 }
 
-func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context, user *models.User) {
 	service := c.serviceKubernetes()
 	nodes, err := service.Nodes()
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context) {
 	ctx.JSON(ret)
 }
 
-func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.User) {
 	nsList, err := c.serviceKubernetes().NamespaceList()
 	if err != nil {
 		c.respondError(ctx, errors.New("Unable to contact Kubernetes cluster"))
@@ -163,11 +163,9 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context) {
 	ctx.JSON(ret)
 }
 
-func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *models.User) {
 	var namespaceName string
 	var kubernetesEnvironment *models.AppConfigKubernetesEnvironment
-
-	user := c.getUserOrStop(ctx)
 
 	formData := formdata.KubernetesNamespaceCreate{}
 	err := ctx.ReadJSON(&formData)
@@ -317,7 +315,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context) {
 	ctx.JSON(resp)
 }
 
-func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context, user *models.User) {
 	namespaceName := ctx.Params().GetString("namespace")
 
 	if namespaceName == "" {
@@ -353,7 +351,7 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context) {
 	ctx.JSON(resp)
 }
 
-func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *models.User) {
 	namespaceName := ctx.Params().GetString("namespace")
 
 	if namespaceName == "" {
@@ -411,7 +409,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context) {
 	ctx.JSON(resp)
 }
 
-func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context) {
+func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models.User) {
 	namespaceName := ctx.Params().GetString("namespace")
 
 	if namespaceName == "" {

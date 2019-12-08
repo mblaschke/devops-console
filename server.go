@@ -261,20 +261,20 @@ func (c *Server) index(ctx iris.Context) {
 }
 
 func (c *Server) template(ctx iris.Context, title, template string) {
-	c.ensureLoggedIn(ctx, func(ctx iris.Context) {
+	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
 		ctx.ViewData("title", title)
 		ctx.View(template)
 	})
 }
 
 func (c *Server) react(ctx iris.Context, title string) {
-	c.ensureLoggedIn(ctx, func(ctx iris.Context) {
+	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
 		ctx.ViewData("title", title)
 		ctx.View("react.jet")
 	})
 }
 
-func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context)) {
+func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
 	c.session.Start(ctx)
 	user, err := c.getUser(ctx)
 
@@ -287,7 +287,7 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 
 	ctx.ViewData("user", user)
 	ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
-	callback(ctx)
+	callback(ctx, user)
 }
 
 func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
