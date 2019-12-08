@@ -222,7 +222,7 @@ class MonitoringAlertmanager extends BaseComponent {
     silenceNew() {
         this.setState({
             selectedSilence: {
-                id: false,
+                id: new Date().toISOString(),
                 startsAt: "" + new Date().toISOString(),
                 endsAt: "" + new Date( new Date().getTime() + 1*3600*1000).toISOString(),
                 comment: "",
@@ -252,7 +252,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         this.setState({
             selectedSilence: {
-                id: false,
+                id: new Date().toISOString(),
                 startsAt: "" + new Date().toISOString(),
                 endsAt: "" + new Date( new Date().getTime() + 1*3600*1000).toISOString(),
                 comment: "Silence alert: " + alert.annotations.summary + "\n" + alert.annotations.description,
