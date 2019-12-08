@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"devops-console/models"
+	"devops-console/models/notification"
 	"devops-console/services"
 	"encoding/json"
 	"errors"
@@ -201,6 +202,10 @@ func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 }
 
 func (c *Server) notificationMessage(ctx iris.Context, message string) {
+	c.notificationMessageWithContext(ctx, message, "")
+}
+
+func (c *Server) notificationMessageWithContext(ctx iris.Context, message string, context string) {
 	if c.config.App.Notification.Slack.Webhook == "" {
 		return
 	}
@@ -211,16 +216,36 @@ func (c *Server) notificationMessage(ctx iris.Context, message string) {
 		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
 	}
 
-	payload := struct {
-		Channel  string `json:"channel"`
-		Username string `json:"username"`
-		Text     string `json:"text"`
-	}{
-		Channel:  c.config.App.Notification.Slack.Channel,
-		Username: "devops-console",
-		Text:     fmt.Sprintf(c.config.App.Notification.Slack.Message, username, message),
+	message = fmt.Sprintf(c.config.App.Notification.Slack.Message, username, message)
+
+	payloadBlocks := []notification.NotificationMessageBlockContext{}
+
+	payloadBlocks = append(payloadBlocks, notification.NotificationMessageBlockContext{
+		Type: "section",
+		Text: &notification.NotificationMessageBlockText{
+			Type: "plain_text",
+			Text: message,
+		},
+	})
+
+	if len(context) > 0 {
+		payloadBlocks = append(payloadBlocks, notification.NotificationMessageBlockContext{
+			Type: "context",
+			Elements: []*notification.NotificationMessageBlockText{
+				{
+					Type: "mrkdwn",
+					Text: context,
+				},
+			},
+		})
 	}
 
+	payload := notification.NotificationMessage{
+		Channel:  c.config.App.Notification.Slack.Channel,
+		Username: "devops-console",
+		Text: message,
+		Blocks: payloadBlocks,
+	}
 	payloadJson, _ := json.Marshal(payload)
 
 	client := http.Client{}
