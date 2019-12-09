@@ -190,3 +190,9 @@ alertmanager:
     url: http://localhost:9093/
   - name: prod
     url: http://localhost:9093/
+  - name: with-auth
+    url: http://localhost:9094/
+    auth:
+      type: basic
+      username: foo
+      password: bar
