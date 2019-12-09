@@ -34,6 +34,7 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 	for _, row := range a.Instances {
 		if row.Name == name {
 			config = &row
+			break
 		}
 	}
 
