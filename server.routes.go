@@ -5,6 +5,15 @@ import (
 )
 
 func (c *Server) initRoutes() {
+	c.logger.Infof(" - init static file handler")
+
+	c.app.HandleDir("/static", "./static", iris.DirOptions{
+		IndexName: "/index.html",
+
+		Gzip:     false,
+		ShowList: false,
+	})
+
 	c.logger.Infof(" - init app routes")
 
 	applicationKubernetes := ApplicationKubernetes{Server: c}
@@ -52,14 +61,4 @@ func (c *Server) initRoutes() {
 	c.app.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
 	c.app.Post("/api/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
 	c.app.Put("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
-
-
-	c.logger.Infof(" - init static file handler")
-
-	c.app.HandleDir("/static", "./static", iris.DirOptions{
-		IndexName: "/index.html",
-
-		Gzip:     false,
-		ShowList: false,
-	})
 }
