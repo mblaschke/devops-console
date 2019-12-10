@@ -28,7 +28,7 @@ body {
 
 .card-body.scrollable {
     max-height: 30rem;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 dd a,
