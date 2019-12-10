@@ -37,7 +37,7 @@ dt a {
 }
 
 .alertmanager-matcher,
-alertmanager-label {
+.alertmanager-label {
     list-style: none;
     padding: 0;
     margin: 0;

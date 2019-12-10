@@ -488,8 +488,8 @@ class MonitoringAlertmanager extends BaseComponent {
                         <col width="200rem"/>
                         <col width="200rem"/>
                         <col width="200rem"/>
-                        <col width="200rem"/>
-                        <col width="80rem"/>
+                        <col width="100rem"/>
+                        <col width="50rem"/>
                     </colgroup>
                     <thead>
                     <tr>
@@ -562,15 +562,14 @@ class MonitoringAlertmanager extends BaseComponent {
                         <col width="200rem"/>
                         <col width="200rem"/>
                         <col width="200rem"/>
-                        <col width="100rem"/>
-                        <col width="100rem"/>
+                        <col width="80rem"/>
                         <col width="80rem"/>
                     </colgroup>
                     <thead>
                     <tr>
                         <th>Alert</th>
                         <th>Matchers</th>
-                        <th>From</th>
+                        <th>Started</th>
                         <th>Until</th>
                         <th></th>
                         <th className="toolbox">
