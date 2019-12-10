@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	iris "github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris"
 	"github.com/prometheus/client_golang/prometheus"
 	coreV1 "k8s.io/api/core/v1"
 	networkingV1 "k8s.io/api/networking/v1"

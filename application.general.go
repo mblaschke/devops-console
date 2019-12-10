@@ -4,7 +4,7 @@ import (
 	"devops-console/models"
 	"devops-console/models/response"
 	"github.com/dustin/go-humanize"
-	iris "github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris"
 	"github.com/prometheus/client_golang/prometheus"
 	"runtime"
 	"time"

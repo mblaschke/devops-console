@@ -1,7 +1,7 @@
 package main
 
 import (
-	iris "github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris"
 )
 
 func (c *Server) initRoutes() {

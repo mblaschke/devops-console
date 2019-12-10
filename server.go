@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"github.com/Masterminds/sprig"
 	glogger "github.com/google/logger"
-	iris "github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/middleware/logger"
-	"github.com/kataras/iris/v12/middleware/recover"
-	"github.com/kataras/iris/v12/sessions"
-	"github.com/kataras/iris/v12/view"
+	iris "github.com/kataras/iris"
+	"github.com/kataras/iris/middleware/logger"
+	"github.com/kataras/iris/middleware/recover"
+	"github.com/kataras/iris/sessions"
+	"github.com/kataras/iris/view"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
@@ -156,11 +156,12 @@ func (c *Server) setupKubernetes() {
 
 func (c *Server) initApp() {
 	c.logger.Infof("setup app server")
+
+	c.app.UseGlobal(c.before)
+
 	c.initSession()
 	c.initTemplateEngine()
 	c.initRoutes()
-
-	c.app.UseGlobal(c.before)
 }
 
 func (c *Server) Run(addr string) {
@@ -181,6 +182,8 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 	}{
 		Message: fmt.Sprintf("Error: %v", err),
 	}
+
+	panic(response.Message)
 
 	c.auditLog(ctx, response.Message, 1)
 

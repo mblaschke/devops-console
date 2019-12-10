@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-openapi/strfmt"
-	iris "github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris"
 	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 	"github.com/prometheus/alertmanager/api/v2/client/alert"
 	"github.com/prometheus/alertmanager/api/v2/client/silence"

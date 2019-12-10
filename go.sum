@@ -396,8 +396,13 @@ github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7V
 github.com/karrick/tparse v2.4.2+incompatible h1:+cW306qKAzrASC5XieHkgN7/vPaGKIuK62Q7nI7DIRc=
 github.com/karrick/tparse/v2 v2.7.1 h1:SSfwxsbxZS3yai0V8EcCyYjpsiYIOvQj/kvzTLu/zS4=
 github.com/karrick/tparse/v2 v2.7.1/go.mod h1:OzmKMqNal7LYYHaO/Ie1f/wXmLWAaGKwJmxUFNQCVxg=
+github.com/kataras/go-sessions v3.0.0+incompatible/go.mod h1:wBiyJj8R+1sfu/n2EO2HERC/0XsIsJiwx3PlYz/iy0A=
+github.com/kataras/golog v0.0.0-20190624001437-99c81de45f40 h1:Q/QxpyNBtfkhXE68tnEA4yyqm77eh/3YOjOw875VbBY=
+github.com/kataras/golog v0.0.0-20190624001437-99c81de45f40/go.mod h1:PcaEvfvhGsqwXZ6S3CgCbmjcp+4UDUh2MIfF2ZEul8M=
 github.com/kataras/golog v0.0.9 h1:J7Dl82843nbKQDrQM/abbNJZvQjS6PfmkkffhOTXEpM=
 github.com/kataras/golog v0.0.9/go.mod h1:12HJgwBIZFNGL0EJnMRhmvGA0PQGx8VFwrZtM4CqbAk=
+github.com/kataras/iris v0.0.0-20191006184023-c8e73f4f4df2 h1:pFfvcdIJa7n+e1q+pNy0P2ikbLIRjp2WTHfQfJFlX9s=
+github.com/kataras/iris v0.0.0-20191006184023-c8e73f4f4df2/go.mod h1:S233OrpfKdzNeZDxCs0ayuPhEnsr0BVlyAjX2dRO7fg=
 github.com/kataras/iris v11.1.1+incompatible h1:c2iRKvKLpTYMXKdVB8YP/+A67NtZFt9kFFy+ZwBhWD0=
 github.com/kataras/iris/v12 v12.0.1 h1:Wo5S7GMWv5OAzJmvFTvss/C4TS1W0uo6LkDlSymT4rM=
 github.com/kataras/iris/v12 v12.0.1/go.mod h1:udK4vLQKkdDqMGJJVd/msuMtN6hpYJhg/lSzuxjhO+U=
