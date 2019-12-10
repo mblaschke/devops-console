@@ -67,7 +67,7 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 		tmp := response.ResponseNamespaceConfig{
 			Environment: row.Name,
 			Description: row.Description,
-			Template: row.Template,
+			Template:    row.Template,
 		}
 
 		ret.NamespaceEnvironments = append(ret.NamespaceEnvironments, tmp)

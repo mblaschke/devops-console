@@ -244,8 +244,8 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 	payload := notification.NotificationMessage{
 		Channel:  c.config.App.Notification.Slack.Channel,
 		Username: "devops-console",
-		Text: message,
-		Blocks: payloadBlocks,
+		Text:     message,
+		Blocks:   payloadBlocks,
 	}
 	payloadJson, _ := json.Marshal(payload)
 
@@ -342,4 +342,3 @@ func (c *Server) getUserOrStop(ctx iris.Context) (user *models.User) {
 
 	return
 }
-

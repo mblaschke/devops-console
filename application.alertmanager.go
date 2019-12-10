@@ -73,7 +73,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 		return
 	}
 
-	if !c.checkSilenceAccess(ctx, user,  silenceResp.Payload) {
+	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload) {
 		c.respondError(ctx, errors.New("Access to silence denied"))
 		return
 	}
@@ -105,7 +105,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		return
 	}
 
-	if !c.checkSilenceAccess(ctx, user,  silenceResp.Payload) {
+	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload) {
 		c.respondError(ctx, errors.New("Access to silence denied"))
 		return
 	}
@@ -115,7 +115,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 
 	postParams := silence.NewPostSilencesParams()
 	postParams.Silence = &alertmanagerModels.PostableSilence{
-		ID: *silenceResp.Payload.ID,
+		ID:      *silenceResp.Payload.ID,
 		Silence: formData.Silence,
 	}
 	if _, err := client.Silence.PostSilences(postParams); err != nil {
@@ -180,8 +180,8 @@ func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata
 	label := "team"
 	labelIsRegexp := false
 	matchers = append(matchers, &alertmanagerModels.Matcher{
-		Name: &label,
-		Value: &formData.Team,
+		Name:    &label,
+		Value:   &formData.Team,
 		IsRegex: &labelIsRegexp,
 	})
 

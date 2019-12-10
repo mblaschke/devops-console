@@ -127,7 +127,6 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 		Message: "Updated personal settings",
 	}
 
-
 	ctx.JSON(resp)
 }
 

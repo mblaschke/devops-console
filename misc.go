@@ -140,7 +140,6 @@ func KubeParseConfig(path string) runtime.Object {
 	return obj
 }
 
-
 func stringToPtr(val string) *string {
 	return &val
 }
