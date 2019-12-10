@@ -47,7 +47,22 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 		return nil, err
 	}
 
-	transport := httptransport.New(net.JoinHostPort(configUrl.Hostname(), configUrl.Port()), fmt.Sprintf("%v/api/v2/", configUrl.Path), []string{configUrl.Scheme})
+	hostScheme := configUrl.Scheme
+	hostName := configUrl.Hostname()
+	hostPort := configUrl.Port()
+
+	if hostPort == "" {
+		switch (hostScheme) {
+		case "http":
+			hostPort = "80"
+			break;
+		case "https":
+			hostPort = "443"
+			break;
+		}
+	}
+
+	transport := httptransport.New(net.JoinHostPort(hostName, hostPort), fmt.Sprintf("%v/api/v2/", configUrl.Path), []string{hostScheme})
 	context, _ := context.WithTimeout(context.Background(), time.Duration(20 * time.Second))
 	transport.Context = context
 
