@@ -345,22 +345,26 @@ class MonitoringAlertmanager extends BaseComponent {
 
     buildFooter(rows) {
         let statsList = {};
-        // collect
-        rows.map((row) => {
-            if (!statsList[row.status.state]) {
-                statsList[row.status.state] = 0;
+        let footerLine = "";
+
+        if (rows) {
+            // collect
+            rows.map((row) => {
+                if (!statsList[row.status.state]) {
+                    statsList[row.status.state] = 0;
+                }
+
+                statsList[row.status.state]++;
+            });
+
+            // to text
+            let footerElements = [];
+            for (var i in statsList) {
+                footerElements.push(`${i}: ${statsList[i]}`)
             }
 
-            statsList[row.status.state]++;
-        });
-
-        // to text
-        let footerElements = [];
-        for (var i in statsList) {
-            footerElements.push(`${i}: ${statsList[i]}`)
+            footerLine = footerElements.join(", ");
         }
-
-        let footerLine = footerElements.join(", ");
 
         return (
             <span>{footerLine}</span>
