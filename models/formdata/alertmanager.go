@@ -90,11 +90,11 @@ func (a *AlertmanagerForm) ToMarkdown(id string) (ret string) {
 
 	commentParts := strings.SplitN(*a.Silence.Comment, "\n", 2)
 	title := strings.TrimSpace(commentParts[0])
-	parts = append(parts, fmt.Sprintf("* id: %v", id))
-	parts = append(parts, fmt.Sprintf("* title: %v", title))
-	parts = append(parts, fmt.Sprintf("* created by: %v", *a.Silence.CreatedBy))
-	parts = append(parts, fmt.Sprintf("* startsAt: %v", time.Time(*a.Silence.StartsAt).String()))
-	parts = append(parts, fmt.Sprintf("* endsAt: %v", time.Time(*a.Silence.EndsAt).String()))
+	parts = append(parts, fmt.Sprintf("id: %v", id))
+	parts = append(parts, fmt.Sprintf("title: %v", title))
+	parts = append(parts, fmt.Sprintf("created by: %v", *a.Silence.CreatedBy))
+	parts = append(parts, fmt.Sprintf("startsAt: %v", time.Time(*a.Silence.StartsAt).String()))
+	parts = append(parts, fmt.Sprintf("endsAt: %v", time.Time(*a.Silence.EndsAt).String()))
 
 	return strings.Join(parts, "\n")
 }

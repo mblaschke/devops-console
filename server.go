@@ -233,12 +233,10 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 
 	if len(context) > 0 {
 		payloadBlocks = append(payloadBlocks, notification.NotificationMessageBlockContext{
-			Type: "context",
-			Elements: []*notification.NotificationMessageBlockText{
-				{
-					Type: "mrkdwn",
-					Text: context,
-				},
+			Type: "section",
+			Text: &notification.NotificationMessageBlockText{
+				Type: "plain_text",
+				Text: context,
 			},
 		})
 	}
