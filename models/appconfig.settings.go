@@ -17,5 +17,4 @@ type (
 		Validation  AppInputValidation
 		Tags        map[string]string
 	}
-
 )

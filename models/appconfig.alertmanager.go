@@ -4,13 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 	httptransport "github.com/go-openapi/runtime/client"
+	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 	"net"
 	"net/url"
 	"time"
 )
-
 
 type (
 	AppConfigAlertmanager struct {
@@ -18,12 +17,12 @@ type (
 	}
 
 	AppConfigAlertmanagerInstance struct {
-		Name string  `yaml:"name"`
-		Url string  `yaml:"url"`
+		Name string `yaml:"name"`
+		Url  string `yaml:"url"`
 		Auth *struct {
-			Type string  `yaml:"type"`
-			Username string  `yaml:"username"`
-			Password string  `yaml:"password"`
+			Type     string `yaml:"type"`
+			Username string `yaml:"username"`
+			Password string `yaml:"password"`
 		} `yaml:"auth"`
 	}
 )
@@ -52,25 +51,25 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 	hostPort := configUrl.Port()
 
 	if hostPort == "" {
-		switch (hostScheme) {
+		switch hostScheme {
 		case "http":
 			hostPort = "80"
-			break;
+			break
 		case "https":
 			hostPort = "443"
-			break;
+			break
 		}
 	}
 
 	transport := httptransport.New(net.JoinHostPort(hostName, hostPort), fmt.Sprintf("%v/api/v2/", configUrl.Path), []string{hostScheme})
-	context, _ := context.WithTimeout(context.Background(), time.Duration(20 * time.Second))
+	context, _ := context.WithTimeout(context.Background(), time.Duration(20*time.Second))
 	transport.Context = context
 
 	if config.Auth != nil {
-		switch (config.Auth.Type) {
+		switch config.Auth.Type {
 		case "basic":
 			transport.DefaultAuthentication = httptransport.BasicAuth(config.Auth.Username, config.Auth.Password)
-			break;
+			break
 		default:
 			return nil, errors.New("Invalid authentication")
 		}

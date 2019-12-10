@@ -11,11 +11,11 @@ import (
 
 type (
 	AppConfig struct {
-		App         Application          `yaml:"application"`
-		Settings    AppConfigSettings    `yaml:"settings"`
-		Azure       AppConfigAzure       `yaml:"azure"`
-		Kubernetes  AppConfigKubernetes  `yaml:"kubernetes"`
-		Permissions AppConfigPermissions `yaml:"permissions"`
+		App          Application           `yaml:"application"`
+		Settings     AppConfigSettings     `yaml:"settings"`
+		Azure        AppConfigAzure        `yaml:"azure"`
+		Kubernetes   AppConfigKubernetes   `yaml:"kubernetes"`
+		Permissions  AppConfigPermissions  `yaml:"permissions"`
 		Alertmanager AppConfigAlertmanager `yaml:"alertmanager"`
 	}
 

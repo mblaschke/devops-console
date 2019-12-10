@@ -12,6 +12,4 @@ type (
 		SettingName string
 		Secret      string
 	}
-
-
 )

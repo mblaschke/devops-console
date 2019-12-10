@@ -1,7 +1,6 @@
 package models
 
 type (
-
 	AppConfigKubernetes struct {
 		Namespace struct {
 			Settings []AppConfigNamespaceSettings

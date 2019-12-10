@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/securecookie"
-	"github.com/kataras/iris/sessions"
+	"github.com/kataras/iris/v12/sessions"
 )
 
 func (c *Server) initSession() {

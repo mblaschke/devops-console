@@ -13,7 +13,6 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.0
 	github.com/Azure/go-autorest/autorest/to v0.3.0
 	github.com/Azure/go-autorest/autorest/validation v0.2.0 // indirect
-	github.com/CloudyKit/fastprinter v0.0.0-20170127035650-74b38d55f37a // indirect
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
@@ -65,6 +64,7 @@ require (
 	github.com/karrick/tparse/v2 v2.7.1
 	github.com/kataras/go-sessions v3.0.0+incompatible // indirect
 	github.com/kataras/iris v0.0.0-20191006184023-c8e73f4f4df2
+	github.com/kataras/iris/v12 v12.0.1
 	github.com/klauspost/compress v1.9.4 // indirect
 	github.com/marstr/goalias v0.0.0-20180416201319-8dff9a14db64 // indirect
 	github.com/marstr/guid v1.1.0 // indirect
@@ -87,7 +87,6 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shopspring/decimal v0.0.0-20191130220710-360f2bc03045 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
