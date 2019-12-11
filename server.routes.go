@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	iris "github.com/kataras/iris"
+	iris "github.com/kataras/iris/v12"
 )
 
 func (c *Server) initRoutes() {
