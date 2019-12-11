@@ -439,12 +439,12 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 		return
 	}
 
-	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name))
+	c.notificationMessage(ctx, fmt.Sprintf("Namespace \"%s\" reset", namespace.Name))
 	c.auditLog(ctx, fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "resetSettings"}).Inc()
 
 	resp := response.GeneralMessage{
-		Message: fmt.Sprintf("Namespace \"%s\" resetted", namespace.Name),
+		Message: fmt.Sprintf("Namespace \"%s\" reset", namespace.Name),
 	}
 
 	ctx.JSON(resp)
