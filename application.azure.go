@@ -12,7 +12,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/hashicorp/go-uuid"
-	iris "github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris"
 	"github.com/prometheus/client_golang/prometheus"
 	"os"
 	"strings"
