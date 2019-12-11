@@ -133,8 +133,6 @@ class AzureResourceGroups extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     stateCreateButton() {

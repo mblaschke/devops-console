@@ -45,8 +45,6 @@ class K8sNamespaceModalDelete extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     componentWillReceiveProps(nextProps) {

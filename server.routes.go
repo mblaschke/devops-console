@@ -74,20 +74,51 @@ func (c *Server) csrfProtectionReferer(ctx iris.Context) {
 }
 
 func (c *Server) csrfProtectionToken(ctx iris.Context) {
+	if opts.DisableCsrfProtection {
+		ctx.ViewData("CSRF_TOKEN_JSON", "false")
+		ctx.Next()
+		return
+	}
+
 	s := c.session.Start(ctx)
+
+	// get token
+	sessionToken := ""
+	if val, ok := s.Get("CSRF").(string); ok {
+		sessionToken = val
+	}
+
+	if sessionToken == "" {
+		sessionToken = c.csrfProtectionTokenRegenerate(ctx)
+	}
 
 	method := ctx.Method()
 
 	// check token if not GET or HEAD (safe methods)
 	if method != "GET" && method != "HEAD" {
-		sessionToken := s.Get("CSRF").(string)
 		clientToken := ctx.GetHeader("X-CSRF-Token")
 
-		if clientToken != sessionToken {
+		if sessionToken == "" || clientToken != sessionToken {
 			c.respondError(ctx, errors.New("Invalid CSRF token"))
 			return
 		}
 	}
+
+	// inject token
+	ctx.Header("X-CSRF-Token", sessionToken)
+
+	tokenJson, _ := json.Marshal(sessionToken)
+	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
+
+	ctx.Next()
+}
+
+func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
+	if opts.DisableCsrfProtection {
+		return ""
+	}
+
+	s := c.session.Start(ctx)
 
 	// set new token
 	token := randomString(64);
@@ -97,5 +128,5 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 	tokenJson, _ := json.Marshal(token)
 	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
 
-	ctx.Next()
+	return token
 }

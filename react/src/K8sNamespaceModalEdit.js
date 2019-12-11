@@ -47,8 +47,6 @@ class K8sNamespaceModalEdit extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     cancelEdit() {

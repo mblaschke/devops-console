@@ -115,7 +115,9 @@ class BaseComponent extends Component {
             opts.headers["X-CSRF-Token"] = window.CSRF_TOKEN;
         }
 
-        return $.ajax(opts);
+        let jqxhr = $.ajax(opts);
+        this.handleXhr(jqxhr);
+        return jqxhr;
     }
 
 }

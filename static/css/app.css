@@ -8,6 +8,10 @@ body {
     z-index: 1000;
 }
 
+label {
+    user-select: none;
+}
+
 @media (min-width: 768px) {
     .sidebar .nav-item .dropdown-menu {
         display: block;
@@ -27,8 +31,14 @@ body {
 }
 
 .card-body.scrollable {
+    min-height: 10rem;
     max-height: 30rem;
     overflow-y: scroll;
+}
+
+.card-body.card-body-table {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 dd a,
@@ -212,6 +222,16 @@ table.table thead th {
     border-radius: 1rem;
     position: absolute;
     right: 0;
+}
+
+.form-group-rel {
+    position: relative;
+}
+
+.bnt-abs-right {
+    position: absolute;
+    right: 0.25rem;
+    top: 0.25rem;
 }
 
 .button-copy:focus {

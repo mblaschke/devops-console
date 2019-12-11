@@ -61,8 +61,9 @@ class MonitoringAlertmanager extends BaseComponent {
         });
 
 
-        let jqxhr = $.get({
-            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/alerts/'
+        let jqxhr = this.ajax({
+            type: 'GET',
+            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/alerts'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
                 this.setInputFocus();
@@ -74,8 +75,6 @@ class MonitoringAlertmanager extends BaseComponent {
                 loadingAlerts: false,
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     loadSilences() {
@@ -87,9 +86,9 @@ class MonitoringAlertmanager extends BaseComponent {
             loadingSilences: true,
         });
 
-        let jqxhr = $.ajax({
-            type: "GET",
-            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/silences/'
+        let jqxhr = this.ajax({
+            type: 'GET',
+            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/silences'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
                 this.setInputFocus();
@@ -101,12 +100,10 @@ class MonitoringAlertmanager extends BaseComponent {
                 loadingSilences: false,
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     loadConfig() {
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: "GET",
             url: '/api/app/config'
         }).done((jqxhr) => {
@@ -130,8 +127,6 @@ class MonitoringAlertmanager extends BaseComponent {
                 });
             }
         });
-
-        this.handleXhr(jqxhr);
     }
 
     componentDidMount() {
@@ -434,7 +429,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             </div>
                         </div>
                     </div>
-                    <div className="card-body scrollable spinner-area">
+                    <div className="card-body card-body-table scrollable spinner-area">
                         {this.renderAlerts()}
                     </div>
                     <div className="card-footer small text-muted">{this.buildFooter(this.state.alerts)}</div>
@@ -465,7 +460,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             </div>
                         </div>
                     </div>
-                    <div className="card-body scrollable spinner-area">
+                    <div className="card-body card-body-table scrollable spinner-area">
                         {this.renderSilences()}
                     </div>
                     <div className="card-footer small text-muted">{this.buildFooter(this.state.silences)}</div>
@@ -616,10 +611,19 @@ class MonitoringAlertmanager extends BaseComponent {
                                             aria-expanded="false">
                                         Action
                                     </button>
-                                    <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                        <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
-                                    </div>
+                                    {(() => {
+                                        switch (row.status.state) {
+                                            case "expired":
+                                                return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                </div>
+                                            default:
+                                                return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                    <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
+                                                </div>
+                                        }
+                                    })()}
                                 </div>
                             </td>
                         </tr>

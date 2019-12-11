@@ -132,7 +132,7 @@ class App extends BaseComponent {
     }
 
     handleLogin() {
-        $.ajax({
+        this.ajax({
             type: 'POST',
             url: "/api/_login",
             data: {

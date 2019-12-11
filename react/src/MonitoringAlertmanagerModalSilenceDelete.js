@@ -41,8 +41,6 @@ class MonitoringAlertmanagerModalSilenceDelete extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     handleConfirmNamespace(event) {

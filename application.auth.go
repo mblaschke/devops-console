@@ -117,6 +117,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	if userSession, err := user.ToJson(); err == nil {
 		s.Set("user", userSession)
+		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
 		ctx.ViewData("messageError", "Unable to set session")
 		ctx.View("login.jet")

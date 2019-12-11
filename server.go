@@ -264,7 +264,7 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 
 func (c *Server) before(ctx iris.Context) {
 	// security headers
-	ctx.Header("X-Frame-Options", "SAMEORIGIN")
+	ctx.Header("X-Frame-Options", "BLOCK")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
 	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")

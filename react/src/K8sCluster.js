@@ -58,8 +58,6 @@ class K8sCluster extends BaseComponent {
                 countAgents: countAgents
             })
         });
-
-        this.handleXhr(jqxhr);
     }
 
     componentDidMount() {
@@ -126,7 +124,7 @@ class K8sCluster extends BaseComponent {
                             <i className="fas fa-server"></i>
                             Kubernetes cluster overview
                         </div>
-                        <div className="card-body">
+                        <div className="card-body card-body-table">
                             <table className="table table-hover table-sm">
                                 <thead>
                                 <tr>

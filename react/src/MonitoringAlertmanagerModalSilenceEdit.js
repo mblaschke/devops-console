@@ -88,8 +88,6 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     saveCreate(e) {
@@ -102,7 +100,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         let jqxhr = this.ajax({
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
-            url: "/api/alertmanager/" + encodeURI(this.props.instance) + "/silence/",
+            url: "/api/alertmanager/" + encodeURI(this.props.instance) + "/silence",
             data: JSON.stringify({
                 team: this.state.team,
                 silence: this.state.silence
@@ -122,8 +120,6 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     cancelEdit() {
@@ -283,70 +279,66 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                     </div>
 
                                     <div className="form-group">
-                                        <label htmlFor="inputNsDescription" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
                                         <div className="form-row">
-                                            <div className="form-group col-md-10">
-                                                <input className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
+                                            <div className="form-group col-md-6 form-group-rel">
+                                                <label htmlFor="inputNsDescription" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
+                                                <div className="form-group-rel">
+                                                    <input className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
+                                                    <div className="btn-group bnt-abs-right" role="group">
+                                                        <button id="btnGroupDrop1" type="button"
+                                                                className="btn btn-secondary dropdown-toggle btn-sm"
+                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            +
+                                                        </button>
+                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "h")}>1 hour</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "h")}>2 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "h")}>4 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 8, "h")}>8 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "d")}>1 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "d")}>2 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "d")}>4 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "w")}>1 week</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "w")}>2 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 3, "w")}>3 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "w")}>4 weeks</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="">
-                                                <div className="btn-group" role="group">
-                                                    <button id="btnGroupDrop1" type="button"
-                                                            className="btn btn-secondary dropdown-toggle"
-                                                            data-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        + time
-                                                    </button>
-                                                    <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "h")}>1 hour</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "h")}>2 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "h")}>4 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 8, "h")}>8 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "d")}>1 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "d")}>2 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "d")}>4 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "w")}>1 week</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "w")}>2 weeks</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 3, "w")}>3 weeks</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "w")}>4 weeks</a>
+
+                                            <div className="form-group col-md-6 form-group-rel">
+                                                <label htmlFor="inputNsDescription" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
+                                                <div className="form-group-rel">
+                                                    <input className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
+                                                    <div className="btn-group bnt-abs-right" role="group">
+                                                        <button id="btnGroupDrop1" type="button"
+                                                                className="btn btn-secondary dropdown-toggle btn-sm"
+                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            +
+                                                        </button>
+                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "h")}>1 hour</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "h")}>2 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "h")}>4 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 8, "h")}>8 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "d")}>1 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "d")}>2 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "d")}>4 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "w")}>1 week</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "w")}>2 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 3, "w")}>3 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "w")}>4 weeks</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="inputNsDescription" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
-                                        <div className="form-row">
-                                            <div className="form-group col-md-10">
-                                                <input className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
-                                            </div>
-                                            <div>
-                                                <div className="btn-group" role="group">
-                                                    <button id="btnGroupDrop1" type="button"
-                                                            className="btn btn-secondary dropdown-toggle"
-                                                            data-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        + time
-                                                    </button>
-                                                    <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "h")}>1 hour</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "h")}>2 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "h")}>4 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 8, "h")}>8 hours</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "d")}>1 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "d")}>2 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "d")}>4 day</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "w")}>1 week</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "w")}>2 weeks</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 3, "w")}>3 weeks</a>
-                                                        <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "w")}>4 weeks</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <table className="table table-sm table-borderless">
+                                    <table className="table table-sm table-borderless table-striped">
                                         <colgroup>
                                             <col widht="*" />
                                             <col widht="*" />
@@ -373,19 +365,15 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                         {matchers.map((item,key) =>
                                             <tr>
                                                 <td>
-                                                    <div className="form-group">
-                                                        <input className="form-control" value={this.getValue("silence.matchers[" + key + "].name")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].name")}  />
-                                                    </div>
+                                                    <input className="form-control" value={this.getValue("silence.matchers[" + key + "].name")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].name")}  />
                                                 </td>
 
                                                 <td>
-                                                    <div className="form-group">
-                                                        <input className="form-control" value={this.getValue("silence.matchers[" + key + "].value")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].value")}  />
-                                                    </div>
+                                                    <input className="form-control" value={this.getValue("silence.matchers[" + key + "].value")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].value")}  />
                                                 </td>
 
                                                 <td>
-                                                    <div className="form-group form-check">
+                                                    <div className="form-check">
                                                         <input type="checkbox" id={this.htmlIdMatcher(key)}
                                                                className="form-check-input"
                                                                checked={this.getValueCheckbox("silence.matchers[" + key + "].isRegex")}

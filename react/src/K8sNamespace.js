@@ -64,8 +64,6 @@ class K8sNamespace extends BaseComponent {
                 isStartup: false
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     loadConfig() {
@@ -87,8 +85,6 @@ class K8sNamespace extends BaseComponent {
                 });
             }
         });
-
-        this.handleXhr(jqxhr);
     }
 
     componentDidMount() {
@@ -168,8 +164,6 @@ class K8sNamespace extends BaseComponent {
             type: 'POST',
             url: "/api/kubernetes/namespace/" + encodeURI(namespace.Name) + "/reset"
         });
-
-        this.handleXhr(jqxhr);
     }
 
     renderRowOwner(row) {
@@ -255,7 +249,6 @@ class K8sNamespace extends BaseComponent {
             this.refresh();
         });
 
-        this.handleXhr(jqxhr);
         event.preventDefault();
         event.stopPropagation();
         return false;
@@ -337,7 +330,7 @@ class K8sNamespace extends BaseComponent {
                             <button type="button" className="btn btn-primary" onClick={this.createNamespace.bind(this)}>Create namespace</button>
                         </div>
                     </div>
-                    <div className="card-body">
+                    <div className="card-body card-body-table">
                         <table className="table table-hover table-sm">
                             <colgroup>
                                 <col width="*" />

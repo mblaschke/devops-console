@@ -34,8 +34,6 @@ class GeneralStats extends BaseComponent {
                 isStartup: false
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     render() {

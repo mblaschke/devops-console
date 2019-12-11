@@ -55,8 +55,6 @@ class K8sNamespaceModalCreate extends BaseComponent {
                 buttonText: oldButtonText
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     handleNamespaceInputChange(name, event) {

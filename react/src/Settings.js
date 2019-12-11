@@ -42,7 +42,8 @@ class Settings extends BaseComponent {
     }
 
     loadConfig() {
-        let jqxhr = $.get({
+        let jqxhr = this.ajax({
+            type: 'GET',
             url: '/api/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
@@ -60,12 +61,11 @@ class Settings extends BaseComponent {
                 });
             }
         });
-
-        this.handleXhr(jqxhr);
     }
 
     loadSettings() {
-        let jqxhr = $.get({
+        let jqxhr = this.ajax({
+            type: 'GET',
             url: '/api/general/settings'
         }).done((jqxhr) => {
             if (jqxhr) {
@@ -87,8 +87,6 @@ class Settings extends BaseComponent {
                 this.setState(state);
             }
         });
-
-        this.handleXhr(jqxhr);
     }
 
     handlePersonalInputChange(name, event) {
@@ -126,7 +124,7 @@ class Settings extends BaseComponent {
             requestRunning: true,
         });
 
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'POST',
             url: "/api/general/settings/user",
             data: JSON.stringify(this.state.user)
@@ -135,8 +133,6 @@ class Settings extends BaseComponent {
                 requestRunning: false,
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     updateTeamSettings(team, e) {
@@ -148,7 +144,7 @@ class Settings extends BaseComponent {
             requestRunning: true
         });
 
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'POST',
             url: "/api/general/settings/team/" + encodeURI(team),
             data: JSON.stringify(this.getTeamConfig(team))
@@ -157,8 +153,6 @@ class Settings extends BaseComponent {
                 requestRunning: false,
             });
         });
-
-        this.handleXhr(jqxhr);
     }
 
     getUserConfigItem(name) {

@@ -31,6 +31,7 @@ var opts struct {
 	MetricsBind string   `long:"metrics-bind" env:"METRICS_BIND" description:"Server address" default:":9001"`
 	DumpConfig  bool     `long:"dump-config" description:"Dump config"`
 	Debug       bool     `long:"debug" description:"Enable debug mode"`
+	DisableCsrfProtection bool `long:"disable-csrf" env:"DISABLE_CSRF_PROTECTION" description:"Disable CSFR protection"`
 }
 
 func main() {
