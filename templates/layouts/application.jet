@@ -23,6 +23,9 @@
     </div>
   </div>
 </main>
+<script>
+window.CSRF_TOKEN = {{ CSRF_TOKEN_JSON | raw }};
+</script>
   {{include "includes/react.jet"}}
   {{include "includes/html-footer.jet"}}
 </body>

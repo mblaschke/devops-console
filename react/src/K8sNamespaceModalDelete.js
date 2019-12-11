@@ -28,7 +28,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
             buttonText: "Deleting...",
         });
 
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'DELETE',
             url: "/api/kubernetes/namespace/" + encodeURI(this.props.namespace.Name)
         }).done(() => {

@@ -51,7 +51,8 @@ class K8sNamespace extends BaseComponent {
     }
 
     loadNamespaces() {
-        let jqxhr = $.get({
+        let jqxhr = this.ajax({
+            type: "GET",
             url: '/api/kubernetes/namespace'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
@@ -68,7 +69,8 @@ class K8sNamespace extends BaseComponent {
     }
 
     loadConfig() {
-        let jqxhr = $.get({
+        let jqxhr = this.ajax({
+            type: "GET",
             url: '/api/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
@@ -162,7 +164,7 @@ class K8sNamespace extends BaseComponent {
     }
 
     resetNamespace(namespace) {
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'POST',
             url: "/api/kubernetes/namespace/" + encodeURI(namespace.Name) + "/reset"
         });
@@ -240,7 +242,7 @@ class K8sNamespace extends BaseComponent {
     }
 
     handleDescriptionSubmit(event) {
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'PUT',
             url: "/api/kubernetes/namespace/" + encodeURI(this.state.namespaceDescriptionEdit),
             data: JSON.stringify({

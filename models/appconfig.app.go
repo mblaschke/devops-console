@@ -18,6 +18,10 @@ type (
 			} `yaml:"secureCookie"`
 		}
 
+		Csrf struct {
+			Secret string `yaml:"secret"`
+		} `yaml:"csrf"`
+
 		Oauth OAuthConfig `yaml:"oauth"`
 
 		Notification struct {

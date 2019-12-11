@@ -44,7 +44,8 @@ class AzureResourceGroups extends BaseComponent {
     }
 
     loadConfig() {
-        $.get({
+        this.ajax({
+            type: "GET",
             url: '/api/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
@@ -118,7 +119,7 @@ class AzureResourceGroups extends BaseComponent {
             buttonText: "Saving..."
         });
 
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'POST',
             url: "/api/azure/resourcegroup",
             data: JSON.stringify(this.state.resourceGroup)

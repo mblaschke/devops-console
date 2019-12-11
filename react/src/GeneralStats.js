@@ -24,7 +24,8 @@ class GeneralStats extends BaseComponent {
     }
 
     refresh() {
-        let jqxhr = $.get({
+        let jqxhr = this.ajax({
+            type: "GET",
             url: '/api/general/stats'
         }).done((jqxhr) => {
             this.setState({

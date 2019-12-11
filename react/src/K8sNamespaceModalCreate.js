@@ -36,7 +36,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
             buttonText: "Saving...",
         });
 
-        let jqxhr = $.ajax({
+        let jqxhr = this.ajax({
             type: 'POST',
             url: "/api/kubernetes/namespace",
             data: JSON.stringify(this.state.namespace)

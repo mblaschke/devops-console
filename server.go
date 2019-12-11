@@ -37,6 +37,7 @@ type Server struct {
 
 func NewServer(pathList []string) *Server {
 	server := Server{}
+
 	server.app = iris.New()
 	server.logger = glogger.Init("Verbose", true, false, ioutil.Discard)
 	server.app.Use(recover.New())
@@ -157,7 +158,8 @@ func (c *Server) setupKubernetes() {
 func (c *Server) initApp() {
 	c.logger.Infof("setup app server")
 
-	c.app.UseGlobal(c.before)
+	c.app.Use(c.before)
+	c.app.Done(c.after)
 
 	c.initSession()
 	c.initTemplateEngine()
@@ -182,8 +184,6 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 	}{
 		Message: fmt.Sprintf("Error: %v", err),
 	}
-
-	panic(response.Message)
 
 	c.auditLog(ctx, response.Message, 1)
 
@@ -263,8 +263,6 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 }
 
 func (c *Server) before(ctx iris.Context) {
-	atomic.AddInt64(&requestCounter, 1)
-
 	// security headers
 	ctx.Header("X-Frame-Options", "SAMEORIGIN")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
@@ -274,6 +272,10 @@ func (c *Server) before(ctx iris.Context) {
 	// view information
 	ctx.ViewData("navigationRoute", ctx.GetCurrentRoute().Path())
 	ctx.Next()
+}
+
+func (c *Server) after(ctx iris.Context) {
+	atomic.AddInt64(&requestCounter, 1)
 }
 
 func (c *Server) index(ctx iris.Context) {

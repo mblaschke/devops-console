@@ -9,8 +9,11 @@ import (
 	"k8s.io/api/settings/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 func createKubernetesObjectList() (list *models.KubernetesObjectList) {
@@ -142,4 +145,18 @@ func KubeParseConfig(path string) runtime.Object {
 
 func stringToPtr(val string) *string {
 	return &val
+}
+
+
+func randomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"abcdefghijklmnopqrstuvwxyz" +
+		"0123456789" +
+		"-_+=*")
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		b.WriteRune(chars[rand.Intn(len(chars))])
+	}
+	return b.String()
 }

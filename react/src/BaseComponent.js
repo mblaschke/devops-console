@@ -13,6 +13,14 @@ class BaseComponent extends Component {
     }
 
     handleXhr(jqxhr) {
+        jqxhr.always((resp) => {
+            // update CSRF token if needed
+            let csrfToken = jqxhr.getResponseHeader("x-csrf-token");
+            if (csrfToken) {
+                window.CSRF_TOKEN = csrfToken;
+            }
+        });
+
         jqxhr.fail((jqxhr) => {
             if (jqxhr.status === 401) {
                 this.setState({
@@ -97,6 +105,19 @@ class BaseComponent extends Component {
             searchValue: event.target.value
         });
     }
+
+    ajax(opts) {
+        if (!opts.headers) {
+            opts.headers = [];
+        }
+
+        if (window.CSRF_TOKEN) {
+            opts.headers["X-CSRF-Token"] = window.CSRF_TOKEN;
+        }
+
+        return $.ajax(opts);
+    }
+
 }
 
 export default BaseComponent;

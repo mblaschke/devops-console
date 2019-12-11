@@ -87,7 +87,8 @@ class MonitoringAlertmanager extends BaseComponent {
             loadingSilences: true,
         });
 
-        let jqxhr = $.get({
+        let jqxhr = $.ajax({
+            type: "GET",
             url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/silences/'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
@@ -105,7 +106,8 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     loadConfig() {
-        let jqxhr = $.get({
+        let jqxhr = $.ajax({
+            type: "GET",
             url: '/api/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {

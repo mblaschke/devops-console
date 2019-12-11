@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	iris "github.com/kataras/iris/v12"
 )
 
@@ -23,41 +25,77 @@ func (c *Server) initRoutes() {
 	applicationGeneral := ApplicationGeneral{Server: c}
 	applicationAuth := ApplicationAuth{Server: c}
 
+
 	c.app.Get("/", c.index)
 	c.app.Post("/login", applicationAuth.Login)
 	c.app.Get("/oauth", applicationAuth.LoginViaOauth)
 	c.app.Get("/logout", applicationAuth.Logout)
 
-	c.app.Get("/api/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
-	c.app.Get("/api/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
+	party := c.app.Party("/", c.csrfProtectionReferer, c.csrfProtectionToken)
+	{
+		party.Get("/api/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
+		party.Get("/api/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
 
-	c.app.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
-	c.app.Get("/api/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
-	c.app.Post("/api/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
-	c.app.Post("/api/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
+		party.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
+		party.Get("/api/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
+		party.Post("/api/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
+		party.Post("/api/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
 
-	c.app.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
+		party.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
 
-	c.app.Get("/kubernetes/cluster", func(ctx iris.Context) { c.react(ctx, "Kubernetes Cluster") })
-	c.app.Get("/api/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
+		party.Get("/kubernetes/cluster", func(ctx iris.Context) { c.react(ctx, "Kubernetes Cluster") })
+		party.Get("/api/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
 
-	c.app.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
-	c.app.Get("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
-	c.app.Post("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceCreate) })
-	c.app.Delete("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceDelete) })
-	c.app.Put("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
-	c.app.Post("/api/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
+		party.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
+		party.Get("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
+		party.Post("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceCreate) })
+		party.Delete("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceDelete) })
+		party.Put("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
+		party.Post("/api/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
 
-	c.app.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
+		party.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
 
-	c.app.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
-	c.app.Post("/api/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
+		party.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
+		party.Post("/api/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
 
-	c.app.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
+		party.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
 
-	c.app.Get("/api/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
-	c.app.Get("/api/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
-	c.app.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
-	c.app.Post("/api/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
-	c.app.Put("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
+		party.Get("/api/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
+		party.Get("/api/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
+		party.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
+		party.Post("/api/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
+		party.Put("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
+	}
+}
+
+func (c *Server) csrfProtectionReferer(ctx iris.Context) {
+	// TODO
+	ctx.Next()
+}
+
+func (c *Server) csrfProtectionToken(ctx iris.Context) {
+	s := c.session.Start(ctx)
+
+	method := ctx.Method()
+
+	// check token if not GET or HEAD (safe methods)
+	if method != "GET" && method != "HEAD" {
+		sessionToken := s.Get("CSRF").(string)
+		clientToken := ctx.GetHeader("X-CSRF-Token")
+
+		if clientToken != sessionToken {
+			c.respondError(ctx, errors.New("Invalid CSRF token"))
+			return
+		}
+	}
+
+	// set new token
+	token := randomString(64);
+	s.Set("CSRF", token);
+	ctx.Header("X-CSRF-Token", token)
+
+	tokenJson, _ := json.Marshal(token)
+	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
+
+	ctx.Next()
 }
