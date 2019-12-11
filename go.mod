@@ -43,6 +43,8 @@ require (
 	github.com/google/pprof v0.0.0-20190723021845-34ac40c74b70 // indirect
 	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/gophercloud/gophercloud v0.3.0 // indirect
+	github.com/gorilla/csrf v1.6.2
+	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.9.5 // indirect
@@ -57,13 +59,14 @@ require (
 	github.com/huandu/xstrings v1.2.1 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/influxdata/influxdb v1.7.7 // indirect
+	github.com/iris-contrib/middleware/csrf v0.0.0-20191111233249-6e1f5f92190e
 	github.com/jessevdk/go-flags v0.0.0-20180331124232-1c38ed7ad0cc
 	github.com/jpillora/backoff v0.0.0-20180909062703-3050d21c67d7 // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9 // indirect
 	github.com/karrick/tparse/v2 v2.7.1
 	github.com/kataras/go-sessions v3.0.0+incompatible // indirect
-	github.com/kataras/iris v0.0.0-20191006184023-c8e73f4f4df2
+	github.com/kataras/iris v0.0.0-20191006184023-c8e73f4f4df2 // indirect
 	github.com/kataras/iris/v12 v12.0.1
 	github.com/klauspost/compress v1.9.4 // indirect
 	github.com/marstr/goalias v0.0.0-20180416201319-8dff9a14db64 // indirect
@@ -99,10 +102,10 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.mongodb.org/mongo-driver v1.1.3 // indirect
-	golang.org/x/crypto v0.0.0-20191202143827-86a70503ff7e // indirect
-	golang.org/x/net v0.0.0-20191204025024-5ee1b9f4859a // indirect
+	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20191204072324-ce4227a45e2e // indirect
+	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
 	golang.org/x/tools v0.0.0-20191202203127-2b6af5f9ace7 // indirect
 	google.golang.org/grpc v1.22.1 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
