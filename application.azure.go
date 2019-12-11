@@ -40,6 +40,10 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	subscriptionId := os.Getenv("AZURE_SUBSCRIPTION_ID")
 
+	if formData.Name == "" {
+		validationMessages = append(validationMessages, "Validation of ResourceGroup name failed (empty)")
+	}
+
 	// validate name
 	if !c.config.Azure.ResourceGroup.Validation.Validate(formData.Name) {
 		validationMessages = append(validationMessages, fmt.Sprintf("Validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Validation.HumanizeString()))
