@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Version = "2.1.7"
+	Version = "2.1.8"
 )
 
 var (
