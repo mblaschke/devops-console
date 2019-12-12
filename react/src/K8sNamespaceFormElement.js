@@ -1,5 +1,4 @@
 import React from 'react';
-
 import BaseComponent from './BaseComponent';
 
 class K8sNamespaceFormElement extends BaseComponent {

@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import BaseComponent from './BaseComponent';
 import Spinner from './Spinner';
 import Breadcrumb from "./Breadcrumb";
@@ -125,45 +123,47 @@ class K8sCluster extends BaseComponent {
                             Kubernetes cluster overview
                         </div>
                         <div className="card-body card-body-table">
-                            <table className="table table-hover table-sm">
-                                <thead>
-                                <tr>
-                                    <th>Server</th>
-                                    <th>Network</th>
-                                    <th>System</th>
-                                    <th>Version</th>
-                                    <th>Created</th>
-                                    <th>Status</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {nodes.map((row) =>
-                                    <tr key={row.Name} className={row.Role === 'master' ? 'k8s-master' : 'k8s-agent'}>
-                                        <td>
-                                            <span className={row.Role === 'master' ? 'badge badge-danger' : 'badge badge-primary'}>{this.highlight(row.Role)}</span> {this.highlight(row.Name)}<br/>
-                                            <span className="badge badge-info">{this.highlight(row.SpecArch)}</span>&nbsp;
-                                            <span className="badge badge-info">{this.highlight(row.SpecOS)}</span>&nbsp;
-                                            <span className="badge badge-secondary">Region {this.highlight(row.SpecRegion)}</span>&nbsp;
-                                            <span className="badge badge-secondary">Zone {this.highlight(row.SpecZone)}</span>
-                                        </td>
-                                        <td>{this.highlight(row.InternalIp)}</td>
-                                        <td>
-                                            <small>
-                                                {this.highlight(row.SpecInstance)}<br/>
-                                                CPU: {this.highlight(row.SpecMachineCPU)}<br/>
-                                                MEM: {this.highlight(row.SpecMachineMemory)}<br/>
-                                            </small>
-                                        </td>
-                                        <td>{this.highlight(row.Version)}</td>
-                                        <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
-                                        <td>
-                                            <span
-                                                className={row.Status === 'Ready' ? 'badge badge-success' : 'badge badge-warning'}>{row.Status !== '' ? this.highlight(row.Status)  : this.highlight("unknown")}</span>
-                                        </td>
+                            <div className="table-responsive">
+                                <table className="table table-hover table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>Server</th>
+                                        <th>Network</th>
+                                        <th>System</th>
+                                        <th>Version</th>
+                                        <th>Created</th>
+                                        <th>Status</th>
                                     </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {nodes.map((row) =>
+                                        <tr key={row.Name} className={row.Role === 'master' ? 'k8s-master' : 'k8s-agent'}>
+                                            <td>
+                                                <span className={row.Role === 'master' ? 'badge badge-danger' : 'badge badge-primary'}>{this.highlight(row.Role)}</span> {this.highlight(row.Name)}<br/>
+                                                <span className="badge badge-info">{this.highlight(row.SpecArch)}</span>&nbsp;
+                                                <span className="badge badge-info">{this.highlight(row.SpecOS)}</span>&nbsp;
+                                                <span className="badge badge-secondary">Region {this.highlight(row.SpecRegion)}</span>&nbsp;
+                                                <span className="badge badge-secondary">Zone {this.highlight(row.SpecZone)}</span>
+                                            </td>
+                                            <td>{this.highlight(row.InternalIp)}</td>
+                                            <td>
+                                                <small>
+                                                    {this.highlight(row.SpecInstance)}<br/>
+                                                    CPU: {this.highlight(row.SpecMachineCPU)}<br/>
+                                                    MEM: {this.highlight(row.SpecMachineMemory)}<br/>
+                                                </small>
+                                            </td>
+                                            <td>{this.highlight(row.Version)}</td>
+                                            <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
+                                            <td>
+                                                <span
+                                                    className={row.Status === 'Ready' ? 'badge badge-success' : 'badge badge-warning'}>{row.Status !== '' ? this.highlight(row.Status)  : this.highlight("unknown")}</span>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div className="card-footer small text-muted">{this.state.countMasters} masters, {this.state.countAgents} agents</div>
                     </div>

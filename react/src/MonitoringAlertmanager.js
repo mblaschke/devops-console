@@ -7,7 +7,6 @@ import Spinner from './Spinner';
 import Breadcrumb from './Breadcrumb';
 import MonitoringAlertmanagerModalSilenceDelete from "./MonitoringAlertmanagerModalSilenceDelete";
 import MonitoringAlertmanagerModalSilenceEdit from "./MonitoringAlertmanagerModalSilenceEdit";
-import * as utils from "./utils";
 
 class MonitoringAlertmanager extends BaseComponent {
     constructor(props) {
@@ -37,6 +36,7 @@ class MonitoringAlertmanager extends BaseComponent {
                 }
             },
             instance: "",
+            team: "*",
             selectedSilence: false,
             searchValue: "",
         };
@@ -217,6 +217,24 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     silenceNew() {
+        let matchers = [];
+
+        // add team matcher (force team selection)
+        if (this.state.team !== "*") {
+            matchers.push({
+                name: "team",
+                value: this.state.team,
+                isRegex: false,
+            });
+        }
+
+        // add empty matcher
+        matchers.push({
+            name: "",
+            value: "",
+            isRegex: false,
+        });
+
         this.setState({
             selectedSilence: {
                 __id__: new Date().toISOString(),
@@ -224,11 +242,8 @@ class MonitoringAlertmanager extends BaseComponent {
                 startsAt: "" + new Date().toISOString(),
                 endsAt: "" + new Date( new Date().getTime() + 1*3600*1000).toISOString(),
                 comment: "",
-                matchers: [{
-                    name: "",
-                    value: "",
-                    isRegex: false,
-                }],
+                team: this.state.team,
+                matchers: matchers,
             }
         });
 
@@ -272,8 +287,9 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     getAlertList() {
-        let ret = this.state.alerts ? this.state.alerts : [];
+        let ret = Array.isArray(this.state.alerts) ? this.state.alerts : [];
 
+        // filter by quickserach
         if (this.state.searchValue !== "") {
             let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
             let re = new RegExp(term, "i");
@@ -291,11 +307,23 @@ class MonitoringAlertmanager extends BaseComponent {
                     }
                 }
 
-
                 return false;
             });
         }
 
+        // filter by team
+        if (this.state.team !== "*") {
+            ret = ret.filter((row) => {
+                if (row.labels && row.labels["team"]) {
+                    if (row.labels["team"] === this.state.team) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        // filter by state:suppressed
         if (!this.state.filter.alert.suppressed) {
             ret = ret.filter((row) => {
                 if (row.status.state !== "suppressed") return true;
@@ -307,8 +335,9 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     getSilenceList() {
-        let ret = this.state.silences ? this.state.silences : [];
+        let ret = Array.isArray(this.state.silences) ? this.state.silences : [];
 
+        // filter by quickserach
         if (this.state.searchValue !== "") {
             let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
             let re = new RegExp(term, "i");
@@ -330,6 +359,23 @@ class MonitoringAlertmanager extends BaseComponent {
             });
         }
 
+        // filter by team
+        if (this.state.team !== "*") {
+            ret = ret.filter((row) => {
+                if (row.matchers) {
+                    for (var i in row.matchers) {
+                        if (row.matchers[i].name === "team") {
+                            if (row.matchers[i].value === this.state.team) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            });
+        }
+
+        // filter by state:expired
         if (!this.state.filter.silence.expired) {
             ret = ret.filter((row) => {
                 if (row.status.state !== "expired") return true;
@@ -340,24 +386,41 @@ class MonitoringAlertmanager extends BaseComponent {
         return ret;
     }
 
-    buildFooter(rows) {
+    buildFooter(totalRows, visibleRows) {
         let statsList = {};
         let footerLine = "";
 
-        if (rows) {
+        if (totalRows) {
             // collect
-            rows.map((row) => {
+            totalRows.map((row) => {
                 if (!statsList[row.status.state]) {
-                    statsList[row.status.state] = 0;
+                    statsList[row.status.state] = {
+                        "total": 0,
+                        "visible": 0,
+                    };
                 }
-
-                statsList[row.status.state]++;
+                statsList[row.status.state]["total"]++;
             });
+        }
 
+        if (visibleRows) {
+            // collect
+            visibleRows.map((row) => {
+                if (!statsList[row.status.state]) {
+                    statsList[row.status.state] = {
+                        "total": 0,
+                        "visible": 0,
+                    };
+                }
+                statsList[row.status.state]["visible"]++;
+            });
+        }
+
+        if (statsList) {
             // to text
             let footerElements = [];
             for (var i in statsList) {
-                footerElements.push(`${i}: ${statsList[i]}`)
+                footerElements.push(`${i}: ${statsList[i]["visible"]} of ${statsList[i]["total"]}`)
             }
 
             footerLine = footerElements.join(", ");
@@ -398,7 +461,8 @@ class MonitoringAlertmanager extends BaseComponent {
             )
         }
 
-        let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
+        let alerts = this.getAlertList();
+        let silences = this.getSilenceList();
 
         return (
             <div>
@@ -410,7 +474,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Alerts
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="form-inline col">
+                                <div className="col-sm-4 form-inline">
                                     <div className="form-check">
                                         <input type="checkbox" className="form-check-input" id="alertFilterSuppressed"
                                                checked={this.getValueCheckbox("filter.alert.suppressed")}
@@ -419,20 +483,20 @@ class MonitoringAlertmanager extends BaseComponent {
                                     </div>
                                 </div>
 
-                                <div className="col">
-                                    <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
-                                        {instances.map((row) =>
-                                            <option key={row} value={row}>{row}</option>
-                                        )}
-                                    </select>
+                                <div className="col-sm-4">
+                                    {this.renderTeamSelector()}
+                                </div>
+
+                                <div className="col-sm-4">
+                                    {this.renderInstanceSelector()}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="card-body card-body-table scrollable spinner-area">
-                        {this.renderAlerts()}
+                        {this.renderAlerts(alerts)}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(this.state.alerts)}</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(this.state.alerts, alerts)}</div>
                 </div>
 
                 <div className="card mb-3">
@@ -441,7 +505,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Silences
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="form-inline col">
+                                <div className="col-sm-4 form-inline">
                                     <div className="form-check">
                                         <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
                                                checked={this.getValueCheckbox("filter.silence.expired")}
@@ -450,20 +514,20 @@ class MonitoringAlertmanager extends BaseComponent {
                                     </div>
                                 </div>
 
-                                <div className="col">
-                                    <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
-                                        {instances.map((row) =>
-                                            <option key={row} value={row}>{row}</option>
-                                        )}
-                                    </select>
+                                <div className="col-sm-4">
+                                    {this.renderTeamSelector()}
+                                </div>
+
+                                <div className="col-sm-4">
+                                    {this.renderInstanceSelector()}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="card-body card-body-table scrollable spinner-area">
-                        {this.renderSilences()}
+                        {this.renderSilences(silences)}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(this.state.silences)}</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(this.state.silences, silences)}</div>
                 </div>
 
                 <MonitoringAlertmanagerModalSilenceDelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
@@ -472,168 +536,200 @@ class MonitoringAlertmanager extends BaseComponent {
         );
     }
 
-    renderAlerts() {
-        let alerts = this.getAlertList();
+    renderTeamSelector() {
+        return (
+            <select className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
+                <option key="*" value="*">All teams</option>
+                {this.state.config.Teams.map((row, value) =>
+                    <option key={row.Id} value={row.Name}>{row.Name}</option>
+                )}
+            </select>
+        )
+    }
 
+    renderInstanceSelector() {
+        let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
+
+        return (
+            <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
+                {instances.map((row) =>
+                    <option key={row} value={row}>{row}</option>
+                )}
+            </select>
+        )
+    }
+
+    renderAlerts(alerts) {
         return (
             <div>
                 <Spinner active={this.state.loadingAlerts}/>
 
-                <table className="table table-hover table-sm">
-                    <colgroup>
-                        <col width="*"/>
-                        <col width="200rem"/>
-                        <col width="200rem"/>
-                        <col width="200rem"/>
-                        <col width="100rem"/>
-                        <col width="50rem"/>
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>Alert</th>
-                        <th>Labels</th>
-                        <th>Started</th>
-                        <th>Last update</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {alerts.map((row) =>
+                <div className="table-responsive">
+                    <table className="table table-hover table-sm table-fixed">
+                        <colgroup>
+                            <col width="*"/>
+                            <col width="200rem"/>
+                            <col width="200rem"/>
+                            <col width="200rem"/>
+                            <col width="100rem"/>
+                            <col width="50rem"/>
+                        </colgroup>
+                        <thead>
                         <tr>
-                            <td>
-                                <strong>{this.highlight(row.annotations.summary)}</strong><br />
-                                <small>{this.highlight(row.annotations.description)}</small>
-                            </td>
-                            <td>
-                                <ul className="alertmanager-label">
-                                {Object.entries(row.labels).map((item) =>
-                                        <li>
-                                            <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
-                                        </li>
-                                )}
-                                </ul>
-                            </td>
-                            <td>{this.transformTime(row.startsAt)}</td>
-                            <td>{this.transformTime(row.updatedAt)}</td>
-                            <td>
-                                {(() => {
-                                    switch (row.status.state) {
-                                        case "active":
-                                            return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
-                                        case "suppressed":
-                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                        default:
-                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                    }
-                                })()}
-                            </td>
-                            <td className="toolbox">
-                                {(() => {
-                                    switch (row.status.state) {
-                                        case "active":
-                                            return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
-                                                Silence
-                                            </button>
-                                    }
-                                })()}
-                            </td>
+                            <th>Alert</th>
+                            <th>Labels</th>
+                            <th>Started</th>
+                            <th>Last update</th>
+                            <th>Status</th>
+                            <th></th>
                         </tr>
-                    )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {alerts.length === 0 &&
+                            <tr>
+                                <td colspan="6" className="not-found">No alerts found.</td>
+                            </tr>
+                        }
+                        {alerts.map((row) =>
+                            <tr>
+                                <td>
+                                    <strong>{this.highlight(row.annotations.summary)}</strong><br />
+                                    <small>{this.highlight(row.annotations.description)}</small>
+                                </td>
+                                <td>
+                                    <ul className="alertmanager-label">
+                                    {Object.entries(row.labels).map((item) =>
+                                            <li>
+                                                <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                            </li>
+                                    )}
+                                    </ul>
+                                </td>
+                                <td>{this.transformTime(row.startsAt)}</td>
+                                <td>{this.transformTime(row.updatedAt)}</td>
+                                <td>
+                                    {(() => {
+                                        switch (row.status.state) {
+                                            case "active":
+                                                return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
+                                            case "suppressed":
+                                                return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                            default:
+                                                return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                        }
+                                    })()}
+                                </td>
+                                <td className="toolbox">
+                                    {(() => {
+                                        switch (row.status.state) {
+                                            case "active":
+                                                return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
+                                                    Silence
+                                                </button>
+                                        }
+                                    })()}
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         )
     }
 
-    renderSilences() {
-        let silences = this.getSilenceList();
-
+    renderSilences(silences) {
         return (
             <div>
                 <Spinner active={this.state.loadingSilences}/>
 
-                <table className="table table-hover table-sm">
-                    <colgroup>
-                        <col width="*"/>
-                        <col width="200rem"/>
-                        <col width="200rem"/>
-                        <col width="200rem"/>
-                        <col width="80rem"/>
-                        <col width="80rem"/>
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>Alert</th>
-                        <th>Matchers</th>
-                        <th>Started</th>
-                        <th>Until</th>
-                        <th></th>
-                        <th className="toolbox">
-                            <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
-                                <i className="fas fa-plus"></i>
-                            </button>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {silences.map((row) =>
+                <div className="table-responsive">
+                    <table className="table table-hover table-sm table-fixed">
+                        <colgroup>
+                            <col width="*"/>
+                            <col width="200rem"/>
+                            <col width="200rem"/>
+                            <col width="200rem"/>
+                            <col width="80rem"/>
+                            <col width="80rem"/>
+                        </colgroup>
+                        <thead>
                         <tr>
-                            <td>
-                                {this.highlight(row.comment)}
-                                <br/>
-                                <i><small>created: {this.highlight(row.createdBy)}</small></i>
-                            </td>
-                            <td>
-                                {row.matchers.map((item) =>
-                                    <ul className="alertmanager-matcher">{this.renderMatch(item)}</ul>
-                                )}
-                            </td>
-                            <td>{this.transformTime(row.startsAt)}</td>
-                            <td>{this.transformTime(row.endsAt)}</td>
-                            <td>
-                                {(() => {
-                                    switch (row.status.state) {
-                                        case "active":
-                                            return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
-                                        case "expired":
-                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                        default:
-                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                    }
-                                })()}
-                            </td>
-                            <td className="toolbox">
-                                <div className="btn-group" role="group">
-                                    <button id="btnGroupDrop1" type="button"
-                                            className="btn btn-secondary dropdown-toggle"
-                                            data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                        Action
-                                    </button>
+                            <th>Alert</th>
+                            <th>Matchers</th>
+                            <th>Started</th>
+                            <th>Until</th>
+                            <th></th>
+                            <th className="toolbox">
+                                <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
+                                    <i className="fas fa-plus"></i>
+                                </button>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {silences.length === 0 &&
+                            <tr>
+                                <td colspan="6" className="not-found">No silences found.</td>
+                            </tr>
+                        }
+                        {silences.map((row) =>
+                            <tr>
+                                <td>
+                                    {this.highlight(row.comment)}
+                                    <br/>
+                                    <i><small>created: {this.highlight(row.createdBy)}</small></i>
+                                </td>
+                                <td>
+                                    {row.matchers.map((item) =>
+                                        <ul className="alertmanager-matcher">{this.renderMatch(item)}</ul>
+                                    )}
+                                </td>
+                                <td>{this.transformTime(row.startsAt)}</td>
+                                <td>{this.transformTime(row.endsAt)}</td>
+                                <td>
                                     {(() => {
                                         switch (row.status.state) {
+                                            case "active":
+                                                return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
                                             case "expired":
-                                                return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                </div>
+                                                return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
                                             default:
-                                                return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                    <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
-                                                </div>
+                                                return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
                                         }
                                     })()}
-                                </div>
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
+                                </td>
+                                <td className="toolbox">
+                                    <div className="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button"
+                                                className="btn btn-secondary dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                            Action
+                                        </button>
+                                        {(() => {
+                                            switch (row.status.state) {
+                                                case "expired":
+                                                    return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                    </div>
+                                                default:
+                                                    return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                        <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
+                                                    </div>
+                                            }
+                                        })()}
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         )
     }
 }
 
 export default MonitoringAlertmanager;
-

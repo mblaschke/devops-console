@@ -24,7 +24,6 @@ func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context, user *models.Us
 	systemApp := response.NewGeneralStats("App stats")
 	systemApp.Add("Startup time", startupTime.Format(time.RFC1123))
 	systemApp.Add("Startup duration", startupDuration.String())
-	systemApp.Add("HTTP requests served", humanize.Comma(requestCounter))
 	systemApp.Add("Go routines", humanize.Comma(int64(runtime.NumGoroutine())))
 
 	memStats := runtime.MemStats{}

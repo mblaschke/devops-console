@@ -85,7 +85,7 @@ func (a *AlertmanagerForm) ToString(id string) (ret string) {
 	return strings.Join(parts, " ")
 }
 
-func (a *AlertmanagerForm) ToMarkdown(id string) (ret string) {
+func (a *AlertmanagerForm) ToMarkdown(id string) (*string) {
 	parts := []string{}
 
 	commentParts := strings.SplitN(*a.Silence.Comment, "\n", 2)
@@ -96,5 +96,6 @@ func (a *AlertmanagerForm) ToMarkdown(id string) (ret string) {
 	parts = append(parts, fmt.Sprintf("startsAt: %v", time.Time(*a.Silence.StartsAt).String()))
 	parts = append(parts, fmt.Sprintf("endsAt: %v", time.Time(*a.Silence.EndsAt).String()))
 
-	return strings.Join(parts, "\n")
+	ret := strings.Join(parts, "\n")
+	return &ret
 }

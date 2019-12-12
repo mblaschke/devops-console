@@ -1,8 +1,5 @@
 import React from 'react';
-import $ from 'jquery';
-
 import BaseComponent from './BaseComponent';
-import onClickOutside from "react-onclickoutside";
 
 class Breadcrumb extends BaseComponent {
     constructor(props) {

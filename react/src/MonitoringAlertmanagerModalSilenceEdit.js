@@ -1,9 +1,6 @@
 import React from 'react';
-import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
-
-import * as utils from './utils.js';
 import BaseComponent from './BaseComponent';
 
 class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
@@ -206,7 +203,13 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
     addTime(field, time, unit, event) {
         let value = this.getValue(field, event);
 
-        value = moment(value, moment.ISO_8601).add(time, unit).toISOString();
+        if (moment(value, moment.ISO_8601).isBefore(new Date())) {
+            // time value is before NOW
+            value = moment(new Date()).add(time, unit).toISOString();
+        } else {
+            // time value is after NOW
+            value = moment(value, moment.ISO_8601).add(time, unit).toISOString();
+        }
 
         var state = this.state;
         _.set(state, field, value);
@@ -229,7 +232,9 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             )
         }
 
-        let matchers = this.state.silence.matchers ? this.state.silence.matchers : [];
+        let matchers = Array.isArray(this.state.silence.matchers) ? this.state.silence.matchers : [];
+        console.log(matchers);
+
         // filter team
         matchers = matchers.filter((row) => {
             if (row.name === "team") {

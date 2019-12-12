@@ -18,5 +18,9 @@
 
 
 {{block navigationItem(title="", href="")}}
-<a class="dropdown-item {{if hasPrefix(navigationRoute, href)}}active{{end}}" href="{{href}}">{{title}}</a>
+{{if isset(navigationRoute) && navigationRoute}}
+    <a class="dropdown-item {{if hasPrefix(navigationRoute, href)}}active{{end}}" href="{{href}}">{{title}}</a>
+{{else}}
+    <a class="dropdown-item" href="{{href}}">{{title}}</a>
+{{end}}
 {{end}}

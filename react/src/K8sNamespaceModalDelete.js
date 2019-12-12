@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import BaseComponent from './BaseComponent';
 
 class K8sNamespaceModalDelete extends BaseComponent {

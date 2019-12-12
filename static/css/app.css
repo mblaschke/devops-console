@@ -41,6 +41,28 @@ label {
     padding-right: 0.5rem;
 }
 
+.card-body.card-body-table.scrollable {
+    min-height: 10rem;
+    max-height: unset;
+    overflow-y: auto;
+}
+
+.table-responsive {
+    max-height: 30rem;
+    overflow:scroll;
+}
+.table-responsive thead tr:nth-child(1) th{
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+td.not-found {
+    text-align: center;
+    font-style: italic;
+}
+
 dd a,
 dt a {
     font-weight: normal;

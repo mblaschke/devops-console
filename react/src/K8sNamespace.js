@@ -331,99 +331,101 @@ class K8sNamespace extends BaseComponent {
                         </div>
                     </div>
                     <div className="card-body card-body-table">
-                        <table className="table table-hover table-sm">
-                            <colgroup>
-                                <col width="*" />
-                                <col width="200rem" />
-                                <col width="200rem" />
-                                <col width="200rem" />
-                                <col width="100rem" />
-                                <col width="80rem" />
-                            </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Namespace</th>
-                                <th>Owner</th>
-                                <th>Settings</th>
-                                <th>Created</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {namespaces.map((row) =>
-                                <tr key={row.Name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
-                                    <td>
-                                        <div class="button-copy-box">
-                                            {this.highlight(row.Name)}
-                                            <CopyToClipboard text={row.Name}>
-                                                <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
-                                            </CopyToClipboard>
-                                        </div>
-                                        <br/>
-                                        {(() => {
-                                           if (this.state.namespaceDescriptionEdit === row.Name) {
-                                               return <form onSubmit={this.handleDescriptionSubmit.bind(this)}>
-                                                   <input type="text" className="form-control description-edit" placeholder="Description" value={this.state.namespaceDescriptionEditValue} onChange={this.handleDescriptionChange.bind(this)}/>
-                                               </form>
-                                           } else {
-                                               return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.Description ? this.highlight(row.Description) : <i>no description set</i>}</small>
-                                           }
-                                        })()}
-                                    </td>
-                                    <td>
-                                        {this.renderRowOwner(row)}
-                                    </td>
-                                    <td class="small">
-                                        {namespaceSettings(row).map((setting, index) =>
-                                            <div>
-                                                <span className="badge badge-light">{setting.Label}: {this.highlight(setting.Value)}</span>
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
-                                    <td>
-                                        {(() => {
-                                            switch (row.Status.toLowerCase()) {
-                                                case "terminating":
-                                                    return <span className="badge badge-danger">{this.highlight(row.Status)}</span>;
-                                                case "active":
-                                                    return <span className="badge badge-success">{this.highlight(row.Status)}</span>;
-                                                default:
-                                                    return <span className="badge badge-warning">{this.highlight(row.Status)}</span>;
-                                            }
-                                        })()}
-                                        <br/>
-                                        <span className={row.Deleteable ? 'hidden' : 'badge badge-info'}>Not deletable</span>
-                                    </td>
-                                    <td className="toolbox">
-                                        {(() => {
-                                            switch (row.Status) {
-                                            case "Terminating":
-                                                return <div></div>
-                                            default:
-                                                return (
-                                                    <div className="btn-group" role="group">
-                                                        <button id="btnGroupDrop1" type="button"
-                                                                className="btn btn-secondary dropdown-toggle"
-                                                                data-toggle="dropdown" aria-haspopup="true"
-                                                                aria-expanded="false">
-                                                            Action
-                                                        </button>
-                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a>
-                                                            <a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a>
-                                                            <a className={row.Deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        })()}
-                                    </td>
+                        <div className="table-responsive">
+                            <table className="table table-hover table-sm">
+                                <colgroup>
+                                    <col width="*" />
+                                    <col width="200rem" />
+                                    <col width="200rem" />
+                                    <col width="200rem" />
+                                    <col width="100rem" />
+                                    <col width="80rem" />
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th>Namespace</th>
+                                    <th>Owner</th>
+                                    <th>Settings</th>
+                                    <th>Created</th>
+                                    <th>Status</th>
+                                    <th></th>
                                 </tr>
-                            )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                {namespaces.map((row) =>
+                                    <tr key={row.Name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
+                                        <td>
+                                            <div class="button-copy-box">
+                                                {this.highlight(row.Name)}
+                                                <CopyToClipboard text={row.Name}>
+                                                    <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
+                                                </CopyToClipboard>
+                                            </div>
+                                            <br/>
+                                            {(() => {
+                                               if (this.state.namespaceDescriptionEdit === row.Name) {
+                                                   return <form onSubmit={this.handleDescriptionSubmit.bind(this)}>
+                                                       <input type="text" className="form-control description-edit" placeholder="Description" value={this.state.namespaceDescriptionEditValue} onChange={this.handleDescriptionChange.bind(this)}/>
+                                                   </form>
+                                               } else {
+                                                   return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.Description ? this.highlight(row.Description) : <i>no description set</i>}</small>
+                                               }
+                                            })()}
+                                        </td>
+                                        <td>
+                                            {this.renderRowOwner(row)}
+                                        </td>
+                                        <td class="small">
+                                            {namespaceSettings(row).map((setting, index) =>
+                                                <div>
+                                                    <span className="badge badge-light">{setting.Label}: {this.highlight(setting.Value)}</span>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
+                                        <td>
+                                            {(() => {
+                                                switch (row.Status.toLowerCase()) {
+                                                    case "terminating":
+                                                        return <span className="badge badge-danger">{this.highlight(row.Status)}</span>;
+                                                    case "active":
+                                                        return <span className="badge badge-success">{this.highlight(row.Status)}</span>;
+                                                    default:
+                                                        return <span className="badge badge-warning">{this.highlight(row.Status)}</span>;
+                                                }
+                                            })()}
+                                            <br/>
+                                            <span className={row.Deleteable ? 'hidden' : 'badge badge-info'}>Not deletable</span>
+                                        </td>
+                                        <td className="toolbox">
+                                            {(() => {
+                                                switch (row.Status) {
+                                                case "Terminating":
+                                                    return <div></div>
+                                                default:
+                                                    return (
+                                                        <div className="btn-group" role="group">
+                                                            <button id="btnGroupDrop1" type="button"
+                                                                    className="btn btn-secondary dropdown-toggle"
+                                                                    data-toggle="dropdown" aria-haspopup="true"
+                                                                    aria-expanded="false">
+                                                                Action
+                                                            </button>
+                                                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                                <a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a>
+                                                                <a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a>
+                                                                <a className={row.Deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+                                            })()}
+                                        </td>
+                                    </tr>
+                                )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div className="card-footer small text-muted">Namespace quota: {this.state.config.Quota.team === 0 ? 'unlimited' : this.state.config.Quota.team} team / {this.state.config.Quota.user === 0 ? 'unlimited' : this.state.config.Quota.user} personal</div>
                 </div>

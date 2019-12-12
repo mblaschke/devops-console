@@ -3,6 +3,7 @@ package main
 import (
 	"devops-console/models"
 	"devops-console/models/formdata"
+	"devops-console/models/response"
 	"errors"
 	"fmt"
 	"github.com/go-openapi/strfmt"
@@ -91,7 +92,11 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 	}
 	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" deleted", *silenceResp.Payload.ID, team))
 
-	ctx.JSON("true")
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Silence \"%s\" deleted", *silenceResp.Payload.ID),
+	}
+
+	ctx.JSON(resp)
 }
 
 func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *models.User) {
@@ -125,7 +130,12 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 
 	c.notificationMessageWithContext(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" updated", *silenceResp.Payload.ID, formData.Team), formData.ToMarkdown(*silenceResp.Payload.ID))
 
-	ctx.JSON("true")
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Silence \"%s\" updated", *silenceResp.Payload.ID),
+	}
+
+	ctx.JSON(resp)
+
 }
 
 func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *models.User) {
@@ -149,7 +159,12 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 
 	c.notificationMessageWithContext(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" create", silenceResp.Payload.SilenceID, formData.Team), formData.ToMarkdown(silenceResp.Payload.SilenceID))
 
-	ctx.JSON("true")
+	resp := response.GeneralMessage{
+		Message: fmt.Sprintf("Silence \"%s\" created", silenceResp.Payload.SilenceID),
+	}
+
+	ctx.JSON(resp)
+
 }
 
 func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata.AlertmanagerForm {

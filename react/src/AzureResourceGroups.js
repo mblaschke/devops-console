@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import BaseComponent from './BaseComponent';
 import Spinner from './Spinner';
 import Breadcrumb from './Breadcrumb';

@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sync/atomic"
 	"text/template"
 )
 
@@ -158,9 +157,6 @@ func (c *Server) setupKubernetes() {
 func (c *Server) initApp() {
 	c.logger.Infof("setup app server")
 
-	c.app.Use(c.before)
-	c.app.Done(c.after)
-
 	c.initSession()
 	c.initTemplateEngine()
 	c.initRoutes()
@@ -188,6 +184,8 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 	c.auditLog(ctx, response.Message, 1)
 
 	ctx.StatusCode(iris.StatusBadRequest)
+	// clear X-CSRF-token header, make sure it's empty
+	ctx.Header("X-CSRF-Token", "")
 	ctx.JSON(response)
 	ctx.EndRequest()
 	ctx.StopExecution()
@@ -205,10 +203,10 @@ func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 }
 
 func (c *Server) notificationMessage(ctx iris.Context, message string) {
-	c.notificationMessageWithContext(ctx, message, "")
+	c.notificationMessageWithContext(ctx, message, nil)
 }
 
-func (c *Server) notificationMessageWithContext(ctx iris.Context, message string, context string) {
+func (c *Server) notificationMessageWithContext(ctx iris.Context, message string, context *string) {
 	if c.config.App.Notification.Slack.Webhook == "" {
 		return
 	}
@@ -220,6 +218,9 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 	}
 
 	message = fmt.Sprintf(c.config.App.Notification.Slack.Message, username, message)
+	if context != nil {
+		message += fmt.Sprintf("\n\n%s", *context)
+	}
 
 	payloadBlocks := []notification.NotificationMessageBlockContext{}
 
@@ -230,16 +231,6 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 			Text: message,
 		},
 	})
-
-	if len(context) > 0 {
-		payloadBlocks = append(payloadBlocks, notification.NotificationMessageBlockContext{
-			Type: "section",
-			Text: &notification.NotificationMessageBlockText{
-				Type: "plain_text",
-				Text: context,
-			},
-		})
-	}
 
 	payload := notification.NotificationMessage{
 		Channel:  c.config.App.Notification.Slack.Channel,
@@ -260,22 +251,6 @@ func (c *Server) notificationMessageWithContext(ctx iris.Context, message string
 	if err != nil {
 		c.logger.Errorf("Failed to send slack notification: %v", err)
 	}
-}
-
-func (c *Server) before(ctx iris.Context) {
-	// security headers
-	ctx.Header("X-Frame-Options", "BLOCK")
-	ctx.Header("X-XSS-Protection", "1; mode=block")
-	ctx.Header("X-Content-Type-Options", "nosniff")
-	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")
-
-	// view information
-	ctx.ViewData("navigationRoute", ctx.GetCurrentRoute().Path())
-	ctx.Next()
-}
-
-func (c *Server) after(ctx iris.Context) {
-	atomic.AddInt64(&requestCounter, 1)
 }
 
 func (c *Server) index(ctx iris.Context) {

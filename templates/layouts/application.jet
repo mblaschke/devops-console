@@ -24,7 +24,11 @@
   </div>
 </main>
 <script>
+{{if isset(CSRF_TOKEN_JSON) && CSRF_TOKEN_JSON}}
 window.CSRF_TOKEN = {{ CSRF_TOKEN_JSON | raw }};
+{{else}}
+window.CSRF_TOKEN = false;
+{{end}}
 </script>
   {{include "includes/react.jet"}}
   {{include "includes/html-footer.jet"}}

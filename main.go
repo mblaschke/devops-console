@@ -21,8 +21,6 @@ var (
 	PrometheusActions *prometheus.GaugeVec
 	startupTime       time.Time
 	startupDuration   time.Duration
-
-	requestCounter int64
 )
 
 var opts struct {

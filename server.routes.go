@@ -7,9 +7,12 @@ import (
 )
 
 func (c *Server) initRoutes() {
+	c.app.Use(c.before)
+
 	c.logger.Infof(" - init static file handler")
 
-	c.app.HandleDir("/static", "./static", iris.DirOptions{
+	staticParty := c.app.Party("/", c.defaultHeaders)
+	staticParty.HandleDir("/static", "./static", iris.DirOptions{
 		IndexName: "/index.html",
 
 		Gzip:     false,
@@ -25,51 +28,75 @@ func (c *Server) initRoutes() {
 	applicationGeneral := ApplicationGeneral{Server: c}
 	applicationAuth := ApplicationAuth{Server: c}
 
-
-	c.app.Get("/", c.index)
-	c.app.Post("/login", applicationAuth.Login)
-	c.app.Get("/oauth", applicationAuth.LoginViaOauth)
-	c.app.Get("/logout", applicationAuth.Logout)
-
-	party := c.app.Party("/", c.csrfProtectionReferer, c.csrfProtectionToken)
+	publicParty := c.app.Party("/", c.defaultHeaders)
 	{
-		party.Get("/api/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
-		party.Get("/api/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
-
-		party.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
-		party.Get("/api/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
-		party.Post("/api/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
-		party.Post("/api/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
-
-		party.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
-
-		party.Get("/kubernetes/cluster", func(ctx iris.Context) { c.react(ctx, "Kubernetes Cluster") })
-		party.Get("/api/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
-
-		party.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
-		party.Get("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
-		party.Post("/api/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceCreate) })
-		party.Delete("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceDelete) })
-		party.Put("/api/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
-		party.Post("/api/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
-
-		party.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
-
-		party.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
-		party.Post("/api/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
-
-		party.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
-
-		party.Get("/api/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
-		party.Get("/api/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
-		party.Delete("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
-		party.Post("/api/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
-		party.Put("/api/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
+		publicParty.Get("/", c.index)
+		publicParty.Post("/login", applicationAuth.Login)
+		publicParty.Get("/oauth", applicationAuth.LoginViaOauth)
+		publicParty.Get("/logout", applicationAuth.Logout)
 	}
+
+	pageParty := c.app.Party("/", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
+	{
+		pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
+		pageParty.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
+		pageParty.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
+		pageParty.Get("/kubernetes/cluster", func(ctx iris.Context) { c.react(ctx, "Kubernetes Cluster") })
+		pageParty.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
+		pageParty.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
+		pageParty.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
+	}
+
+	apiParty := c.app.Party("/api", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
+	{
+		apiParty.Get("/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
+		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
+
+		apiParty.Get("/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
+		apiParty.Post("/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
+		apiParty.Post("/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
+		
+		apiParty.Get("/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
+
+		apiParty.Get("/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
+		apiParty.Post("/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceCreate) })
+		apiParty.Delete("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceDelete) })
+		apiParty.Put("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
+		apiParty.Post("/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
+
+		apiParty.Post("/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
+		
+		apiParty.Get("/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
+		apiParty.Get("/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
+		apiParty.Delete("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
+		apiParty.Post("/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
+		apiParty.Put("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
+	}
+}
+
+
+func (c *Server) before(ctx iris.Context) {
+	// view information
+	ctx.ViewData("navigationRoute", ctx.GetCurrentRoute().Path())
+	ctx.Next()
+}
+
+func (c *Server) defaultHeaders(ctx iris.Context) {
+	// security headers
+	ctx.Header("X-Frame-Options", "BLOCK")
+	ctx.Header("X-XSS-Protection", "1; mode=block")
+	ctx.Header("X-Content-Type-Options", "nosniff")
+	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")
+	ctx.Next()
 }
 
 func (c *Server) csrfProtectionReferer(ctx iris.Context) {
 	// TODO
+	ctx.Next()
+}
+
+func (c *Server) csrfProtectionRegenrateToken(ctx iris.Context) {
+	c.csrfProtectionTokenRegenerate(ctx)
 	ctx.Next()
 }
 

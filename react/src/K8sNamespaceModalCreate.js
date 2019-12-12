@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import BaseComponent from './BaseComponent';

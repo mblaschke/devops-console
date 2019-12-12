@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
-
 import BaseComponent from './BaseComponent';
 import K8sNamespaceFormElement from "./K8sNamespaceFormElement";
 
