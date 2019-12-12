@@ -48,7 +48,7 @@ label {
 }
 
 .table-responsive {
-    max-height: 30rem;
+    height: 30rem;
     overflow:scroll;
 }
 .table-responsive thead tr:nth-child(1) th{
