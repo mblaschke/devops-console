@@ -38,7 +38,7 @@ func (c *Server) Logout(ctx iris.Context) {
 	s.Destroy()
 
 	ctx.ViewData("messageSuccess", "Logged out")
-	ctx.View("login.jet")
+	c.templateLogin(ctx)
 }
 
 func (c *Server) LogoutForced(ctx iris.Context) {
@@ -47,7 +47,7 @@ func (c *Server) LogoutForced(ctx iris.Context) {
 	s.Destroy()
 
 	ctx.ViewData("ERROR_MESSAGE", "Session was terminated, please login again.")
-	ctx.View("login.jet")
+	c.templateLogin(ctx)
 }
 
 func (c *Server) LoginViaOauth(ctx iris.Context) {
@@ -60,60 +60,62 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 			message = fmt.Sprintf("%s:\n%s", error, errorDesc)
 		}
 		ctx.ViewData("messageError", message)
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	code := ctx.URLParam("code")
 	if code == "" {
 		ctx.ViewData("messageError", "OAuth pre check failed: code empty")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	state := ctx.URLParam("state")
 	if state == "" {
 		ctx.ViewData("messageError", "OAuth pre check failed: state empty")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	if state != s.Get("oauth") {
 		ctx.ViewData("messageError", "OAuth pre check failed: state mismatch")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	tkn, err := oauth.Exchange(code)
 	if err != nil {
 		ctx.ViewData("messageError", "OAuth check failed: failed getting token from provider")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	if !tkn.Valid() {
 		ctx.ViewData("messageError", "OAuth check failed: invalid token")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 
 	user, err := oauth.FetchUserInfo(tkn)
 	if err != nil {
 		ctx.ViewData("messageError", "OAuth check failed: unable to get user information")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
+		return
 	}
 
 	// check username
 	if user.Username == "" {
 		ctx.ViewData("messageError", "OAuth login failed: provided username is empty")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
+		return
 	}
 
 	if c.config.App.Oauth.Filter.UsernameWhitelist != "" {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameWhitelist)
 		if !filterRegexp.MatchString(user.Username) {
 			ctx.ViewData("messageError", fmt.Sprintf("User %s is not allowed to use this application", user.Username))
-			ctx.View("login.jet")
+			c.templateLogin(ctx)
 			return
 		}
 	}
@@ -122,7 +124,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameBlacklist)
 		if filterRegexp.MatchString(c.config.App.Oauth.Filter.UsernameBlacklist) {
 			ctx.ViewData("messageError", fmt.Sprintf("User %s is not allowed to use this application", user.Username))
-			ctx.View("login.jet")
+			c.templateLogin(ctx)
 			return
 		}
 	}
@@ -137,7 +139,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
 		ctx.ViewData("messageError", "Unable to set session")
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 		return
 	}
 

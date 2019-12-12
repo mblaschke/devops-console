@@ -8,6 +8,11 @@ import (
 	"os"
 )
 
+func (c *Server) templateLogin(ctx iris.Context) {
+	ctx.ViewData("title", "Login")
+	ctx.View("login.jet")
+}
+
 func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
 	c.session.Start(ctx)
 	user, err := c.getUser(ctx)

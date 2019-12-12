@@ -15,7 +15,7 @@ func (c *Server) index(ctx iris.Context) {
 	if err == nil && user != nil {
 		ctx.Redirect("/kubernetes/namespaces")
 	} else {
-		ctx.View("login.jet")
+		c.templateLogin(ctx)
 	}
 }
 

@@ -67,8 +67,10 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 		ctx.ViewData("ERROR_MESSAGE", message)
 
 		if logout {
+			ctx.ViewData("title", "Login")
 			ctx.View("login.jet")
 		} else {
+			ctx.ViewData("title", "Error")
 			ctx.View("error.jet")
 		}
 	}
