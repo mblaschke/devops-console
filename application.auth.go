@@ -6,8 +6,8 @@ import (
 	"fmt"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	"math/rand"
 	"regexp"
+	"crypto/rand"
 )
 
 type ApplicationAuth struct {
@@ -15,8 +15,9 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
+	randReader := rand.Reader
 	b := make([]byte, 16)
-	rand.Read(b)
+	randReader.Read(b)
 
 	state := base64.URLEncoding.EncodeToString(b)
 
