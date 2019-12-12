@@ -222,7 +222,6 @@ class Settings extends BaseComponent {
                 </div>
 
                 {this.state.config.Teams.map((team, value) =>
-
                     <div className="card mb-3">
                         <div className="card-header">
                             <i className="fas fa-users-cog"></i>
@@ -243,7 +242,6 @@ class Settings extends BaseComponent {
                         </div>
                     </div>
                 )}
-
 
             </div>
         );
