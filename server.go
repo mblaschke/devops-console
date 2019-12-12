@@ -3,10 +3,6 @@ package main
 import (
 	"bytes"
 	"devops-console/models"
-	"devops-console/models/notification"
-	"devops-console/services"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/Masterminds/sprig"
 	glogger "github.com/google/logger"
@@ -17,7 +13,6 @@ import (
 	"github.com/kataras/iris/v12/view"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -164,158 +159,5 @@ func (c *Server) initApp() {
 
 func (c *Server) Run(addr string) {
 	c.logger.Infof("run app server")
-
 	c.app.Run(iris.Addr(addr))
-}
-
-func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {
-	oauth := services.OAuth{Host: ctx.Host()}
-	oauth.Config = c.config.App.Oauth
-	return oauth
-}
-
-func (c *Server) respondError(ctx iris.Context, err error) {
-	response := struct {
-		Message string
-	}{
-		Message: fmt.Sprintf("Error: %v", err),
-	}
-
-	c.auditLog(ctx, response.Message, 1)
-
-	ctx.StatusCode(iris.StatusBadRequest)
-	// clear X-CSRF-token header, make sure it's empty
-	ctx.Header("X-CSRF-Token", "")
-	ctx.JSON(response)
-	ctx.EndRequest()
-	ctx.StopExecution()
-	panic(ctx)
-}
-
-func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
-	username := "*anonymous*"
-	user, _ := c.getUser(ctx)
-	if user != nil {
-		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
-	}
-
-	c.logger.InfoDepth(depth, fmt.Sprintf("AUDIT: user[%s]: %s", username, message))
-}
-
-func (c *Server) notificationMessage(ctx iris.Context, message string) {
-	c.notificationMessageWithContext(ctx, message, nil)
-}
-
-func (c *Server) notificationMessageWithContext(ctx iris.Context, message string, context *string) {
-	if c.config.App.Notification.Slack.Webhook == "" {
-		return
-	}
-
-	username := "*anonymous*"
-	user, _ := c.getUser(ctx)
-	if user != nil {
-		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
-	}
-
-	message = fmt.Sprintf(c.config.App.Notification.Slack.Message, username, message)
-	if context != nil {
-		message += fmt.Sprintf("\n\n%s", *context)
-	}
-
-	payloadBlocks := []notification.NotificationMessageBlockContext{}
-
-	payloadBlocks = append(payloadBlocks, notification.NotificationMessageBlockContext{
-		Type: "section",
-		Text: &notification.NotificationMessageBlockText{
-			Type: "plain_text",
-			Text: message,
-		},
-	})
-
-	payload := notification.NotificationMessage{
-		Channel:  c.config.App.Notification.Slack.Channel,
-		Username: "devops-console",
-		Text:     message,
-		Blocks:   payloadBlocks,
-	}
-	payloadJson, _ := json.Marshal(payload)
-
-	client := http.Client{}
-	req, err := http.NewRequest("POST", c.config.App.Notification.Slack.Webhook, bytes.NewBuffer(payloadJson))
-	defer req.Body.Close()
-	if err != nil {
-		c.logger.Errorf("Failed to send slack notification: %v", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	_, err = client.Do(req)
-	if err != nil {
-		c.logger.Errorf("Failed to send slack notification: %v", err)
-	}
-}
-
-func (c *Server) index(ctx iris.Context) {
-	user, err := c.getUser(ctx)
-
-	if err == nil && user != nil {
-		ctx.Redirect("/kubernetes/namespaces")
-	} else {
-		ctx.View("login.jet")
-	}
-}
-
-func (c *Server) template(ctx iris.Context, title, template string) {
-	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
-		ctx.ViewData("title", title)
-		ctx.View(template)
-	})
-}
-
-func (c *Server) react(ctx iris.Context, title string) {
-	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
-		ctx.ViewData("title", title)
-		ctx.View("react.jet")
-	})
-}
-
-func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
-	c.session.Start(ctx)
-	user, err := c.getUser(ctx)
-
-	if err != nil {
-		c.session.Destroy(ctx)
-		ctx.ViewData("messageError", "Invalid session")
-		ctx.View("login.jet")
-		return
-	}
-
-	ctx.ViewData("user", user)
-	ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
-	callback(ctx, user)
-}
-
-func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
-	s := c.session.Start(ctx)
-	userJson := s.GetString("user")
-
-	if opts.Debug {
-		if val := os.Getenv("DEBUG_SESSION_USER"); val != "" {
-			s.Set("user", "DEBUG_SESSION_USER")
-			userJson = val
-		}
-	}
-
-	user, err = models.UserCreateFromJson(userJson, &c.config)
-	return
-}
-
-func (c *Server) getUserOrStop(ctx iris.Context) (user *models.User) {
-	var err error
-	user, err = c.getUser(ctx)
-
-	if err != nil || user == nil {
-		c.session.Destroy(ctx)
-		c.respondError(ctx, errors.New("Invalid session"))
-	}
-
-	return
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"devops-console/services"
 	"encoding/base64"
 	"fmt"
 	iris "github.com/kataras/iris/v12"
@@ -32,9 +33,19 @@ func (c *Server) Login(ctx iris.Context) {
 
 func (c *Server) Logout(ctx iris.Context) {
 	s := c.session.Start(ctx)
+	s.Clear()
 	s.Destroy()
 
 	ctx.ViewData("messageSuccess", "Logged out")
+	ctx.View("login.jet")
+}
+
+func (c *Server) LogoutForced(ctx iris.Context) {
+	s := c.session.Start(ctx)
+	s.Clear()
+	s.Destroy()
+
+	ctx.ViewData("ERROR_MESSAGE", "Session was terminated, please login again.")
 	ctx.View("login.jet")
 }
 
@@ -116,6 +127,11 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	}
 
 	if userSession, err := user.ToJson(); err == nil {
+		// regenerate session
+		s.Clear()
+		s.Destroy()
+		s := c.session.Start(ctx)
+
 		s.Set("user", userSession)
 		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
@@ -127,4 +143,10 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "login"}).Inc()
 
 	ctx.Redirect("/kubernetes/namespaces")
+}
+
+func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {
+	oauth := services.OAuth{Host: ctx.Host()}
+	oauth.Config = c.config.App.Oauth
+	return oauth
 }

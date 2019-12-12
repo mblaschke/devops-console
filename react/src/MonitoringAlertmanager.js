@@ -69,8 +69,10 @@ class MonitoringAlertmanager extends BaseComponent {
                 this.setInputFocus();
             }
 
+            let alerts = Array.isArray(jqxhr) ? jqxhr : [];
+
             this.setState({
-                alerts: jqxhr,
+                alerts: alerts,
                 isStartup: false,
                 loadingAlerts: false,
             });
@@ -94,8 +96,10 @@ class MonitoringAlertmanager extends BaseComponent {
                 this.setInputFocus();
             }
 
+            let silences = Array.isArray(jqxhr) ? jqxhr : [];
+
             this.setState({
-                silences: jqxhr,
+                silences: silences,
                 isStartup: false,
                 loadingSilences: false,
             });
@@ -390,7 +394,8 @@ class MonitoringAlertmanager extends BaseComponent {
         let statsList = {};
         let footerLine = "";
 
-        if (totalRows) {
+
+        if (totalRows && Array.isArray(totalRows)) {
             // collect
             totalRows.map((row) => {
                 if (!statsList[row.status.state]) {
@@ -403,7 +408,7 @@ class MonitoringAlertmanager extends BaseComponent {
             });
         }
 
-        if (visibleRows) {
+        if (visibleRows && Array.isArray(visibleRows)) {
             // collect
             visibleRows.map((row) => {
                 if (!statsList[row.status.state]) {

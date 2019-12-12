@@ -30,6 +30,7 @@ var opts struct {
 	DumpConfig  bool     `long:"dump-config" description:"Dump config"`
 	Debug       bool     `long:"debug" description:"Enable debug mode"`
 	DisableCsrfProtection bool `long:"disable-csrf" env:"DISABLE_CSRF_PROTECTION" description:"Disable CSFR protection"`
+	ErrorPunishmentThreshold int64 `long:"error-punishment-threshold" env:"ERROR_PUNISHMENT_THRESHOLD" description:"Error threshold when punishment is executed (logout)" default:"5"`
 }
 
 func main() {

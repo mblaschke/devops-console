@@ -23,10 +23,7 @@ class BaseComponent extends Component {
 
         jqxhr.fail((jqxhr) => {
             if (jqxhr.status === 401) {
-                this.setState({
-                    globalError: "Login expired, please reload",
-                    isStartup: false
-                });
+                window.location.href = "/logout/forced";
             } else if (jqxhr.responseJSON && jqxhr.responseJSON.Message) {
                 window.App.pushGlobalMessage("danger", jqxhr.responseJSON.Message);
                 this.setState({
@@ -113,6 +110,10 @@ class BaseComponent extends Component {
 
         if (window.CSRF_TOKEN) {
             opts.headers["X-CSRF-Token"] = window.CSRF_TOKEN;
+        }
+
+        if (!opts.contentType) {
+            opts.contentType = "application/json";
         }
 
         let jqxhr = $.ajax(opts);

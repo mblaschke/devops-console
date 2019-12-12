@@ -62,6 +62,13 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 		ret.Teams = append(ret.Teams, row)
 	}
 
+	row := response.ResponseConfigTeam{
+		Id:   "foobar",
+		Name: "foobar",
+	}
+	ret.Teams = append(ret.Teams, row)
+
+
 	for _, row := range c.config.App.Kubernetes.Environments {
 		tmp := response.ResponseNamespaceConfig{
 			Environment: row.Name,

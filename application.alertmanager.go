@@ -21,7 +21,7 @@ type ApplicationAlertmanager struct {
 func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *alertmanager.Alertmanager {
 	client, err := c.config.Alertmanager.GetAlertmanagerInstance(name)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 	}
 
 	return client
@@ -74,8 +74,8 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 		return
 	}
 
-	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload) {
-		c.respondError(ctx, errors.New("Access to silence denied"))
+	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload.Matchers) {
+		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
 		return
 	}
 
@@ -87,7 +87,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 	}
 
 	team := ""
-	if val := c.getSilenceMatcherTeam(ctx, user, silenceResp.Payload); val != nil {
+	if val := c.getSilenceMatcherTeam(ctx, user, silenceResp.Payload.Matchers); val != nil {
 		team = *val
 	}
 	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" deleted", *silenceResp.Payload.ID, team))
@@ -110,8 +110,8 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		return
 	}
 
-	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload) {
-		c.respondError(ctx, errors.New("Access to silence denied"))
+	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload.Matchers) {
+		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
 		return
 	}
 
@@ -151,6 +151,11 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 		Silence: formData.Silence,
 	}
 
+	if !c.checkSilenceAccess(ctx, user, postParams.Silence.Matchers) {
+		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
+		return
+	}
+
 	silenceResp, err := client.Silence.PostSilences(postParams)
 	if err != nil {
 		c.respondError(ctx, err)
@@ -172,7 +177,7 @@ func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata
 
 	formData := &formdata.AlertmanagerForm{}
 	if err := ctx.ReadJSON(&formData); err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return nil
 	}
 
@@ -238,7 +243,7 @@ func (c *ApplicationAlertmanager) filterSilences(ctx iris.Context, silences *sil
 	filteredSilences := alertmanagerModels.GettableSilences{}
 
 	for _, row := range silences.Payload {
-		if c.checkSilenceAccess(ctx, user, row) {
+		if c.checkSilenceAccess(ctx, user, row.Matchers) {
 			filteredSilences = append(filteredSilences, row)
 		}
 	}
@@ -247,8 +252,8 @@ func (c *ApplicationAlertmanager) filterSilences(ctx iris.Context, silences *sil
 	return silences
 }
 
-func (c *ApplicationAlertmanager) getSilenceMatcherTeam(ctx iris.Context, user *models.User, row *alertmanagerModels.GettableSilence) (team *string) {
-	for _, matcher := range row.Matchers {
+func (c *ApplicationAlertmanager) getSilenceMatcherTeam(ctx iris.Context, user *models.User, matchers alertmanagerModels.Matchers) (team *string) {
+	for _, matcher := range matchers {
 		if matcher.Name != nil && matcher.Value != nil {
 			if *matcher.Name == "team" {
 				team = matcher.Value
@@ -259,10 +264,10 @@ func (c *ApplicationAlertmanager) getSilenceMatcherTeam(ctx iris.Context, user *
 	return
 }
 
-func (c *ApplicationAlertmanager) checkSilenceAccess(ctx iris.Context, user *models.User, row *alertmanagerModels.GettableSilence) (status bool) {
+func (c *ApplicationAlertmanager) checkSilenceAccess(ctx iris.Context, user *models.User, matchers alertmanagerModels.Matchers) (status bool) {
 	status = false
 
-	team := c.getSilenceMatcherTeam(ctx, user, row)
+	team := c.getSilenceMatcherTeam(ctx, user, matchers)
 	if team != nil && user.IsMemberOf(*team) {
 		status = true
 	}

@@ -1,0 +1,8 @@
+{{extends "layouts/login.jet"}}
+{{import "includes/blocks.jet"}}
+
+{{block title()}}Login{{end}}
+
+{{block documentBody()}}
+  {{yield errorMessage(default="An internal error occurred, sorry.")}}
+{{end}}

@@ -233,7 +233,6 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         }
 
         let matchers = Array.isArray(this.state.silence.matchers) ? this.state.silence.matchers : [];
-        console.log(matchers);
 
         // filter team
         matchers = matchers.filter((row) => {

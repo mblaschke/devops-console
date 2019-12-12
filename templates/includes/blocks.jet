@@ -24,3 +24,13 @@
     <a class="dropdown-item" href="{{href}}">{{title}}</a>
 {{end}}
 {{end}}
+
+{{block errorMessage(default="")}}
+{{if isset(ERROR_MESSAGE) && ERROR_MESSAGE}}
+    <div class="alert alert-warning" role="alert">{{ERROR_MESSAGE}}</div>
+{{else}}
+    {{if default}}
+        <div class="alert alert-warning" role="alert">{{default}}</div>
+    {{end}}
+{{end}}
+{{end}}

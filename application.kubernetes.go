@@ -170,7 +170,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	formData := formdata.KubernetesNamespaceCreate{}
 	err := ctx.ReadJSON(&formData)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return
 	}
 
@@ -219,7 +219,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// membership check
 	if !user.IsMemberOf(*formData.Team) {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", *formData.Team)))
+		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", *formData.Team)))
 		return
 	}
 
@@ -271,7 +271,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	}
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace) {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Access to namespace \"%s\" denied", namespace.Name)))
+		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to namespace \"%s\" denied", namespace.Name)))
 		return
 	}
 
@@ -362,7 +362,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	formData := formdata.KubernetesNamespaceCreate{}
 	err := ctx.ReadJSON(&formData)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return
 	}
 

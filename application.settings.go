@@ -77,7 +77,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 	formData := formdata.GeneralSettings{}
 	err = ctx.ReadJSON(&formData)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return
 	}
 
@@ -140,14 +140,14 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 	}
 	// membership check
 	if !user.IsMemberOf(team) {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", team)))
+		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", team)))
 		return
 	}
 
 	formData := formdata.GeneralSettings{}
 	err = ctx.ReadJSON(&formData)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return
 	}
 

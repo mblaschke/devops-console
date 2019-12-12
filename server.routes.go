@@ -34,6 +34,7 @@ func (c *Server) initRoutes() {
 		publicParty.Post("/login", applicationAuth.Login)
 		publicParty.Get("/oauth", applicationAuth.LoginViaOauth)
 		publicParty.Get("/logout", applicationAuth.Logout)
+		publicParty.Get("/logout/forced", applicationAuth.LogoutForced)
 	}
 
 	pageParty := c.app.Party("/", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
@@ -72,8 +73,18 @@ func (c *Server) initRoutes() {
 		apiParty.Post("/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
 		apiParty.Put("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
 	}
+
+	c.app.OnErrorCode(iris.StatusNotFound, c.notFound)
 }
 
+
+func (c *Server) notFound(ctx iris.Context) {
+	defer func() {
+		recover()
+	}()
+
+	c.respondErrorWithPenalty(ctx, errors.New("Document not found"))
+}
 
 func (c *Server) before(ctx iris.Context) {
 	// view information
@@ -126,7 +137,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 		clientToken := ctx.GetHeader("X-CSRF-Token")
 
 		if sessionToken == "" || clientToken != sessionToken {
-			c.respondError(ctx, errors.New("Invalid CSRF token"))
+			c.respondErrorWithPenalty(ctx, errors.New("Invalid CSRF token"))
 			return
 		}
 	}

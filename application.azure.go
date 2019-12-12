@@ -34,7 +34,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	formData := formdata.AzureResourceGroup{}
 	err := ctx.ReadJSON(&formData)
 	if err != nil {
-		c.respondError(ctx, err)
+		c.respondErrorWithPenalty(ctx, err)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	// membership check
 	if !user.IsMemberOf(formData.Team) {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", err)))
+		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", err)))
 		return
 	}
 
