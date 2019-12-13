@@ -15,11 +15,16 @@ func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 	if opts.ErrorPunishmentThreshold >= 0 {
 		s := c.session.Start(ctx)
 
-		errorCounter, _ := s.GetInt64("__errorCounter")
+		// ignore new sessions
+		errorCounter, errorCounterErr := s.GetInt64("__errorCounter")
+		if errorCounterErr != nil {
+			errorCounter = 0
+		}
+
 		if errorCounter >= opts.ErrorPunishmentThreshold {
 			// counter threshold reached, PUNISH
 			c.auditLog(ctx, "Error threshold reached, punishing user by killing session, original error was: " + err.Error(), 2)
-			err = errors.New("Sorry, too many errors occurred. You're session was terminated, please login again.")
+			err = errors.New("Sorry, too many errors occurred. Your session was terminated, please login again.")
 
 			c.handleError(ctx, err, true)
 			return
