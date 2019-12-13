@@ -299,6 +299,21 @@ class K8sNamespace extends BaseComponent {
         return ret;
     }
 
+
+    buildFooter(namespaces) {
+        let NamespaceCountTotal = this.state.namespaces.length;
+        let NamespaceCountShown = namespaces.length;
+
+        return (
+            <span>
+                Namespaces: {NamespaceCountShown} of {NamespaceCountTotal},&nbsp;
+                Quota:&nbsp;
+                {this.state.config.Quota.team === 0 ? 'unlimited' : this.state.config.Quota.team} team /&nbsp;
+                {this.state.config.Quota.user === 0 ? 'unlimited' : this.state.config.Quota.user} personal
+            </span>
+        )
+    }
+
     render() {
         if (this.state.isStartup) {
             return (
@@ -446,7 +461,7 @@ class K8sNamespace extends BaseComponent {
                             </table>
                         </div>
                     </div>
-                    <div className="card-footer small text-muted">Namespace quota: {this.state.config.Quota.team === 0 ? 'unlimited' : this.state.config.Quota.team} team / {this.state.config.Quota.user === 0 ? 'unlimited' : this.state.config.Quota.user} personal</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(namespaces)}</div>
                 </div>
 
                 <K8sNamespaceModalDelete config={this.state.config} namespace={this.state.selectedNamespaceDelete} callback={this.handleNamespaceDeletion.bind(this)} />
