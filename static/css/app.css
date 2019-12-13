@@ -176,12 +176,12 @@ button {
     cursor: pointer;
 }
 
-.table.table-hover td.toolbox .btn-group {
+.table.table-hover td.toolbox .btn {
     opacity: 0.2;
 }
 
-.table.table-hover td.toolbox .btn-group.show,
-.table.table-hover tr:hover td.toolbox .btn-group {
+.table.table-hover td.toolbox .btn.show,
+.table.table-hover tr:hover td.toolbox .btn {
     opacity: 1;
 }
 

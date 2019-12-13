@@ -31,6 +31,7 @@ class K8sNamespace extends BaseComponent {
                     }
                 }
             },
+            team: "*",
             namespaceDescriptionEdit: false,
             namespaceDescriptionEditValue: "",
             namespaceEditModalShow: false,
@@ -280,6 +281,15 @@ class K8sNamespace extends BaseComponent {
             ret = this.state.namespaces;
         }
 
+        // filter by team
+        if (this.state.team !== "*") {
+            ret = ret.filter((row) => {
+                if (row.OwnerTeam === this.state.team) return true;
+                return false;
+            });
+        }
+
+
         ret = ret.sort(function(a,b) {
             if(a.Name < b.Name) return -1;
             if(a.Name > b.Name) return 1;
@@ -327,7 +337,7 @@ class K8sNamespace extends BaseComponent {
                         <i className="fas fa-object-group"></i>
                         Kubernetes namespaces
                         <div className="toolbox">
-                            <button type="button" className="btn btn-primary" onClick={this.createNamespace.bind(this)}>Create namespace</button>
+                            {this.renderTeamSelector()}
                         </div>
                     </div>
                     <div className="card-body card-body-table">
@@ -348,10 +358,19 @@ class K8sNamespace extends BaseComponent {
                                     <th>Settings</th>
                                     <th>Created</th>
                                     <th>Status</th>
-                                    <th></th>
+                                    <th className="toolbox">
+                                        <button type="button" className="btn btn-secondary" onClick={this.createNamespace.bind(this)}>
+                                            <i className="fas fa-plus"></i>
+                                        </button>
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
+                                {namespaces.length === 0 &&
+                                <tr>
+                                    <td colspan="6" className="not-found">No namespaces found.</td>
+                                </tr>
+                                }
                                 {namespaces.map((row) =>
                                     <tr key={row.Name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
                                         <td>

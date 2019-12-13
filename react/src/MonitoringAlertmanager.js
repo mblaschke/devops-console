@@ -541,16 +541,6 @@ class MonitoringAlertmanager extends BaseComponent {
         );
     }
 
-    renderTeamSelector() {
-        return (
-            <select className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
-                <option key="*" value="*">All teams</option>
-                {this.state.config.Teams.map((row, value) =>
-                    <option key={row.Id} value={row.Name}>{row.Name}</option>
-                )}
-            </select>
-        )
-    }
 
     renderInstanceSelector() {
         let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
