@@ -481,7 +481,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             <div className="form-group row">
                                 <div className="col-sm-4 form-inline">
                                     <div className="form-check">
-                                        <input type="checkbox" className="form-check-input"
+                                        <input type="checkbox" id="alertFilterSuppressed" className="form-check-input"
                                                checked={this.getValueCheckbox("filter.alert.suppressed")}
                                                onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")}/>
                                         <label className="form-check-label" htmlFor="alertFilterSuppressed">Suppressed</label>
@@ -512,7 +512,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             <div className="form-group row">
                                 <div className="col-sm-4 form-inline">
                                     <div className="form-check">
-                                        <input type="checkbox" className="form-check-input"
+                                        <input type="checkbox" id="silenceFilterExpired" className="form-check-input"
                                                checked={this.getValueCheckbox("filter.silence.expired")}
                                                onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
                                         <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
