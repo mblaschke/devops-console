@@ -30,3 +30,11 @@ services:
       - "9093:9093"
     volumes:
       - ./etc/alertmanager.yaml:/etc/alertmanager/alertmanager.yml:ro
+
+  ###########################
+  # REDIS
+  ###########################
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
