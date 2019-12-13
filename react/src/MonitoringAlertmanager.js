@@ -32,7 +32,7 @@ class MonitoringAlertmanager extends BaseComponent {
                     expired: false
                 },
                 alert: {
-                    suppressed: true
+                    suppressed: false
                 }
             },
             instance: "",
