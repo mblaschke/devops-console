@@ -481,7 +481,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             <div className="form-group row">
                                 <div className="col-sm-4 form-inline">
                                     <div className="form-check">
-                                        <input type="checkbox" className="form-check-input" id="alertFilterSuppressed"
+                                        <input type="checkbox" className="form-check-input"
                                                checked={this.getValueCheckbox("filter.alert.suppressed")}
                                                onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")}/>
                                         <label className="form-check-label" htmlFor="alertFilterSuppressed">Suppressed</label>
@@ -512,7 +512,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             <div className="form-group row">
                                 <div className="col-sm-4 form-inline">
                                     <div className="form-check">
-                                        <input type="checkbox" className="form-check-input" id="silenceFilterExpired"
+                                        <input type="checkbox" className="form-check-input"
                                                checked={this.getValueCheckbox("filter.silence.expired")}
                                                onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
                                         <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
@@ -696,7 +696,7 @@ class MonitoringAlertmanager extends BaseComponent {
                                 </td>
                                 <td className="toolbox">
                                     <div className="btn-group" role="group">
-                                        <button id="btnGroupDrop1" type="button"
+                                        <button id={"btnGroupDrop-" + silences.id} type="button"
                                                 className="btn btn-secondary dropdown-toggle"
                                                 data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
@@ -705,11 +705,11 @@ class MonitoringAlertmanager extends BaseComponent {
                                         {(() => {
                                             switch (row.status.state) {
                                                 case "expired":
-                                                    return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                    return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
                                                         <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
                                                     </div>
                                                 default:
-                                                    return <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                    return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
                                                         <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
                                                         <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
                                                     </div>

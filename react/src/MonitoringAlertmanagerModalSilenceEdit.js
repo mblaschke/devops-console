@@ -269,8 +269,8 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                 <div className="modal-body">
 
                                     <div className="form-group">
-                                        <label htmlFor="inputTeam">Team</label>
-                                        <select name="inputTeam" id="inputTeam" className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
+                                        <label htmlFor="silence-form-team">Team</label>
+                                        <select name="inputTeam" id="silence-form-team" className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
                                             {this.props.config.Teams.map((row, value) =>
                                                 <option key={row.Id} value={row.Name}>{row.Name}</option>
                                             )}
@@ -278,24 +278,24 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                     </div>
 
                                     <div className="form-group">
-                                        <label htmlFor="inputNsDescription" className="inputRg">Description</label>
-                                        <textarea className="form-control" value={this.getValue("silence.comment")} onChange={this.setValue.bind(this, "silence.comment")}  />
+                                        <label htmlFor="silence-form-comment" className="inputRg">Description</label>
+                                        <textarea id="silence-form-comment" className="form-control" value={this.getValue("silence.comment")} onChange={this.setValue.bind(this, "silence.comment")}  />
                                     </div>
 
                                     <div className="form-group">
                                         <div className="form-row">
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="inputNsDescription" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
+                                                <label htmlFor="silence-form-startsAt" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
+                                                    <input id="silence-form-startsAt" className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
                                                     <div className="btn-group bnt-abs-right" role="group">
-                                                        <button id="btnGroupDrop1" type="button"
+                                                        <button id="btnGroupDrop-startsAt" type="button"
                                                                 className="btn btn-secondary dropdown-toggle btn-sm"
                                                                 data-toggle="dropdown" aria-haspopup="true"
                                                                 aria-expanded="false">
                                                             +
                                                         </button>
-                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop-startsAt">
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "h")}>1 hour</a>
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "h")}>2 hours</a>
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "h")}>4 hours</a>
@@ -313,17 +313,17 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                             </div>
 
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="inputNsDescription" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
+                                                <label htmlFor="silence-form-endsAt" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
+                                                    <input id="silence-form-endsAt" className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
                                                     <div className="btn-group bnt-abs-right" role="group">
-                                                        <button id="btnGroupDrop1" type="button"
+                                                        <button id="btnGroupDrop-endsAt" type="button"
                                                                 className="btn btn-secondary dropdown-toggle btn-sm"
                                                                 data-toggle="dropdown" aria-haspopup="true"
                                                                 aria-expanded="false">
                                                             +
                                                         </button>
-                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                        <div className="dropdown-menu" aria-labelledby="btnGroupDrop-endsAt">
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "h")}>1 hour</a>
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "h")}>2 hours</a>
                                                             <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "h")}>4 hours</a>

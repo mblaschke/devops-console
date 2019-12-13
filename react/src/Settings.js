@@ -210,8 +210,8 @@ class Settings extends BaseComponent {
                         <form method="post">
                             {this.state.settingConfig.User.map((setting, value) =>
                                 <div className="form-group">
-                                    <label htmlFor="inputNsApp" className="inputRg">{setting.Label}</label>
-                                    <input type="text" name={setting.Name} id={setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getUserConfigItem(setting.Name)} onChange={this.handlePersonalInputChange.bind(this, setting.Name)} />
+                                    <label htmlFor={"personal-" + setting.Name} className="inputRg">{setting.Label}</label>
+                                    <input type="text" name={setting.Name} id={"personal-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getUserConfigItem(setting.Name)} onChange={this.handlePersonalInputChange.bind(this, setting.Name)} />
                                 </div>
                             )}
                             <div className="toolbox">
@@ -231,8 +231,8 @@ class Settings extends BaseComponent {
                             <form method="post">
                                 {this.state.settingConfig.Team.map((setting, value) =>
                                     <div className="form-group">
-                                        <label htmlFor="inputNsApp" className="inputRg">{setting.Label}</label>
-                                        <input type="text" name={setting.Name} id={setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getTeamConfigItem(team.Name, setting.Name)} onChange={this.handleTeamInputChange.bind(this, team.Name, setting.Name)} />
+                                        <label htmlFor={"team-" + team.Name + "-" + setting.Name} className="inputRg">{setting.Label}</label>
+                                        <input type="text" name={setting.Name} id={"team-" + team.Name + "-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getTeamConfigItem(team.Name, setting.Name)} onChange={this.handleTeamInputChange.bind(this, team.Name, setting.Name)} />
                                     </div>
                                 )}
                                 <div className="toolbox">

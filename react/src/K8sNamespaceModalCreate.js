@@ -256,7 +256,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
                                     </div>
                                     <div className="row">
                                         <div className="col">
-                                            <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("description")} onChange={this.handleNamespaceInputChange.bind(this, "description")} />
+                                            <input type="text" name="nsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("description")} onChange={this.handleNamespaceInputChange.bind(this, "description")} />
                                         </div>
                                     </div>
 
