@@ -16,6 +16,16 @@ type (
 				HashKey  string `yaml:"hashKey"`
 				BlockKey string `yaml:"blockKey"`
 			} `yaml:"secureCookie"`
+
+			Redis struct {
+				Addr string `yaml:"addr"`
+				Timeout  time.Duration `yaml:"timeout"`
+				MaxActive int  `yaml:"maxActive"`
+				Password string  `yaml:"password"`
+				Database string  `yaml:"database"`
+				Prefix string `yaml:"prefix"`
+				Delim string  `yaml:"delim"`
+			} `yaml:"redis"`
 		}
 
 		Csrf struct {

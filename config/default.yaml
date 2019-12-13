@@ -11,6 +11,15 @@ application:
       hashKey: {{env "SESSION_SECURECOOKIE_HASHKEY" | default "F11JJT1PWFfcPbcnltjMeiFSEZOt3F3I" | toJson }}
       blockKey: {{env "SESSION_SECURECOOKIE_BLOCKKEY" | default "XDC0RgG55pPRQLb!" | toJson }}
 
+    redis:
+      addr: {{env "SESSION_REDIS_ADDR" | toJson }}
+      timeout: {{env "SESSION_REDIS_TIMEOUT"  | default "10s" | toJson }}
+      maxActive: {{env "SESSION_REDIS_MAXACTIVE"  | default "10" | int }}
+      password: {{env "SESSION_REDIS_PASSWORD"  | default "" | toJson }}
+      database: {{env "SESSION_REDIS_DATABASE"  | default "" | toJson }}
+      prefix: {{env "SESSION_REDIS_PREFIX"  | default "" | toJson }}
+      delim:  {{env "SESSION_REDIS_DELIM"  | default "|" | toJson }}
+
   oauth:
     provider: {{env "OAUTH_PROVIDER" | toJson }}
     usernamePrefix: {{env "OAUTH_USERNAME_PREFIX" | toJson }}
