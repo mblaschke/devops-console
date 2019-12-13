@@ -225,5 +225,5 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
 	}
 
-	ctx.JSON(response)
+	c.responseJson(ctx, response)
 }

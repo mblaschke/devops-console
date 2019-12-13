@@ -68,7 +68,9 @@ func (c *Server) initSessionRedis() {
 
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {
-		db.Close()
+		if err := db.Close(); err != nil {
+			c.logger.Errorln(err)
+		}
 	})
 
 	c.session = sessions.New(sessions.Config{

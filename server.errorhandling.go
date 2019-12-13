@@ -66,17 +66,21 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 		}{
 			Message: message,
 		}
-		ctx.JSON(response)
+		c.responseJson(ctx, response)
 	} else {
 		// Page error
 		ctx.ViewData("ERROR_MESSAGE", message)
 
 		if logout {
 			ctx.ViewData("title", "Login")
-			ctx.View("login.jet")
+			if err := ctx.View("login.jet"); err != nil {
+				c.logger.Errorln(err)
+			}
 		} else {
 			ctx.ViewData("title", "Error")
-			ctx.View("error.jet")
+			if err := ctx.View("error.jet"); err != nil {
+				c.logger.Errorln(err)
+			}
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"regexp"
 	"crypto/rand"
+	"errors"
 )
 
 type ApplicationAuth struct {
@@ -17,7 +18,10 @@ type ApplicationAuth struct {
 func (c *Server) Login(ctx iris.Context) {
 	randReader := rand.Reader
 	b := make([]byte, 16)
-	randReader.Read(b)
+	if _, err := randReader.Read(b); err != nil {
+		c.logger.Errorln(err)
+		c.respondError(ctx, errors.New("Unable to start oauth"))
+	}
 
 	state := base64.URLEncoding.EncodeToString(b)
 

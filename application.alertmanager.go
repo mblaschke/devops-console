@@ -42,7 +42,7 @@ func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context, user *models.U
 
 	alerts = c.filterAlerts(ctx, alerts)
 
-	ctx.JSON(alerts.Payload)
+	c.responseJson(ctx, alerts.Payload)
 }
 
 func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context, user *models.User) {
@@ -60,7 +60,7 @@ func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context, user *models
 
 	silences = c.filterSilences(ctx, silences)
 
-	ctx.JSON(silences.Payload)
+	c.responseJson(ctx, silences.Payload)
 }
 
 func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *models.User) {
@@ -96,7 +96,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 		Message: fmt.Sprintf("Silence \"%s\" deleted", *silenceResp.Payload.ID),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *models.User) {
@@ -134,7 +134,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		Message: fmt.Sprintf("Silence \"%s\" updated", *silenceResp.Payload.ID),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 
 }
 
@@ -168,8 +168,7 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 		Message: fmt.Sprintf("Silence \"%s\" created", silenceResp.Payload.SilenceID),
 	}
 
-	ctx.JSON(resp)
-
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata.AlertmanagerForm {

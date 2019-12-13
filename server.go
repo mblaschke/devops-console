@@ -69,7 +69,8 @@ func (c *Server) setupConfig(path string) {
 	var config []byte
 
 	c.logger.Infof("reading configuration from file %v", path)
-	if data, err := ioutil.ReadFile(path); err == nil {
+
+	if data, err := ioutil.ReadFile(filepath.Clean(path)); err == nil {
 		config = data
 	} else {
 		panic(err)
@@ -159,5 +160,13 @@ func (c *Server) initApp() {
 
 func (c *Server) Run(addr string) {
 	c.logger.Infof("run app server")
-	c.app.Run(iris.Addr(addr))
+	if err := c.app.Run(iris.Addr(addr)); err != nil {
+		c.logger.Fatalln(err)
+	}
+}
+
+func (c *Server) responseJson(ctx iris.Context, v interface{}) {
+	if _, err := ctx.JSON(v); err != nil {
+		c.logger.Errorln(err)
+	}
 }

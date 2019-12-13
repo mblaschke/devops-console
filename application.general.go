@@ -47,7 +47,7 @@ func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context, user *models.Us
 
 	PrometheusActions.With(prometheus.Labels{"scope": "general", "type": "stats"}).Inc()
 
-	ctx.JSON(ret)
+	c.responseJson(ctx, ret)
 }
 
 func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.User) {
@@ -89,5 +89,5 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 		ret.Alertmanager.Instances = append(ret.Alertmanager.Instances, alertmanagerInstance.Name)
 	}
 
-	ctx.JSON(ret)
+	c.responseJson(ctx, ret)
 }

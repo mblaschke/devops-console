@@ -10,7 +10,9 @@ import (
 
 func (c *Server) templateLogin(ctx iris.Context) {
 	ctx.ViewData("title", "Login")
-	ctx.View("login.jet")
+	if err := ctx.View("login.jet"); err != nil {
+		c.logger.Errorln(err)
+	}
 }
 
 func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {

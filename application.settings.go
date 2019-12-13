@@ -68,7 +68,7 @@ func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 	close(secretChannel)
 	wgProcess.Wait()
 
-	ctx.JSON(ret)
+	c.responseJson(ctx, ret)
 }
 
 func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User) {
@@ -127,7 +127,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 		Message: "Updated personal settings",
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User) {
@@ -198,7 +198,7 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 		Message: fmt.Sprintf("Updated team \"%s\" settings", team),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationSettings) userSecretName(user *models.User, name string) string {

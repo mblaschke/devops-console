@@ -39,7 +39,9 @@ func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context, user *models.User) 
 	ctx.Header("ContentType", "text/yaml")
 	ctx.Header("Content-Disposition", "attachment; filename=\"kubeconfig.yaml\"")
 	ctx.ViewData("config", c.config)
-	ctx.View("kubeconfig.jet")
+	if err := ctx.View("kubeconfig.jet"); err != nil {
+		c.logger.Errorln(err)
+	}
 }
 
 func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context, user *models.User) {
@@ -108,7 +110,7 @@ func (c *ApplicationKubernetes) ApiCluster(ctx iris.Context, user *models.User) 
 
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "listCluster"}).Inc()
 
-	ctx.JSON(ret)
+	c.responseJson(ctx, ret)
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.User) {
@@ -160,7 +162,7 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "listNamespace"}).Inc()
 
-	ctx.JSON(ret)
+	c.responseJson(ctx, ret)
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *models.User) {
@@ -312,7 +314,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 		Message: fmt.Sprintf("Namespace \"%s\" created", namespace.Name),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context, user *models.User) {
@@ -348,7 +350,7 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context, user *model
 		Message: fmt.Sprintf("Namespace \"%s\" deleted", namespace.Name),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *models.User) {
@@ -406,7 +408,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		Message: fmt.Sprintf("Namespace \"%s\" updated", namespace.Name),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models.User) {
@@ -447,7 +449,7 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 		Message: fmt.Sprintf("Namespace \"%s\" reset", namespace.Name),
 	}
 
-	ctx.JSON(resp)
+	c.responseJson(ctx, resp)
 }
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace) (*models.KubernetesNamespace, error) {

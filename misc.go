@@ -2,6 +2,7 @@ package main
 
 import (
 	"devops-console/models"
+	"fmt"
 	"io/ioutil"
 	v1 "k8s.io/api/core/v1"
 	v1Networking "k8s.io/api/networking/v1"
@@ -45,12 +46,16 @@ func buildKubeConfigList(defaultPath, path string) *models.KubernetesObjectList 
 
 func addK8sConfigsFromPath(configPath string, list *models.KubernetesObjectList) {
 	var fileList []string
-	filepath.Walk(configPath, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(configPath, func(path string, f os.FileInfo, err error) error {
 		if IsK8sConfigFile(path) {
 			fileList = append(fileList, path)
 		}
 		return nil
 	})
+
+	if err != nil {
+		fmt.Println(fmt.Sprintf("ERROR: %s", err))
+	}
 
 	for _, path := range fileList {
 		item := models.KubernetesObject{}
@@ -119,18 +124,22 @@ func IsK8sConfigFile(path string) bool {
 }
 
 func recursiveFileListByPath(path string) (list []string) {
-	filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
 		if IsK8sConfigFile(path) {
 			list = append(list, path)
 		}
 		return nil
 	})
 
+	if err != nil {
+		fmt.Println(fmt.Sprintf("ERROR: %s", err))
+	}
+
 	return
 }
 
 func KubeParseConfig(path string) runtime.Object {
-	data, err := ioutil.ReadFile(path)
+	data, err := ioutil.ReadFile(filepath.Clean(path))
 	if err != nil {
 		panic(err)
 	}
@@ -156,7 +165,9 @@ func randomString(length int) string {
 		"-_+=*")
 	var b strings.Builder
 	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
+		if _, err := b.WriteRune(chars[rand.Intn(len(chars))]); err != nil {
+			fmt.Println(fmt.Sprintf("ERROR: %s", err))
+		}
 	}
 	return b.String()
 }
