@@ -16,16 +16,17 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
+	s := c.session.Start(ctx)
+
 	randReader := rand.Reader
 	b := make([]byte, 16)
 	if _, err := randReader.Read(b); err != nil {
 		c.logger.Errorln(err)
 		c.respondError(ctx, errors.New("Unable to start oauth"))
+		return
 	}
 
 	state := base64.URLEncoding.EncodeToString(b)
-
-	s := c.session.Start(ctx)
 	s.Set("oauth", state)
 
 	oauth := c.newServiceOauth(ctx)
