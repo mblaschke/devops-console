@@ -73,12 +73,13 @@ class K8sCluster extends BaseComponent {
     }
 
     getNodes() {
-        let ret = [];
+        let ret = Array.isArray(this.state.nodes) ? this.state.nodes : [];
+
         if (this.state.searchValue !== "") {
             let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
             let re = new RegExp(term, "i");
 
-            ret = this.state.nodes.filter((row) => {
+            ret = ret.filter((row) => {
                 if (row.Role.search(re) !== -1) return true;
                 if (row.Name.search(re) !== -1) return true;
                 if (row.InternalIp.search(re) !== -1) return true;
@@ -95,8 +96,6 @@ class K8sCluster extends BaseComponent {
 
                 return false;
             });
-        } else {
-            ret = this.state.nodes;
         }
 
         ret = ret.sort(function(a,b) {
@@ -113,8 +112,6 @@ class K8sCluster extends BaseComponent {
         if (nodes) {
             return (
                 <div>
-                    <Spinner active={this.state.isStartup}/>
-
                     <Breadcrumb/>
 
                     <div className="card mb-3">
@@ -122,9 +119,11 @@ class K8sCluster extends BaseComponent {
                             <i className="fas fa-server"></i>
                             Kubernetes cluster overview
                         </div>
-                        <div className="card-body card-body-table">
+                        <div className="card-body card-body-table spinner-area">
+                            <Spinner active={this.state.isStartup}/>
+
                             <div className="table-responsive">
-                                <table className="table table-hover table-sm">
+                                <table className="table table-hover table-sm spinner-area">
                                     <thead>
                                     <tr>
                                         <th>Server</th>

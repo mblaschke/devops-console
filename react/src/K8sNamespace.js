@@ -256,12 +256,13 @@ class K8sNamespace extends BaseComponent {
     }
 
     getNamespaces() {
-        let ret = [];
+        let ret = Array.isArray(this.state.namespaces) ? this.state.namespaces : [];
+
         if (this.state.searchValue !== "") {
             let term = this.state.searchValue.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
             let re = new RegExp(term, "i");
 
-            ret = this.state.namespaces.filter((row) => {
+            ret = ret.filter((row) => {
                 if (row.Name.search(re) !== -1) return true;
                 if (row.OwnerTeam.search(re) !== -1) return true;
                 if (row.OwnerUser.search(re) !== -1) return true;
@@ -277,8 +278,6 @@ class K8sNamespace extends BaseComponent {
 
                 return false;
             });
-        } else {
-            ret = this.state.namespaces;
         }
 
         // filter by team
@@ -315,18 +314,10 @@ class K8sNamespace extends BaseComponent {
     }
 
     render() {
-        if (this.state.isStartup) {
-            return (
-                <div>
-                    <Spinner active={this.state.isStartup}/>
-                </div>
-            )
-        }
-
         let namespaceSettings = (row) => {
            let ret = [];
            try {
-               if (this.state.config.Kubernetes.Namespace.Settings) {
+               if (this.state.config && this.state.config.Kubernetes.Namespace.Settings) {
                    this.state.config.Kubernetes.Namespace.Settings.map((setting) => {
                        if (row.Settings && row.Settings[setting.Name]) {
                            ret.push({
@@ -355,7 +346,9 @@ class K8sNamespace extends BaseComponent {
                             {this.renderTeamSelector()}
                         </div>
                     </div>
-                    <div className="card-body card-body-table">
+                    <div className="card-body card-body-table spinner-area">
+                        <Spinner active={this.state.isStartup}/>
+
                         <div className="table-responsive">
                             <table className="table table-hover table-sm">
                                 <colgroup>
