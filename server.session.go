@@ -6,6 +6,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"time"
 )
 
 func (c *Server) initSession() {
@@ -54,21 +55,39 @@ func (c *Server) initSessionSecureCookie() {
 }
 
 func (c *Server) initSessionRedis() {
-	db := redis.New(redis.Config{
-		Network:   "tcp",
-		Addr:      c.config.App.Session.Redis.Addr,
-		Timeout:   c.config.App.Session.Redis.Timeout,
-		MaxActive: c.config.App.Session.Redis.MaxActive,
-		Password:  c.config.App.Session.Redis.Password,
-		Database:  c.config.App.Session.Redis.Database,
-		Prefix:    c.config.App.Session.Redis.Prefix,
-		Delim:     c.config.App.Session.Redis.Delim,
-		Driver:    redis.Redigo(),
-	})
+	for i := 0; i < 25; i++ {
+		retryTime := time.Duration(time.Duration(i*2) * time.Second)
+
+		c.redisConnection = redis.New(redis.Config{
+			Network:   "tcp",
+			Addr:      c.config.App.Session.Redis.Addr,
+			Timeout:   c.config.App.Session.Redis.Timeout,
+			MaxActive: c.config.App.Session.Redis.MaxActive,
+			Password:  c.config.App.Session.Redis.Password,
+			Database:  c.config.App.Session.Redis.Database,
+			Prefix:    c.config.App.Session.Redis.Prefix,
+			Delim:     c.config.App.Session.Redis.Delim,
+			Driver:    redis.Redigo(),
+		})
+
+		if c.redisConnection != nil {
+			break
+		}
+
+		c.logger.Errorln(fmt.Sprintf("Redis connection failed, retrying in %v", retryTime.String()))
+		time.Sleep(retryTime)
+	}
+
+	if c.redisConnection == nil {
+		c.logger.Fatalln("Redis connection failed, cannot connect to session database")
+	}
+
+	c.logger.Infoln("Redis connection established")
+
 
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {
-		if err := db.Close(); err != nil {
+		if err := c.redisConnection.Close(); err != nil {
 			c.logger.Errorln(err)
 		}
 	})
@@ -79,5 +98,5 @@ func (c *Server) initSessionRedis() {
 		AllowReclaim: true,
 	})
 
-	c.session.UseDatabase(db)
+	c.session.UseDatabase(c.redisConnection)
 }

@@ -16,6 +16,8 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+
 )
 
 type Server struct {
@@ -23,6 +25,8 @@ type Server struct {
 	tmpl *view.JetEngine
 
 	session *sessions.Sessions
+
+	redisConnection *redis.Database
 
 	config models.AppConfig
 
