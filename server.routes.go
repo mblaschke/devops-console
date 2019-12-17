@@ -27,6 +27,7 @@ func (c *Server) initRoutes() {
 	applicationSettings := ApplicationSettings{Server: c}
 	applicationGeneral := ApplicationGeneral{Server: c}
 	applicationAuth := ApplicationAuth{Server: c}
+	applicationSystem := ApplicationSystem{Server: c}
 
 	publicParty := c.app.Party("/", c.defaultHeaders)
 	{
@@ -35,6 +36,8 @@ func (c *Server) initRoutes() {
 		publicParty.Get("/oauth", applicationAuth.LoginViaOauth)
 		publicParty.Get("/logout", applicationAuth.Logout)
 		publicParty.Get("/logout/forced", applicationAuth.LogoutForced)
+
+		publicParty.Get("/_healthz", applicationSystem.Healthz)
 	}
 
 	pageParty := c.app.Party("/", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
