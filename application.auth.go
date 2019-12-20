@@ -64,6 +64,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		if errorDesc := ctx.URLParam("error_description"); errorDesc != "" {
 			message = fmt.Sprintf("%s:\n%s", error, errorDesc)
 		}
+		c.logger.Errorln(error)
 		ctx.ViewData("messageError", message)
 		c.templateLogin(ctx)
 		return
@@ -91,6 +92,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	tkn, err := oauth.Exchange(code)
 	if err != nil {
+		c.logger.Errorln(err)
 		ctx.ViewData("messageError", "OAuth check failed: failed getting token from provider")
 		c.templateLogin(ctx)
 		return
@@ -104,6 +106,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	user, err := oauth.FetchUserInfo(tkn)
 	if err != nil {
+		c.logger.Errorln(err)
 		ctx.ViewData("messageError", "OAuth check failed: unable to get user information")
 		c.templateLogin(ctx)
 		return
