@@ -28,6 +28,7 @@ func (c *Server) initRoutes() {
 	applicationGeneral := ApplicationGeneral{Server: c}
 	applicationAuth := ApplicationAuth{Server: c}
 	applicationSystem := ApplicationSystem{Server: c}
+	applicationIndex := ApplicationIndex{Server: c}
 
 	publicParty := c.app.Party("/", c.defaultHeaders)
 	{
@@ -53,6 +54,8 @@ func (c *Server) initRoutes() {
 
 	apiParty := c.app.Party("/api", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
 	{
+		apiParty.Get("/heartbeat",  applicationIndex.heartbeat)
+
 		apiParty.Get("/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
 		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
 

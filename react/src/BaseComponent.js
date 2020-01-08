@@ -5,6 +5,28 @@ import * as utils from "./utils";
 import _ from 'lodash';
 
 class BaseComponent extends Component {
+    constructor(props) {
+        super(props);
+
+        this.startHeartbeat();
+    }
+
+    startHeartbeat() {
+        if (!this.startHeartbeat.interval) {
+            this.startHeartbeat.interval = setInterval(() => {
+                this.heartbeat();
+            }, 30 * 1000)
+        }
+    }
+
+    heartbeat() {
+        let jqxhr = this.ajax({
+            type: "GET",
+            url: '/api/heartbeat'
+        });
+
+        this.handleXhr(jqxhr);
+    }
 
     setInputFocus() {
         setTimeout( () => {

@@ -36,3 +36,13 @@ func (c *Server) react(ctx iris.Context, title string) {
 		}
 	})
 }
+
+func (c *Server) heartbeat(ctx iris.Context) {
+	user, err := c.getUser(ctx)
+	if err == nil && user != nil {
+		ctx.JSON("Ok")
+	} else {
+		ctx.StatusCode(iris.StatusUnauthorized)
+		ctx.JSON("Failed")
+	}
+}
