@@ -56,13 +56,8 @@ class K8sNamespace extends BaseComponent {
             type: "GET",
             url: '/api/kubernetes/namespace'
         }).done((jqxhr) => {
-            if (this.state.isStartup) {
-                this.setInputFocus();
-            }
-
             this.setState({
                 namespaces: jqxhr,
-                isStartup: false
             });
         });
     }
@@ -73,6 +68,10 @@ class K8sNamespace extends BaseComponent {
             url: '/api/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
+                if (this.state.isStartup) {
+                    this.setInputFocus();
+                }
+
                 if (!jqxhr.Teams) {
                     jqxhr.Teams = [];
                 }
@@ -82,6 +81,7 @@ class K8sNamespace extends BaseComponent {
                 }
 
                 this.setState({
+                    isStartup: false,
                     config: jqxhr
                 });
             }
@@ -314,6 +314,15 @@ class K8sNamespace extends BaseComponent {
     }
 
     render() {
+        if (this.state.isStartup) {
+            return (
+                <div>
+                    <Breadcrumb/>
+                    <Spinner active={this.state.isStartup}/>
+                </div>
+            )
+        }
+
         let namespaceSettings = (row) => {
            let ret = [];
            try {
@@ -347,8 +356,6 @@ class K8sNamespace extends BaseComponent {
                         </div>
                     </div>
                     <div className="card-body card-body-table spinner-area">
-                        <Spinner active={this.state.isStartup}/>
-
                         <div className="table-responsive">
                             <table className="table table-hover table-sm">
                                 <colgroup>
