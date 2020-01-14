@@ -4,10 +4,27 @@ import (
 	"encoding/json"
 	"errors"
 	iris "github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/logger"
 )
 
 func (c *Server) initRoutes() {
 	c.app.Use(c.before)
+
+	requestLogger := logger.New(logger.Config{
+		// Status displays status code
+		Status: true,
+		// IP displays request's remote address
+		IP: true,
+		// Method displays the http method
+		Method: true,
+		// Path displays the request path
+		Path: true,
+		// Query appends the url query to the Path.
+		Query: opts.Debug,
+		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
+		// will be added to the logs.
+		MessageContextKeys: []string{"userIdentification"},
+	})
 
 	c.logger.Infof(" - init static file handler")
 
@@ -31,7 +48,7 @@ func (c *Server) initRoutes() {
 	applicationSystem := ApplicationSystem{Server: c}
 	applicationIndex := ApplicationIndex{Server: c}
 
-	publicParty := c.app.Party("/", c.defaultHeaders)
+	publicParty := c.app.Party("/", requestLogger, c.defaultHeaders)
 	{
 		publicParty.Get("/", c.index)
 		publicParty.Post("/login", applicationAuth.Login)
@@ -42,7 +59,7 @@ func (c *Server) initRoutes() {
 		publicParty.Get("/_healthz", applicationSystem.Healthz)
 	}
 
-	pageParty := c.app.Party("/", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
+	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
 	{
 		pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
 		pageParty.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
@@ -53,7 +70,7 @@ func (c *Server) initRoutes() {
 		pageParty.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
 	}
 
-	apiParty := c.app.Party("/api", c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
+	apiParty := c.app.Party("/api", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
 	{
 		apiParty.Get("/heartbeat",  applicationIndex.heartbeat)
 

@@ -7,17 +7,15 @@ import (
 	"github.com/Masterminds/sprig"
 	glogger "github.com/google/logger"
 	iris "github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
 	"github.com/kataras/iris/v12/sessions"
+	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"github.com/kataras/iris/v12/view"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
-	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
-
 )
 
 type Server struct {
@@ -39,21 +37,6 @@ func NewServer(pathList []string) *Server {
 	server.app = iris.New()
 	server.logger = glogger.Init("Verbose", true, false, ioutil.Discard)
 	server.app.Use(recover.New())
-	server.app.Use(logger.New(logger.Config{
-		// Status displays status code
-		Status: true,
-		// IP displays request's remote address
-		IP: true,
-		// Method displays the http method
-		Method: true,
-		// Path displays the request path
-		Path: true,
-		// Query appends the url query to the Path.
-		Query: opts.Debug,
-		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
-		// will be added to the logs.
-		MessageContextKeys: []string{"userIdentification"},
-	}))
 
 	server.Init()
 	for _, config := range pathList {
