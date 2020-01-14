@@ -18,6 +18,7 @@ func (c *Server) initRoutes() {
 		Gzip:     false,
 		ShowList: false,
 	})
+	c.app.Favicon("./static/img/favicon.ico")
 
 	c.logger.Infof(" - init app routes")
 
