@@ -16,6 +16,7 @@ class K8sNamespace extends BaseComponent {
 
         this.state = {
             isStartup: true,
+            isStartupNamespaces: true,
             namespaces: [],
             confUser: {},
             config: {
@@ -58,6 +59,7 @@ class K8sNamespace extends BaseComponent {
         }).done((jqxhr) => {
             this.setState({
                 namespaces: jqxhr,
+                isStartupNamespaces: false
             });
         });
     }
@@ -356,6 +358,8 @@ class K8sNamespace extends BaseComponent {
                         </div>
                     </div>
                     <div className="card-body card-body-table spinner-area">
+                        <Spinner active={this.state.isStartupNamespaces}/>
+
                         <div className="table-responsive">
                             <table className="table table-hover table-sm">
                                 <colgroup>
