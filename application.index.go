@@ -2,6 +2,7 @@ package main
 
 import (
 	"devops-console/models"
+	"fmt"
 	"github.com/kataras/iris/v12"
 )
 
@@ -40,6 +41,7 @@ func (c *Server) react(ctx iris.Context, title string) {
 func (c *Server) heartbeat(ctx iris.Context) {
 	user, err := c.getUser(ctx)
 	if err == nil && user != nil {
+		ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
 		ctx.JSON("Ok")
 	} else {
 		ctx.StatusCode(iris.StatusUnauthorized)
