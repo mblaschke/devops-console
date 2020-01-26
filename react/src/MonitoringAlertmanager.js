@@ -34,7 +34,8 @@ class MonitoringAlertmanager extends BaseComponent {
                 },
                 alert: {
                     active: true,
-                    suppressed: false
+                    suppressed: false,
+                    collapsed: []
                 }
             },
             instance: "",
@@ -466,11 +467,11 @@ class MonitoringAlertmanager extends BaseComponent {
     renderMatch(matcher) {
         if (matcher.isRegexp) {
             return (
-                <li><span className="badge badge-secondary">{matcher.name}=~{this.highlight(matcher.value)}</span></li>
+                <span className="badge badge-secondary">{matcher.name}=~{this.highlight(matcher.value)}</span>
             )
         } else {
             return (
-               <li><span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span></li>
+               <span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span>
             )
         }
     }
@@ -612,7 +613,121 @@ class MonitoringAlertmanager extends BaseComponent {
         )
     }
 
+    buildGroupedAlerts(alerts) {
+        let ret = {
+            list: {},
+            length: 0
+        };
+
+        alerts.map((row) => {
+            if (row.labels && row.labels.alertname) {
+                if (!ret.list[row.labels.alertname]) {
+                    ret.list[row.labels.alertname] = [];
+                }
+                ret.list[row.labels.alertname].push(row);
+            } else {
+                if (!ret.list["__UNGROUPED__"]) {
+                    ret.list["__UNGROUPED__"] = [];
+                }
+
+                ret.list["__UNGROUPED__"].push(row);
+            }
+            ret.length++;
+        });
+
+        return ret;
+    }
+
+    alertTriggerCollapse(alertName) {
+        let state = this.state;
+
+        let alertIndex = state.filter.alert.collapsed.indexOf(alertName);
+
+        if (alertIndex !== -1 ) {
+            // existing -> removing
+            state.filter.alert.collapsed.splice(alertIndex, 1);
+        } else {
+            // not existing -> adding
+            state.filter.alert.collapsed.push(alertName);
+        }
+        this.setState(state);
+    }
+
     renderAlerts(alerts) {
+        let groupedAlerts = this.buildGroupedAlerts(alerts);
+        let groupedAlertList = groupedAlerts.list;
+
+        let htmlTableRows = [];
+
+        Object.keys(groupedAlertList).map((alertName, alertIndex) => {
+            let isVisible = true;
+            let alertGroupIconClassName = "far fa-caret-square-down";
+
+            if (this.state.filter.alert.collapsed.indexOf(alertName) !== -1) {
+                isVisible = false;
+                alertGroupIconClassName = "far fa-caret-square-up";
+            }
+
+            let alertCount = groupedAlertList[alertName].length;
+
+            htmlTableRows.push(
+                <tr className="alertmanager-alertname-group">
+                    <th colSpan="5">
+                        <a href="#" className="group-filter" onClick={this.alertTriggerCollapse.bind(this, alertName)}>
+                            <i className={alertGroupIconClassName}></i>&nbsp;
+                            {alertName} ({alertCount} alerts)
+                        </a>
+                    </th>
+                </tr>
+            );
+
+            if (isVisible) {
+                groupedAlertList[alertName].map((row) => {
+                    htmlTableRows.push(
+                        <tr className="alertmanager-alertname-item">
+                            <td className="detail">
+                                <strong>{this.highlight(row.annotations.summary)}</strong><br />
+                                <small>{this.highlight(row.annotations.description)}</small>
+
+                                <ul className="alertmanager-label">
+                                    {Object.entries(row.labels).map((item) =>
+                                        <li>
+                                            <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                        </li>
+                                    )}
+                                </ul>
+                            </td>
+                            <td>{this.transformTime(row.startsAt)}</td>
+                            <td>{this.transformTime(row.updatedAt)}</td>
+                            <td>
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
+                                        case "suppressed":
+                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                        default:
+                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                    }
+                                })()}
+                            </td>
+                            <td className="toolbox">
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
+                                                Silence
+                                            </button>
+                                    }
+                                })()}
+                            </td>
+                        </tr>
+                    )
+                });
+            }
+        });
+
+
         return (
             <div>
                 <Spinner active={this.state.loadingAlerts}/>
@@ -623,14 +738,12 @@ class MonitoringAlertmanager extends BaseComponent {
                             <col width="*"/>
                             <col width="200rem"/>
                             <col width="200rem"/>
-                            <col width="200rem"/>
                             <col width="100rem"/>
                             <col width="50rem"/>
                         </colgroup>
                         <thead>
                         <tr>
                             <th>Alert</th>
-                            <th>Labels</th>
                             <th>Started</th>
                             <th>Last update</th>
                             <th>Status</th>
@@ -638,52 +751,12 @@ class MonitoringAlertmanager extends BaseComponent {
                         </tr>
                         </thead>
                         <tbody>
-                        {alerts.length === 0 &&
+                        {htmlTableRows.length === 0 &&
                             <tr>
-                                <td colspan="6" className="not-found">No alerts found.</td>
+                                <td colspan="5" className="not-found">No alerts found.</td>
                             </tr>
                         }
-                        {alerts.map((row) =>
-                            <tr>
-                                <td>
-                                    <strong>{this.highlight(row.annotations.summary)}</strong><br />
-                                    <small>{this.highlight(row.annotations.description)}</small>
-                                </td>
-                                <td>
-                                    <ul className="alertmanager-label">
-                                    {Object.entries(row.labels).map((item) =>
-                                            <li>
-                                                <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
-                                            </li>
-                                    )}
-                                    </ul>
-                                </td>
-                                <td>{this.transformTime(row.startsAt)}</td>
-                                <td>{this.transformTime(row.updatedAt)}</td>
-                                <td>
-                                    {(() => {
-                                        switch (row.status.state) {
-                                            case "active":
-                                                return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
-                                            case "suppressed":
-                                                return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                            default:
-                                                return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                        }
-                                    })()}
-                                </td>
-                                <td className="toolbox">
-                                    {(() => {
-                                        switch (row.status.state) {
-                                            case "active":
-                                                return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
-                                                    Silence
-                                                </button>
-                                        }
-                                    })()}
-                                </td>
-                            </tr>
-                        )}
+                        {htmlTableRows}
                         </tbody>
                     </table>
                 </div>
@@ -702,14 +775,12 @@ class MonitoringAlertmanager extends BaseComponent {
                             <col width="*"/>
                             <col width="200rem"/>
                             <col width="200rem"/>
-                            <col width="200rem"/>
                             <col width="80rem"/>
                             <col width="80rem"/>
                         </colgroup>
                         <thead>
                         <tr>
                             <th>Alert</th>
-                            <th>Matchers</th>
                             <th>Started</th>
                             <th>Until</th>
                             <th></th>
@@ -723,7 +794,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         <tbody>
                         {silences.length === 0 &&
                             <tr>
-                                <td colspan="6" className="not-found">No silences found.</td>
+                                <td colspan="5" className="not-found">No silences found.</td>
                             </tr>
                         }
                         {silences.map((row) =>
@@ -732,11 +803,12 @@ class MonitoringAlertmanager extends BaseComponent {
                                     {this.highlight(row.comment)}
                                     <br/>
                                     <i><small>created: {this.highlight(row.createdBy)}</small></i>
-                                </td>
-                                <td>
-                                    {row.matchers.map((item) =>
-                                        <ul className="alertmanager-matcher">{this.renderMatch(item)}</ul>
-                                    )}
+
+                                    <ul className="alertmanager-matcher">
+                                        {row.matchers.map((item) =>
+                                            <li>{this.renderMatch(item)}</li>
+                                        )}
+                                    </ul>
                                 </td>
                                 <td>{this.transformTime(row.startsAt)}</td>
                                 <td>{this.transformTime(row.endsAt)}</td>

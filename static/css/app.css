@@ -68,6 +68,11 @@ dt a {
     font-weight: normal;
 }
 
+a.group-filter,
+a.group-filter:hover {
+    color: #212529;
+}
+
 .alertmanager-matcher,
 .alertmanager-label {
     list-style: none;
@@ -75,11 +80,21 @@ dt a {
     margin: 0;
 }
 
+.alertmanager-label li,
+.alertmanager-matcher li {
+    display: inline-block;
+}
+
 .alertmanager-label .badge,
 .alertmanager-matcher .badge {
     max-width: 10rem;
     width: auto;
     white-space: normal;
+    margin: 0 0.2rem;
+}
+
+.alertmanager-alertname-item .detail {
+    padding-left: 2rem;
 }
 
 .card-header .toolbox .form-check,
