@@ -125,14 +125,29 @@ class BaseComponent extends Component {
         });
     }
 
-    renderTeamSelector() {
+    renderTeamSelector(htmlId) {
+        if (!htmlId) {
+            htmlId = "formTeamSelector" + Math.random() * 10000;
+        }
+
         return (
-            <select className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
+            <select className="form-control" id={htmlId} value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
                 <option key="*" value="*">All teams</option>
                 {this.state.config.Teams.map((row, value) =>
                     <option key={row.Id} value={row.Name}>{row.Name}</option>
                 )}
             </select>
+        )
+    }
+
+    renderTeamSelectorWithlabel() {
+        let htmlId = "formTeamSelector" + Math.random() * 10000;
+
+        return (
+            <div className="form-group">
+                <label htmlFor={htmlId}>Team</label>
+                {this.renderTeamSelector(htmlId)}
+            </div>
         )
     }
 

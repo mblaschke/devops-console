@@ -29,9 +29,11 @@ class MonitoringAlertmanager extends BaseComponent {
             loadingSilences: true,
             filter: {
                 silence: {
+                    active: true,
                     expired: false
                 },
                 alert: {
+                    active: true,
                     suppressed: false
                 }
             },
@@ -327,6 +329,14 @@ class MonitoringAlertmanager extends BaseComponent {
             });
         }
 
+        // filter by state:active
+        if (!this.state.filter.alert.active) {
+            ret = ret.filter((row) => {
+                if (row.status.state !== "active") return true;
+                return false;
+            });
+        }
+
         // filter by state:suppressed
         if (!this.state.filter.alert.suppressed) {
             ret = ret.filter((row) => {
@@ -375,6 +385,14 @@ class MonitoringAlertmanager extends BaseComponent {
                         }
                     }
                 }
+                return false;
+            });
+        }
+
+        // filter by state:active
+        if (!this.state.filter.silence.active) {
+            ret = ret.filter((row) => {
+                if (row.status.state !== "active") return true;
                 return false;
             });
         }
@@ -479,20 +497,40 @@ class MonitoringAlertmanager extends BaseComponent {
                         Alerts
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col-sm-4 form-inline">
-                                    <div className="form-check">
-                                        <input type="checkbox" id="alertFilterSuppressed" className="form-check-input"
-                                               checked={this.getValueCheckbox("filter.alert.suppressed")}
-                                               onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")}/>
-                                        <label className="form-check-label" htmlFor="alertFilterSuppressed">Suppressed</label>
+                                <div className="col-sm-6 form-inline">
+                                    <div className="dropdown">
+                                        <button className="btn btn-secondary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                            Filter
+                                        </button>
+
+                                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <form className="px-4 py-3">
+                                                {this.renderTeamSelectorWithlabel()}
+
+                                                <label>Status</label>
+                                                <div className="form-check">
+                                                    <input type="checkbox" className="form-check-input" id="alertFilterActive" checked={this.getValueCheckbox("filter.alert.active")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.active")} />
+                                                    <label className="form-check-label" htmlFor="alertFilterActive">
+                                                        Active
+                                                    </label>
+                                                </div>
+
+                                                <div className="form-check">
+                                                    <input type="checkbox" className="form-check-input" id="alertFilterSuppressed" checked={this.getValueCheckbox("filter.alert.suppressed")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")} />
+                                                    <label className="form-check-label" htmlFor="alertFilterSuppressed">
+                                                        Suppressed
+                                                    </label>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="col-sm-4">
-                                    {this.renderTeamSelector()}
-                                </div>
-
-                                <div className="col-sm-4">
+                                <div className="col-sm-6">
                                     {this.renderInstanceSelector()}
                                 </div>
                             </div>
@@ -510,20 +548,40 @@ class MonitoringAlertmanager extends BaseComponent {
                         Silences
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col-sm-4 form-inline">
-                                    <div className="form-check">
-                                        <input type="checkbox" id="silenceFilterExpired" className="form-check-input"
-                                               checked={this.getValueCheckbox("filter.silence.expired")}
-                                               onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
-                                        <label className="form-check-label" htmlFor="silenceFilterExpired">Expired</label>
+                                <div className="col-sm-6">
+                                    <div className="dropdown">
+                                        <button className="btn btn-secondary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                            Filter
+                                        </button>
+
+                                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <form className="px-4 py-3">
+                                                {this.renderTeamSelectorWithlabel()}
+
+                                                <label>Status</label>
+                                                <div className="form-check">
+                                                    <input type="checkbox" className="form-check-input" id="silenceFilterActive" checked={this.getValueCheckbox("filter.silence.active")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.active")} />
+                                                    <label className="form-check-label" htmlFor="silenceFilterActive">
+                                                        Active
+                                                    </label>
+                                                </div>
+
+                                                <div className="form-check">
+                                                    <input type="checkbox" className="form-check-input" id="silenceFilteExpiredr" checked={this.getValueCheckbox("filter.silence.expired")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")} />
+                                                    <label className="form-check-label" htmlFor="silenceFilteExpiredr">
+                                                        Expired
+                                                    </label>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="col-sm-4">
-                                    {this.renderTeamSelector()}
-                                </div>
-
-                                <div className="col-sm-4">
+                                <div className="col-sm-6">
                                     {this.renderInstanceSelector()}
                                 </div>
                             </div>
