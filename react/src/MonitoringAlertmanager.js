@@ -34,7 +34,7 @@ class MonitoringAlertmanager extends BaseComponent {
                 },
                 alert: {
                     active: true,
-                    suppressed: false,
+                    suppressed: true,
                     collapsed: []
                 }
             },
@@ -293,8 +293,8 @@ class MonitoringAlertmanager extends BaseComponent {
         });
     }
 
-    getAlertList() {
-        let ret = Array.isArray(this.state.alerts) ? this.state.alerts : [];
+    filterAlerts(alerts) {
+        let ret = Array.isArray(alerts) ? alerts : [];
 
         // filter by quickserach
         if (this.state.searchValue !== "") {
@@ -455,6 +455,37 @@ class MonitoringAlertmanager extends BaseComponent {
         )
     }
 
+    buildGroupHeader(rows) {
+        let statsList = {};
+        let footerLine = "";
+
+        if (rows && Array.isArray(rows)) {
+            // collect
+            rows.map((row) => {
+                if (!statsList[row.status.state]) {
+                    statsList[row.status.state] = {
+                        "total": 0
+                    };
+                }
+                statsList[row.status.state]["total"]++;
+            });
+        }
+        if (statsList) {
+            // to text
+            let footerElements = [];
+            for (var i in statsList) {
+                footerElements.push(`${i}: ${statsList[i]["total"]}`)
+            }
+
+            footerLine = footerElements.join(", ");
+        }
+
+        return (
+            <span>{footerLine}</span>
+        )
+    }
+
+
     transformTime(time) {
         return (
             <span>
@@ -485,7 +516,8 @@ class MonitoringAlertmanager extends BaseComponent {
             )
         }
 
-        let alerts = this.getAlertList();
+        let alerts = this.state.alerts;
+        let alertsVisible = this.filterAlerts(alerts);
         let silences = this.getSilenceList();
 
         return (
@@ -498,7 +530,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Alerts
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col-sm-6 form-inline">
+                                <div className="col-sm-6">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
                                                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
@@ -538,9 +570,9 @@ class MonitoringAlertmanager extends BaseComponent {
                         </div>
                     </div>
                     <div className="card-body card-body-table scrollable spinner-area">
-                        {this.renderAlerts(alerts)}
+                        {this.renderAlerts(alertsVisible)}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(this.state.alerts, alerts)}</div>
+                    <div className="card-footer small text-muted">{this.buildFooter(alertsVisible, alerts)}</div>
                 </div>
 
                 <div className="card mb-3">
@@ -668,21 +700,21 @@ class MonitoringAlertmanager extends BaseComponent {
                 alertGroupIconClassName = "far fa-caret-square-up";
             }
 
-            let alertCount = groupedAlertList[alertName].length;
+            let alertList = groupedAlertList[alertName];
 
             htmlTableRows.push(
                 <tr className="alertmanager-alertname-group">
                     <th colSpan="5">
                         <a href="#" className="group-filter" onClick={this.alertTriggerCollapse.bind(this, alertName)}>
                             <i className={alertGroupIconClassName}></i>&nbsp;
-                            {alertName} ({alertCount} alerts)
+                            {alertName} ({this.buildGroupHeader(alertList)})
                         </a>
                     </th>
                 </tr>
             );
 
             if (isVisible) {
-                groupedAlertList[alertName].map((row) => {
+                alertList.map((row) => {
                     htmlTableRows.push(
                         <tr className="alertmanager-alertname-item">
                             <td className="detail">

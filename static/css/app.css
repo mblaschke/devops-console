@@ -28,6 +28,7 @@ label {
     right: 1rem;
     top: .25rem;
     padding: 0;
+    min-width: 20rem;
 }
 
 .card-body.scrollable {
@@ -87,10 +88,14 @@ a.group-filter:hover {
 
 .alertmanager-label .badge,
 .alertmanager-matcher .badge {
-    max-width: 10rem;
+    max-width: 100%;
     width: auto;
     white-space: normal;
     margin: 0 0.2rem;
+}
+
+.alertmanager-alertname-group {
+    background-color: #e9ecef;
 }
 
 .alertmanager-alertname-item .detail {
