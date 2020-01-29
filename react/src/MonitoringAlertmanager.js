@@ -35,7 +35,7 @@ class MonitoringAlertmanager extends BaseComponent {
                 alert: {
                     active: true,
                     suppressed: true,
-                    collapsed: []
+                    expanded: []
                 }
             },
             instance: "",
@@ -673,14 +673,14 @@ class MonitoringAlertmanager extends BaseComponent {
     alertTriggerCollapse(alertName) {
         let state = this.state;
 
-        let alertIndex = state.filter.alert.collapsed.indexOf(alertName);
+        let alertIndex = state.filter.alert.expanded.indexOf(alertName);
 
         if (alertIndex !== -1 ) {
             // existing -> removing
-            state.filter.alert.collapsed.splice(alertIndex, 1);
+            state.filter.alert.expanded.splice(alertIndex, 1);
         } else {
             // not existing -> adding
-            state.filter.alert.collapsed.push(alertName);
+            state.filter.alert.expanded.push(alertName);
         }
         this.setState(state);
     }
@@ -692,12 +692,12 @@ class MonitoringAlertmanager extends BaseComponent {
         let htmlTableRows = [];
 
         Object.keys(groupedAlertList).map((alertName, alertIndex) => {
-            let isVisible = true;
-            let alertGroupIconClassName = "far fa-caret-square-down";
+            let isVisible = false;
+            let alertGroupIconClassName = "far fa-caret-square-up";
 
-            if (this.state.filter.alert.collapsed.indexOf(alertName) !== -1) {
-                isVisible = false;
-                alertGroupIconClassName = "far fa-caret-square-up";
+            if (this.state.filter.alert.expanded.indexOf(alertName) !== -1) {
+                isVisible = true;
+                alertGroupIconClassName = "far fa-caret-square-down";
             }
 
             let alertList = groupedAlertList[alertName];
@@ -707,7 +707,7 @@ class MonitoringAlertmanager extends BaseComponent {
                     <th colSpan="5">
                         <a href="#" className="group-filter" onClick={this.alertTriggerCollapse.bind(this, alertName)}>
                             <i className={alertGroupIconClassName}></i>&nbsp;
-                            {alertName} ({this.buildGroupHeader(alertList)})
+                            {alertName} <span className="group-stats">{this.buildGroupHeader(alertList)}</span>
                         </a>
                     </th>
                 </tr>
@@ -771,7 +771,7 @@ class MonitoringAlertmanager extends BaseComponent {
                             <col width="200rem"/>
                             <col width="200rem"/>
                             <col width="100rem"/>
-                            <col width="50rem"/>
+                            <col width="100rem"/>
                         </colgroup>
                         <thead>
                         <tr>

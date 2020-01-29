@@ -72,6 +72,15 @@ dt a {
 a.group-filter,
 a.group-filter:hover {
     color: #212529;
+    position: relative;
+    display: block;
+}
+
+a.group-filter .group-stats {
+    position: absolute;
+    right: 0;
+    color: #5a6268;
+    font-size: 0.8em;
 }
 
 .alertmanager-matcher,
