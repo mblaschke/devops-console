@@ -120,6 +120,11 @@ a.group-filter .group-stats {
 color: #95999c;
 }
 
+.kubeconfig {
+    width: 100%;
+    height: 10rem;
+}
+
 body.hide-search #global-search-form {
 visibility: collapse !important;
 }
