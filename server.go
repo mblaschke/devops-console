@@ -50,6 +50,10 @@ func NewServer(pathList []string) *Server {
 
 func (c *Server) Init() {
 	c.config = models.AppConfig{}
+
+	if opts.EnableNamespacePodCount {
+		c.logger.Infof("enable namespace pod count")
+	}
 }
 
 func (c *Server) setupConfig(path string) {

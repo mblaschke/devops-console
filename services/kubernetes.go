@@ -150,6 +150,25 @@ func (k *Kubernetes) NamespaceDelete(namespace string) error {
 	return k.Client().CoreV1().Namespaces().Delete(namespace, &opts)
 }
 
+func (k *Kubernetes) NamespacePodCount(namespace string) (podcount *int64) {
+	if err := k.namespaceValidate(namespace); err != nil {
+		return
+	}
+
+	opts := metav1.ListOptions{}
+
+	count := int64(0)
+	result, err := k.Client().CoreV1().Pods(namespace).List(opts)
+	if err == nil {
+		count += int64(len(result.Items))
+		if result.RemainingItemCount != nil {
+			count += *result.RemainingItemCount
+		}
+	}
+
+	return &count
+}
+
 // Create cluster rolebinding for user for general access
 func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (roleBinding *v12.ClusterRoleBinding, error error) {
 	roleBindName := fmt.Sprintf("user:%s", username)

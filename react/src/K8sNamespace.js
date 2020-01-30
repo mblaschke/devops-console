@@ -373,6 +373,7 @@ class K8sNamespace extends BaseComponent {
                             <table className="table table-hover table-sm">
                                 <colgroup>
                                     <col width="*" />
+                                    <col width="50rem" />
                                     <col width="200rem" />
                                     <col width="200rem" />
                                     <col width="200rem" />
@@ -382,6 +383,7 @@ class K8sNamespace extends BaseComponent {
                                 <thead>
                                 <tr>
                                     <th>Namespace</th>
+                                    <th>Pods</th>
                                     <th>Owner</th>
                                     <th>Settings</th>
                                     <th>Created</th>
@@ -396,7 +398,7 @@ class K8sNamespace extends BaseComponent {
                                 <tbody>
                                 {namespaces.length === 0 &&
                                 <tr>
-                                    <td colspan="6" className="not-found">No namespaces found.</td>
+                                    <td colspan="7" className="not-found">No namespaces found.</td>
                                 </tr>
                                 }
                                 {namespaces.map((row) =>
@@ -418,6 +420,9 @@ class K8sNamespace extends BaseComponent {
                                                    return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.Description ? this.highlight(row.Description) : <i>no description set</i>}</small>
                                                }
                                             })()}
+                                        </td>
+                                        <td>
+                                            {row.PodCount !== null ? row.PodCount : "n/a" }
                                         </td>
                                         <td>
                                             {this.renderRowOwner(row)}

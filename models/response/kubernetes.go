@@ -20,6 +20,7 @@ type (
 
 	KubernetesNamespace struct {
 		Name        string
+		PodCount    *int64
 		Environment string
 		Description string
 		OwnerTeam   string

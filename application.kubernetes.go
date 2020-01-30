@@ -145,6 +145,10 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			Settings:    namespace.SettingsExtract(c.config.Kubernetes),
 		}
 
+		if opts.EnableNamespacePodCount {
+			row.PodCount = c.serviceKubernetes().NamespacePodCount(namespace.Name)
+		}
+
 		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description]; ok {
 			row.Description = val
 		}
