@@ -84,7 +84,6 @@ func (c *Server) initSessionRedis() {
 
 	c.logger.Infoln("Redis connection established")
 
-
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {
 		if err := c.redisConnection.Close(); err != nil {

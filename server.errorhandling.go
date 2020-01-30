@@ -23,7 +23,7 @@ func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 
 		if errorCounter >= opts.ErrorPunishmentThreshold {
 			// counter threshold reached, PUNISH
-			c.auditLog(ctx, "Error threshold reached, punishing user by killing session, original error was: " + err.Error(), 2)
+			c.auditLog(ctx, "Error threshold reached, punishing user by killing session, original error was: "+err.Error(), 2)
 			err = errors.New("Sorry, too many errors occurred. Your session was terminated, please login again.")
 
 			c.handleError(ctx, err, true)
@@ -37,7 +37,6 @@ func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 
 	c.handleError(ctx, err, false)
 }
-
 
 func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 	message := fmt.Sprintf("Error: %v", err)
@@ -56,7 +55,7 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 	ctx.Header("X-CSRF-Token", "")
 
 	if strings.Contains(ctx.GetHeader("Content-Type"), "application/json") {
-		if (logout) {
+		if logout {
 			ctx.StatusCode(iris.StatusUnauthorized)
 		}
 

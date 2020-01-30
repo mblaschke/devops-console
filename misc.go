@@ -156,7 +156,6 @@ func stringToPtr(val string) *string {
 	return &val
 }
 
-
 func randomString(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +

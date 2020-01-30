@@ -72,7 +72,7 @@ func (c *Server) initRoutes() {
 
 	apiParty := c.app.Party("/api", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
 	{
-		apiParty.Get("/heartbeat",  applicationIndex.heartbeat)
+		apiParty.Get("/heartbeat", applicationIndex.heartbeat)
 
 		apiParty.Get("/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
 		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
@@ -80,7 +80,7 @@ func (c *Server) initRoutes() {
 		apiParty.Get("/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
 		apiParty.Post("/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
 		apiParty.Post("/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
-		
+
 		apiParty.Get("/kubernetes/cluster", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiCluster) })
 
 		apiParty.Get("/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
@@ -91,7 +91,7 @@ func (c *Server) initRoutes() {
 		pageParty.Get("/api/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
 
 		apiParty.Post("/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
-		
+
 		apiParty.Get("/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
 		apiParty.Get("/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
 		apiParty.Delete("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
@@ -101,7 +101,6 @@ func (c *Server) initRoutes() {
 
 	c.app.OnErrorCode(iris.StatusNotFound, c.notFound)
 }
-
 
 func (c *Server) notFound(ctx iris.Context) {
 	defer func() {
@@ -184,8 +183,8 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 	s := c.session.Start(ctx)
 
 	// set new token
-	token := randomString(64);
-	s.Set("CSRF", token);
+	token := randomString(64)
+	s.Set("CSRF", token)
 	ctx.Header("X-CSRF-Token", token)
 
 	tokenJson, _ := json.Marshal(token)

@@ -1,14 +1,14 @@
 package main
 
 import (
+	"crypto/rand"
 	"devops-console/services"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 	"regexp"
-	"crypto/rand"
-	"errors"
 )
 
 type ApplicationAuth struct {
