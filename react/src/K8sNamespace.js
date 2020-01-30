@@ -86,13 +86,22 @@ class K8sNamespace extends BaseComponent {
                     isStartup: false,
                     config: jqxhr
                 });
+
+                // trigger init
+                setTimeout(() => {
+                    this.init();
+                });
             }
         });
     }
 
+    init() {
+        this.initTeam();
+        this.refresh();
+    }
+
     componentDidMount() {
         this.loadConfig();
-        this.refresh();
     }
 
     refresh() {

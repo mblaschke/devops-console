@@ -141,6 +141,8 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     init() {
+        this.initTeam();
+
         let state = this.state;
 
         // default team for local storage

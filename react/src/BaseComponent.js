@@ -125,13 +125,51 @@ class BaseComponent extends Component {
         });
     }
 
+    initTeam() {
+        let state = this.state;
+
+        // default team for local storage
+        try {
+            let lastSelectedTeam = "" + localStorage.getItem("team");
+            this.state.config.Teams.map((row, value) => {
+                if (row.Name === lastSelectedTeam) {
+                    state.team = lastSelectedTeam;
+                }
+            });
+        } catch {}
+
+        // select first team if no selection available
+        if (state.team === "") {
+            if (this.state.config.Teams.length > 0) {
+                state.team = this.state.config.Teams[0].Name
+            }
+        }
+
+        this.setState(state);
+    }
+
+    setTeam(field, event) {
+        let value = false;
+        if (event.target) {
+            value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
+        } else {
+            value = event;
+        }
+
+        try {
+            localStorage.setItem("team", value);
+        } catch {}
+
+        this.setValue(field, event);
+    }
+
     renderTeamSelector(htmlId) {
         if (!htmlId) {
             htmlId = "formTeamSelector" + Math.random() * 10000;
         }
 
         return (
-            <select className="form-control" id={htmlId} value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
+            <select className="form-control" id={htmlId} value={this.getValue("team")} onChange={this.setTeam.bind(this, "team")}>
                 <option key="*" value="*">All teams</option>
                 {this.state.config.Teams.map((row, value) =>
                     <option key={row.Id} value={row.Name}>{row.Name}</option>
