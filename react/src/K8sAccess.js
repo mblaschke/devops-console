@@ -49,9 +49,14 @@ class K8sAccess extends BaseComponent {
                         Kubernetes Access
                     </div>
                     <div className="card-body card-body-table spinner-area">
-                        <textarea className="kubeconfig" readOnly="readOnly" value={this.state.kubeconfig}/>
-                        <div className="d-flex justify-content-end">
-                            <a href="/api/kubernetes/kubeconfig" download="kubeconfig.json" className="btn btn-secondary btn-lg active" role="button" aria-pressed="true">Download kubeconfig</a>
+
+                        <div className="form-group">
+                            <label htmlFor="textareaKubeconfig">Kubeconfig</label>
+                            <textarea id="textareaKubeconfig" className="kubeconfig" readOnly="readOnly" value={this.state.kubeconfig}/>
+                            <small className="form-text text-muted">Save as ~/.kube/config</small>
+                            <div className="d-flex justify-content-end">
+                                <a href="/api/kubernetes/kubeconfig" download="kubeconfig.json" className="btn btn-secondary btn-lg active" role="button" aria-pressed="true">Download kubeconfig</a>
+                            </div>
                         </div>
                     </div>
                     <div className="card-footer small text-muted"></div>
