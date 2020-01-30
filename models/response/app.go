@@ -10,8 +10,8 @@ type (
 		Quota                 map[string]int
 		Azure                 models.AppConfigAzure
 		Kubernetes            models.AppConfigKubernetes
-		Alertmanager struct {
-			Instances []string  `json:"Instances"`
+		Alertmanager          struct {
+			Instances []string `json:"Instances"`
 		} `json:"Alertmanager"`
 	}
 

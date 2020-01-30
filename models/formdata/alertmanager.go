@@ -10,7 +10,7 @@ import (
 
 type (
 	AlertmanagerForm struct {
-		Team string
+		Team    string
 		Silence models.Silence
 	}
 )
@@ -44,7 +44,7 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 
 	matcherList := models.Matchers{}
 	for _, matcher := range a.Silence.Matchers {
-		if (matcher.Name == nil || *matcher.Name == "" ) && (matcher.Value == nil || *matcher.Value == "") {
+		if (matcher.Name == nil || *matcher.Name == "") && (matcher.Value == nil || *matcher.Value == "") {
 			continue
 		}
 
@@ -85,7 +85,7 @@ func (a *AlertmanagerForm) ToString(id string) (ret string) {
 	return strings.Join(parts, " ")
 }
 
-func (a *AlertmanagerForm) ToMarkdown(id string) (*string) {
+func (a *AlertmanagerForm) ToMarkdown(id string) *string {
 	parts := []string{}
 
 	commentParts := strings.SplitN(*a.Silence.Comment, "\n", 2)
