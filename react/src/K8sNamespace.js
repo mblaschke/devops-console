@@ -422,7 +422,7 @@ class K8sNamespace extends BaseComponent {
                                             })()}
                                         </td>
                                         <td>
-                                            {row.PodCount !== null ? row.PodCount : "n/a" }
+                                            <p className="text-right">{row.PodCount !== null ? row.PodCount : "n/a" }</p>
                                         </td>
                                         <td>
                                             {this.renderRowOwner(row)}
