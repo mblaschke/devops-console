@@ -45,7 +45,7 @@ class K8sAccess extends BaseComponent {
 
                 <div className="card mb-3">
                     <div className="card-header">
-                        <i className="fas fa-server"></i>
+                        <i className="fas fa-sign-in-alt"></i>
                         Kubernetes Access
                     </div>
                     <div className="card-body card-body-table spinner-area">
