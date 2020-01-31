@@ -975,7 +975,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         </colgroup>
                         <thead>
                         <tr>
-                            <th>Alert</th>
+                            <th>Silence</th>
                             <th>Started</th>
                             <th>Until</th>
                             <th></th>
