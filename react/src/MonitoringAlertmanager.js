@@ -30,7 +30,8 @@ class MonitoringAlertmanager extends BaseComponent {
             filter: {
                 silence: {
                     active: true,
-                    expired: false
+                    expired: false,
+                    expanded: []
                 },
                 alert: {
                     active: true,
@@ -657,6 +658,8 @@ class MonitoringAlertmanager extends BaseComponent {
             length: 0
         };
 
+        let ungrouped = "Ungrouped alerts";
+
         alerts.map((row) => {
             if (row.labels && row.labels.alertname) {
                 if (!ret.list[row.labels.alertname]) {
@@ -664,11 +667,11 @@ class MonitoringAlertmanager extends BaseComponent {
                 }
                 ret.list[row.labels.alertname].push(row);
             } else {
-                if (!ret.list["__UNGROUPED__"]) {
-                    ret.list["__UNGROUPED__"] = [];
+                if (!ret.list[ungrouped]) {
+                    ret.list[ungrouped] = [];
                 }
 
-                ret.list["__UNGROUPED__"].push(row);
+                ret.list[ungrouped].push(row);
             }
             ret.length++;
         });
@@ -676,19 +679,21 @@ class MonitoringAlertmanager extends BaseComponent {
         return ret;
     }
 
-    alertTriggerCollapse(alertName) {
+    alertTriggerCollapse(alertName, event) {
         let state = this.state;
 
-        let alertIndex = state.filter.alert.expanded.indexOf(alertName);
+        let collapseIndex = state.filter.alert.expanded.indexOf(alertName);
 
-        if (alertIndex !== -1 ) {
+        if (collapseIndex !== -1 ) {
             // existing -> removing
-            state.filter.alert.expanded.splice(alertIndex, 1);
+            state.filter.alert.expanded.splice(collapseIndex, 1);
         } else {
             // not existing -> adding
             state.filter.alert.expanded.push(alertName);
         }
         this.setState(state);
+        this.handlePreventEvent(event);
+        return false;
     }
 
     renderAlerts(alerts) {
@@ -789,12 +794,12 @@ class MonitoringAlertmanager extends BaseComponent {
                         </tr>
                         </thead>
                         <tbody>
-                        {htmlTableRows.length === 0 &&
-                            <tr>
-                                <td colspan="5" className="not-found">No alerts found.</td>
-                            </tr>
-                        }
-                        {htmlTableRows}
+                            {htmlTableRows.length === 0 &&
+                                <tr>
+                                    <td colspan="5" className="not-found">No alerts found.</td>
+                                </tr>
+                            }
+                            {htmlTableRows}
                         </tbody>
                     </table>
                 </div>
@@ -802,7 +807,145 @@ class MonitoringAlertmanager extends BaseComponent {
         )
     }
 
+
+    buildGroupedSilences(alerts) {
+        let ret = {
+            list: {},
+            length: 0
+        };
+
+        let ungrouped = "Ungrouped silences";
+
+        alerts.map((row) => {
+            let alertname = false;
+            row.matchers.map((item) => {
+               if (item.name === "alertname") {
+                   alertname = item.value;
+               }
+            });
+
+            if (alertname) {
+                if (!ret.list[alertname]) {
+                    ret.list[alertname] = [];
+                }
+                ret.list[alertname].push(row);
+            } else {
+                if (!ret.list[ungrouped]) {
+                    ret.list[ungrouped] = [];
+                }
+
+                ret.list[ungrouped].push(row);
+            }
+            ret.length++;
+        });
+
+        return ret;
+    }
+
+    silenceTriggerCollapse(alertName, event) {
+        let state = this.state;
+
+        let collapseIndex = state.filter.silence.expanded.indexOf(alertName);
+
+        if (collapseIndex !== -1 ) {
+            // existing -> removing
+            state.filter.silence.expanded.splice(collapseIndex, 1);
+        } else {
+            // not existing -> adding
+            state.filter.silence.expanded.push(alertName);
+        }
+        this.setState(state);
+        this.handlePreventEvent(event);
+        return false;
+    }
+
     renderSilences(silences) {
+        let groupedSilences = this.buildGroupedSilences(silences);
+        let groupedSilenceList = groupedSilences.list;
+
+        let htmlTableRows = [];
+
+        Object.keys(groupedSilenceList).map((alertName, silenceIndex) => {
+            let isVisible = false;
+            let alertGroupIconClassName = "far fa-caret-square-up";
+
+            if (this.state.filter.silence.expanded.indexOf(alertName) !== -1) {
+                isVisible = true;
+                alertGroupIconClassName = "far fa-caret-square-down";
+            }
+
+            let silenceList = groupedSilenceList[alertName];
+
+            htmlTableRows.push(
+                <tr className="alertmanager-alertname-group">
+                    <th colSpan="5">
+                        <a href="#" className="group-filter" onClick={this.silenceTriggerCollapse.bind(this, alertName)}>
+                            <i className={alertGroupIconClassName}></i>&nbsp;
+                            {alertName} <span className="group-stats">{this.buildGroupHeader(silenceList)}</span>
+                        </a>
+                    </th>
+                </tr>
+            );
+
+            if (isVisible) {
+                silenceList.map((row) => {
+                    htmlTableRows.push(
+                        <tr>
+                            <td>
+                                {this.highlight(row.comment)}
+                                <br/>
+                                <i><small>created: {this.highlight(row.createdBy)}</small></i>
+
+                                <ul className="alertmanager-matcher">
+                                    {row.matchers.map((item) =>
+                                        <li>{this.renderMatch(item)}</li>
+                                    )}
+                                </ul>
+                            </td>
+                            <td>{this.transformTime(row.startsAt)}</td>
+                            <td>{this.transformTime(row.endsAt)}</td>
+                            <td>
+                                {(() => {
+                                    switch (row.status.state) {
+                                        case "active":
+                                            return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
+                                        case "expired":
+                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                        default:
+                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                    }
+                                })()}
+                            </td>
+                            <td className="toolbox">
+                                <div className="btn-group" role="group">
+                                    <button id={"btnGroupDrop-" + silences.id} type="button"
+                                            className="btn btn-secondary dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                        Action
+                                    </button>
+                                    {(() => {
+                                        switch (row.status.state) {
+                                            case "expired":
+                                                return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
+                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                </div>
+                                            default:
+                                                return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
+                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
+                                                    <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
+                                                </div>
+                                        }
+                                    })()}
+                                </div>
+                            </td>
+                        </tr>
+                    )
+                });
+            }
+        });
+
+
         return (
             <div>
                 <Spinner active={this.state.loadingSilences}/>
@@ -830,63 +973,12 @@ class MonitoringAlertmanager extends BaseComponent {
                         </tr>
                         </thead>
                         <tbody>
-                        {silences.length === 0 &&
+                            {htmlTableRows.length === 0 &&
                             <tr>
-                                <td colspan="5" className="not-found">No silences found.</td>
+                                <td colspan="5" className="not-found">No alerts found.</td>
                             </tr>
-                        }
-                        {silences.map((row) =>
-                            <tr>
-                                <td>
-                                    {this.highlight(row.comment)}
-                                    <br/>
-                                    <i><small>created: {this.highlight(row.createdBy)}</small></i>
-
-                                    <ul className="alertmanager-matcher">
-                                        {row.matchers.map((item) =>
-                                            <li>{this.renderMatch(item)}</li>
-                                        )}
-                                    </ul>
-                                </td>
-                                <td>{this.transformTime(row.startsAt)}</td>
-                                <td>{this.transformTime(row.endsAt)}</td>
-                                <td>
-                                    {(() => {
-                                        switch (row.status.state) {
-                                            case "active":
-                                                return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
-                                            case "expired":
-                                                return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
-                                            default:
-                                                return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
-                                        }
-                                    })()}
-                                </td>
-                                <td className="toolbox">
-                                    <div className="btn-group" role="group">
-                                        <button id={"btnGroupDrop-" + silences.id} type="button"
-                                                className="btn btn-secondary dropdown-toggle"
-                                                data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">
-                                            Action
-                                        </button>
-                                        {(() => {
-                                            switch (row.status.state) {
-                                                case "expired":
-                                                    return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
-                                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                    </div>
-                                                default:
-                                                    return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
-                                                        <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                        <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
-                                                    </div>
-                                            }
-                                        })()}
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
+                            }
+                            {htmlTableRows}
                         </tbody>
                     </table>
                 </div>
