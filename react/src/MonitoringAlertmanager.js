@@ -652,6 +652,23 @@ class MonitoringAlertmanager extends BaseComponent {
         )
     }
 
+    alertTriggerCollapse(alertName, event) {
+        let state = this.state;
+
+        let collapseIndex = state.filter.alert.expanded.indexOf(alertName);
+
+        if (collapseIndex !== -1 ) {
+            // existing -> removing
+            state.filter.alert.expanded.splice(collapseIndex, 1);
+        } else {
+            // not existing -> adding
+            state.filter.alert.expanded.push(alertName);
+        }
+        this.setState(state);
+        this.handlePreventEvent(event);
+        return false;
+    }
+
     buildGroupedAlerts(alerts) {
         let ret = {
             list: {},
@@ -679,25 +696,15 @@ class MonitoringAlertmanager extends BaseComponent {
         return ret;
     }
 
-    alertTriggerCollapse(alertName, event) {
-        let state = this.state;
-
-        let collapseIndex = state.filter.alert.expanded.indexOf(alertName);
-
-        if (collapseIndex !== -1 ) {
-            // existing -> removing
-            state.filter.alert.expanded.splice(collapseIndex, 1);
-        } else {
-            // not existing -> adding
-            state.filter.alert.expanded.push(alertName);
-        }
-        this.setState(state);
-        this.handlePreventEvent(event);
-        return false;
-    }
-
     renderAlerts(alerts) {
-        let groupedAlerts = this.buildGroupedAlerts(alerts);
+        let groupedAlerts = this.buildGroupedList(alerts, (row) => {
+            let alertname = false;
+            if (row.labels && row.labels.alertname) {
+                alertname = row.labels.alertname;
+            }
+            return alertname;
+        }, "Ungrouped silences");
+
         let groupedAlertList = groupedAlerts.list;
 
         let htmlTableRows = [];
@@ -808,33 +815,30 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
 
-    buildGroupedSilences(alerts) {
+    buildGroupedList(list, groupCallback, ungroupedName) {
         let ret = {
             list: {},
             length: 0
         };
 
-        let ungrouped = "Ungrouped silences";
+        if (!ungroupedName) {
+            ungroupedName = "- Ungrouped -";
+        }
 
-        alerts.map((row) => {
-            let alertname = false;
-            row.matchers.map((item) => {
-               if (item.name === "alertname") {
-                   alertname = item.value;
-               }
-            });
+        list.map((row) => {
+            let groupName = groupCallback(row);
 
-            if (alertname) {
-                if (!ret.list[alertname]) {
-                    ret.list[alertname] = [];
+            if (groupName) {
+                if (!ret.list[groupName]) {
+                    ret.list[groupName] = [];
                 }
-                ret.list[alertname].push(row);
+                ret.list[groupName].push(row);
             } else {
-                if (!ret.list[ungrouped]) {
-                    ret.list[ungrouped] = [];
+                if (!ret.list[ungroupedName]) {
+                    ret.list[ungroupedName] = [];
                 }
 
-                ret.list[ungrouped].push(row);
+                ret.list[ungroupedName].push(row);
             }
             ret.length++;
         });
@@ -860,7 +864,17 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 
     renderSilences(silences) {
-        let groupedSilences = this.buildGroupedSilences(silences);
+        let groupedSilences = this.buildGroupedList(silences, (row) => {
+            let alertname = false;
+            row.matchers.map((item) => {
+                if (item.name === "alertname") {
+                    alertname = item.value;
+                }
+            });
+
+            return alertname;
+        }, "Ungrouped silences");
+
         let groupedSilenceList = groupedSilences.list;
 
         let htmlTableRows = [];
