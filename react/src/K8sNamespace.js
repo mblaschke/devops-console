@@ -363,7 +363,12 @@ class K8sNamespace extends BaseComponent {
                         <i className="fas fa-object-group"></i>
                         Kubernetes namespaces
                         <div className="toolbox">
-                            {this.renderTeamSelector()}
+                                <div className="form-group row">
+                                <div className="col-sm-8"></div>
+                                <div className="col-sm-4">
+                                    {this.renderTeamSelector()}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="card-body card-body-table spinner-area">

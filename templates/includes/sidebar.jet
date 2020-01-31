@@ -8,7 +8,7 @@
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
         {{yield navigationItem(title="Cluster", href="/kubernetes/cluster")}}
         {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
-        {{yield navigationItem(title="Access", href="/kubernetes/access")}}
+        {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
         </div>
       </li>
 

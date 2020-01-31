@@ -532,7 +532,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Alerts
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col-sm-6">
+                                <div className="col-sm-4">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
                                                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
@@ -542,8 +542,6 @@ class MonitoringAlertmanager extends BaseComponent {
 
                                         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <form className="px-4 py-3">
-                                                {this.renderTeamSelectorWithlabel()}
-
                                                 <label>Status</label>
                                                 <div className="form-check">
                                                     <input type="checkbox" className="form-check-input" id="alertFilterActive" checked={this.getValueCheckbox("filter.alert.active")}
@@ -565,7 +563,11 @@ class MonitoringAlertmanager extends BaseComponent {
                                     </div>
                                 </div>
 
-                                <div className="col-sm-6">
+                                <div className="col-sm-4">
+                                    {this.renderTeamSelector()}
+                                </div>
+
+                                <div className="col-sm-4">
                                     {this.renderInstanceSelector()}
                                 </div>
                             </div>
@@ -583,7 +585,7 @@ class MonitoringAlertmanager extends BaseComponent {
                         Silences
                         <div className="toolbox">
                             <div className="form-group row">
-                                <div className="col-sm-6">
+                                <div className="col-sm-4">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
                                                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
@@ -593,8 +595,6 @@ class MonitoringAlertmanager extends BaseComponent {
 
                                         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <form className="px-4 py-3">
-                                                {this.renderTeamSelectorWithlabel()}
-
                                                 <label>Status</label>
                                                 <div className="form-check">
                                                     <input type="checkbox" className="form-check-input" id="silenceFilterActive" checked={this.getValueCheckbox("filter.silence.active")}
@@ -616,7 +616,11 @@ class MonitoringAlertmanager extends BaseComponent {
                                     </div>
                                 </div>
 
-                                <div className="col-sm-6">
+                                <div className="col-sm-4">
+                                    {this.renderTeamSelector()}
+                                </div>
+
+                                <div className="col-sm-4">
                                     {this.renderInstanceSelector()}
                                 </div>
                             </div>

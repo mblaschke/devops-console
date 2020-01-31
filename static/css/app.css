@@ -27,8 +27,10 @@ label {
     position: absolute;
     right: 1rem;
     top: .25rem;
+    left: 20rem;
     padding: 0;
     min-width: 20rem;
+    max-width: 80%;
 }
 
 .card-body.scrollable {
