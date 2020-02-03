@@ -67,10 +67,11 @@ kubernetes:
           required: true
       - name: servicemesh
         k8stype: annotation
-        k8sname: sidecar.istio.io/inject
+        k8sname: istio-injection
         label: Enable ServiceMesh
         type: checkbox
         default: "true"
+        k8svalue: "enabled"
 
 permissions:
   default:

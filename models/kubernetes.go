@@ -48,7 +48,11 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 					val := frontendBoolToBackendBool(val)
 
 					if val == "true" {
-						n.Labels[setting.K8sName] = val
+						k8sValue := val
+						if setting.K8sValue != "" {
+							k8sValue = setting.K8sValue
+						}
+						n.Labels[setting.K8sName] = k8sValue
 					} else {
 						// label has no content, delete it
 						delete(n.Labels, setting.K8sName)
@@ -71,7 +75,11 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 					val := frontendBoolToBackendBool(val)
 
 					if val == "true" {
-						n.Annotations[setting.K8sName] = val
+						k8sValue := val
+						if setting.K8sValue != "" {
+							k8sValue = setting.K8sValue
+						}
+						n.Annotations[setting.K8sName] = k8sValue
 					} else {
 						// label has no content, delete it
 						delete(n.Annotations, setting.K8sName)
@@ -112,7 +120,11 @@ func (n *KubernetesNamespace) SettingsExtract(config AppConfigKubernetes) (ret m
 		switch setting.Type {
 		case "checkbox":
 			if _, ok := ret[setting.Name]; ok {
-				ret[setting.Name] = backendBoolToFrontendBool(ret[setting.Name])
+				val := ret[setting.Name]
+				if setting.K8sValue != "" && ret[setting.Name] == setting.K8sValue {
+					val = "true"
+				}
+				ret[setting.Name] = backendBoolToFrontendBool(val)
 			}
 			break
 		}

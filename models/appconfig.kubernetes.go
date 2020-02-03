@@ -13,6 +13,7 @@ type (
 		Description    string
 		K8sType        string
 		K8sName        string
+		K8sValue       string
 		Type           string
 		Default        string
 		Placeholder    string
