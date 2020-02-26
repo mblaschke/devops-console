@@ -72,6 +72,16 @@ kubernetes:
         type: checkbox
         default: "true"
         k8svalue: "enabled"
+      - name: barfoo
+        type: hidden
+        k8stype: annotation
+        k8sname: static-annotation
+        k8svalue: "foobar1"
+      - name: barfoo
+        type: hidden
+        k8stype: label
+        k8sname: static-label
+        k8svalue: "foobar2"
 
 permissions:
   default:

@@ -44,6 +44,8 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 			if val, ok := settings[setting.Name]; ok && val != "" {
 				// label has content, set/add it
 				switch setting.Type {
+				case "hidden":
+					n.Labels[setting.K8sName] = setting.K8sValue
 				case "checkbox":
 					val := frontendBoolToBackendBool(val)
 
@@ -71,6 +73,8 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 			if val, ok := settings[setting.Name]; ok && val != "" {
 				// annotation has content, set/add it
 				switch setting.Type {
+				case "hidden":
+					n.Annotations[setting.K8sName] = setting.K8sValue
 				case "checkbox":
 					val := frontendBoolToBackendBool(val)
 
