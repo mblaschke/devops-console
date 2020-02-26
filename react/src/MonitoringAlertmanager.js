@@ -52,16 +52,24 @@ class MonitoringAlertmanager extends BaseComponent {
         window.App.enableSearch();
 
         $(document).on('show.bs.modal', ".modal", this.disableRefresh.bind(this));
-        $(document).on('hide.bs.modal', ".modal", this.refresh.bind(this));
+        $(document).on('hide.bs.modal', ".modal", () => {
+            this.setState({
+                loadingSilences: true,
+                loadingAlerts: true
+            });
+
+            // wait until alertmanagers are synced
+            setTimeout(this.refresh.bind(this,true), 1250)
+        });
     }
 
-    loadAlerts() {
+    loadAlerts(showSpinner) {
         if (!this.state.instance || this.state.instance === "") {
             return
         }
 
         this.setState({
-            loadingAlerts: true,
+            loadingAlerts: showSpinner,
         });
 
 
@@ -83,13 +91,13 @@ class MonitoringAlertmanager extends BaseComponent {
         });
     }
 
-    loadSilences() {
+    loadSilences(showSpinner) {
         if (!this.state.instance || this.state.instance === "") {
             return
         }
 
         this.setState({
-            loadingSilences: true,
+            loadingSilences: showSpinner,
         });
 
         let jqxhr = this.ajax({
@@ -166,8 +174,8 @@ class MonitoringAlertmanager extends BaseComponent {
         this.setState(state);
 
         setTimeout(() => {
-            this.refresh();
-        }, 100);
+            this.refresh(true);
+        }, 250);
     }
 
     disableRefresh() {
@@ -176,16 +184,16 @@ class MonitoringAlertmanager extends BaseComponent {
         } catch(e) {}
     }
 
-    refresh() {
-        this.loadAlerts();
-        this.loadSilences();
+    refresh(showSpinner) {
+        this.loadAlerts(showSpinner);
+        this.loadSilences(showSpinner);
 
         try {
             clearTimeout(this.refreshHandler);
         } catch(e) {}
 
         this.refreshHandler = setTimeout(() =>{
-            this.refresh();
+            this.refresh(false);
         }, 15000);
     }
 
@@ -196,7 +204,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         localStorage.setItem("alertmanager", state.instance);
 
-        this.refresh();
+        this.refresh(false);
     }
 
     silenceDelete(row) {
