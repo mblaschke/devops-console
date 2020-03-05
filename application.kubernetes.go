@@ -401,7 +401,6 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Netpol] = *formData.Netpol
 	}
 
-
 	// labels
 	if formData.Settings != nil {
 		nsSettings, validationMessages := c.validateSettings(*formData.Settings)
@@ -413,7 +412,8 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		namespace.SettingsApply(nsSettings, c.config.Kubernetes)
 	}
 
-	if err := c.updateNamespaceSettings(ctx, namespace); err != nil {
+	// update netpol
+	if err := c.updateNamespaceNetpol(namespace); err != nil {
 		c.respondError(ctx, err)
 		return
 	}
