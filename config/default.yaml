@@ -63,6 +63,7 @@ application:
       annotations:
         description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
         immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
+        netpol: {{env "K8S_ANNOTATION_NAMESPACE_NETPOL" | default "stable.webdevops.io/netpol" | toJson }}
 
       labels:
         name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}

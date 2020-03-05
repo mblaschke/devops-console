@@ -99,6 +99,7 @@ type (
 		Annotations struct {
 			Description string
 			Immortal    string
+			Netpol      string
 		}
 
 		Labels struct {

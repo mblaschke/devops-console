@@ -23,6 +23,7 @@ type (
 		PodCount    *int64
 		Environment string
 		Description string
+		Netpol      string
 		OwnerTeam   string
 		OwnerUser   string
 		Status      string

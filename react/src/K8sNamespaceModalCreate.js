@@ -254,10 +254,21 @@ class K8sNamespaceModalCreate extends BaseComponent {
                                             <input type="text" name="nsApp" id="inputNsApp" className="form-control" placeholder="Name" required value={this.getNamespaceItem("app")} onChange={this.handleNamespaceInputChange.bind(this, "app")} />
                                         </div>
                                     </div>
+
                                     <div className="row">
                                         <div className="col">
                                             <input type="text" name="nsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("description")} onChange={this.handleNamespaceInputChange.bind(this, "description")} />
                                         </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
+                                        <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("netpol")} onChange={this.handleNamespaceInputChange.bind(this, "netpol")}>
+                                            <option value="none">no policy</option>
+                                            <option value="deny">block all traffic</option>
+                                            <option value="namespace">allow same namespace</option>
+                                            <option value="allow">allow all</option>
+                                        </select>
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>

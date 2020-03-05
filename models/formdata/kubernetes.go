@@ -6,6 +6,7 @@ type (
 		Team        *string
 		App         *string
 		Description *string
+		Netpol      *string
 		Settings    *map[string]string
 	}
 )

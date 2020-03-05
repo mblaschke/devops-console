@@ -159,6 +159,16 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                         <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("Description")} onChange={this.handleNamespaceInputChange.bind(this, "Description")} />
                                     </div>
 
+                                    <div className="form-group">
+                                        <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
+                                        <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("Netpol")} onChange={this.handleNamespaceInputChange.bind(this, "Netpol")}>
+                                            <option value="none">no policy</option>
+                                            <option value="deny">block all traffic</option>
+                                            <option value="namespace">allow same namespace</option>
+                                            <option value="allow">allow all</option>
+                                        </select>
+                                    </div>
+
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
                                         <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.Name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.Name)} />
                                     )}
