@@ -176,7 +176,10 @@ func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (
 	getOpts := metav1.GetOptions{}
 	if rb, _ := k.Client().RbacV1().ClusterRoleBindings().Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
 		deleteOpts := metav1.DeleteOptions{}
-		k.Client().RbacV1().ClusterRoleBindings().Delete(roleBindName, &deleteOpts)
+		err := k.Client().RbacV1().ClusterRoleBindings().Delete(roleBindName, &deleteOpts)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	annotiations := map[string]string{}
@@ -206,7 +209,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 	getOpts := metav1.GetOptions{}
 	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
 		deleteOpts := metav1.DeleteOptions{}
-		k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	annotiations := map[string]string{}
@@ -237,7 +243,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 	getOpts := metav1.GetOptions{}
 	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
 		deleteOpts := metav1.DeleteOptions{}
-		k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	annotiations := map[string]string{}
@@ -282,7 +291,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName 
 	getOpts := metav1.GetOptions{}
 	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
 		deleteOpts := metav1.DeleteOptions{}
-		k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	annotiations := map[string]string{}
@@ -313,7 +325,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 	getOpts := metav1.GetOptions{}
 	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
 		deleteOpts := metav1.DeleteOptions{}
-		k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	annotiations := map[string]string{}

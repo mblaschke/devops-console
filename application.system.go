@@ -14,17 +14,24 @@ func (c *Server) Healthz(ctx iris.Context) {
 		if redisError != nil {
 			c.logger.Errorln("Healthz: Redis error: ", redisSuccess)
 			ctx.StatusCode(iris.StatusInternalServerError)
-			ctx.Text("Error")
+			if _, err := ctx.Text("Error"); err != nil {
+				c.logger.Errorf("Error while sending response: %v", err)
+			}
+
 			return
 		}
 
 		if !redisSuccess {
 			c.logger.Errorln("Healthz: Redis pingPong failed")
 			ctx.StatusCode(iris.StatusInternalServerError)
-			ctx.Text("Error")
+			if _, err := ctx.Text("Error"); err != nil {
+				c.logger.Errorf("Error while sending response: %v", err)
+			}
 			return
 		}
 	}
 
-	ctx.Text("OK")
+	if _, err := ctx.Text("OK"); err != nil {
+		c.logger.Errorf("Error while sending response: %v", err)
+	}
 }
