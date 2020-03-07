@@ -82,6 +82,17 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 
 	// kubernetes
 	ret.Kubernetes = c.config.Kubernetes
+	for _, row := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+		tmp := models.AppConfigNamespaceNetworkPolicy{
+			Name: row.Name,
+			Description: row.Description,
+		}
+
+		ret.Kubernetes.Namespace.NetworkPolicy = append(
+			ret.Kubernetes.Namespace.NetworkPolicy,
+			tmp,
+		)
+	}
 
 	// Alertmanager
 	ret.Alertmanager.Instances = []string{}

@@ -28,7 +28,8 @@ class K8sNamespace extends BaseComponent {
                 Quota: {},
                 Kubernetes: {
                     Namespace: {
-                        Settings: []
+                        Settings: [],
+                        NetworkPolicy: []
                     }
                 }
             },
@@ -433,6 +434,9 @@ class K8sNamespace extends BaseComponent {
                                             {this.renderRowOwner(row)}
                                         </td>
                                         <td class="small">
+                                            <div>
+                                                <span className="badge badge-warning">NetworkPolicy: {row.NetworkPolicy || "none"}</span>
+                                            </div>
                                             {namespaceSettings(row).map((setting, index) =>
                                                 <div>
                                                     <span className="badge badge-light">{setting.Label}: {this.highlight(setting.Value)}</span>

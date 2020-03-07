@@ -63,7 +63,7 @@ application:
       annotations:
         description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
         immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
-        netpol: {{env "K8S_ANNOTATION_NAMESPACE_NETPOL" | default "stable.webdevops.io/netpol" | toJson }}
+        networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
 
       labels:
         name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}
@@ -80,6 +80,21 @@ application:
         user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
         team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
 
+      networkPolicy:
+        - name: none
+          description: No policy (using Cluster defaults)
+        - name: allow-all
+          description: Allow all traffic
+          path: ./config/networkpolicy/allow-all.yaml
+        - name: allow-namespace
+          description: Allow all same namespace traffic
+          path: ./config/networkpolicy/allow-namespace.yaml
+        - name: allow-cluster
+          description: Allow all cluster traffic
+          path: ./config/networkpolicy/allow-cluster.yaml
+        - name: deny-all
+          description: Deny all traffic
+          path: ./config/networkpolicy/deny-all.yaml
 
 settings:
   vault:

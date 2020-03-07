@@ -1,6 +1,7 @@
 .PHONY: all build-run build-backend build-backend run
 
 all: build-frontend build-backend
+build: build-frontend build-backend
 
 build-run: build-frontend build-backend run
 

@@ -154,8 +154,8 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			row.Description = val
 		}
 
-		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Netpol]; ok {
-			row.Netpol = val
+		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
+			row.NetworkPolicy = val
 		}
 
 		if val, ok := namespace.Labels["team"]; ok {
@@ -277,9 +277,9 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 		namespace.Annotations = map[string]string{}
 	}
 
-	// netpol
-	if formData.Netpol != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Netpol] = *formData.Netpol
+	// NetworkPolicy
+	if formData.NetworkPolicy != nil {
+		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
 
 	if formData.Description != nil {
@@ -396,9 +396,9 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	if formData.Description != nil {
 		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
-	// netpol
-	if formData.Netpol != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Netpol] = *formData.Netpol
+	// NetworkPolicy
+	if formData.NetworkPolicy != nil {
+		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
 
 	// labels
@@ -412,8 +412,8 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		namespace.SettingsApply(nsSettings, c.config.Kubernetes)
 	}
 
-	// update netpol
-	if err := c.updateNamespaceNetpol(namespace); err != nil {
+	// update networkPolicy
+	if err := c.updateNamespaceNetworkPolicy(namespace); err != nil {
 		c.respondError(ctx, err)
 		return
 	}
@@ -579,7 +579,7 @@ func (c *ApplicationKubernetes) updateNamespaceSettings(ctx iris.Context, namesp
 		return err
 	}
 
-	if err := c.updateNamespaceNetpol(namespace); err != nil {
+	if err := c.updateNamespaceNetworkPolicy(namespace); err != nil {
 		return err
 	}
 
@@ -698,58 +698,28 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 	return
 }
 
-func (c *ApplicationKubernetes) updateNamespaceNetpol(namespace *models.KubernetesNamespace) (error) {
+func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.KubernetesNamespace) (error) {
 	if namespace.Annotations == nil {
 		return nil
 	}
 
-	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Netpol]; ok {
-
+	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
+		// delete default netpol
 		deleteOpts := metav1.DeleteOptions{}
 		err := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete("default", &deleteOpts)
 		if err != nil {
-			c.logger.Info(fmt.Sprintf("Deletion of netpol/default in namespace %v failed: %v", namespace.Name, err))
+			c.logger.Info(fmt.Sprintf("Deletion of NetworkPolicy/default in namespace %v failed: %v", namespace.Name, err))
 		}
 
-		netpol := &networkingV1.NetworkPolicy{}
-		netpol.ObjectMeta.Name = "default"
-		netpol.Spec.PolicyTypes = []networkingV1.PolicyType{"Ingress", "Egress"}
-
-		switch strings.ToLower(val) {
-		case "none":
-			// nothing to do here, we can skip the rest here
-			return nil
-		case "deny":
-		case "namespace":
-			ingressRule := networkingV1.NetworkPolicyIngressRule{}
-			ingressRuleFromPeer := networkingV1.NetworkPolicyPeer{}
-			ingressRuleFromPeer.PodSelector = &metav1.LabelSelector{}
-			ingressRule.From = []networkingV1.NetworkPolicyPeer{ingressRuleFromPeer}
-			netpol.Spec.Ingress = []networkingV1.NetworkPolicyIngressRule{ingressRule}
-
-			egressRule := networkingV1.NetworkPolicyEgressRule{}
-			egressRuleFromPeer := networkingV1.NetworkPolicyPeer{}
-			egressRuleFromPeer.PodSelector = &metav1.LabelSelector{}
-			egressRule.To = []networkingV1.NetworkPolicyPeer{egressRuleFromPeer}
-			netpol.Spec.Egress = []networkingV1.NetworkPolicyEgressRule{egressRule}
-		case "allow":
-			ingressRule := networkingV1.NetworkPolicyIngressRule{}
-			ingressRuleFromPeer := networkingV1.NetworkPolicyPeer{}
-			ingressRuleFromPeer.NamespaceSelector = &metav1.LabelSelector{}
-			ingressRule.From = []networkingV1.NetworkPolicyPeer{ingressRuleFromPeer}
-			netpol.Spec.Ingress = []networkingV1.NetworkPolicyIngressRule{ingressRule}
-
-			egressRule := networkingV1.NetworkPolicyEgressRule{}
-			egressRuleFromPeer := networkingV1.NetworkPolicyPeer{}
-			egressRuleFromPeer.NamespaceSelector = &metav1.LabelSelector{}
-			egressRule.To = []networkingV1.NetworkPolicyPeer{egressRuleFromPeer}
-			netpol.Spec.Egress = []networkingV1.NetworkPolicyEgressRule{egressRule}
-		}
-
-		_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(netpol)
-		if err != nil {
-			c.logger.Info(fmt.Sprintf("Deletion of netpol/default in namespace %v failed: %v", namespace.Name, err))
-			return err
+		// create netpol
+		for _, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+			if netpol.Name == val {
+				k8sObject := netpol.GetKubernetesObject()
+				if k8sObject != nil {
+					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(k8sObject)
+				}
+				break
+			}
 		}
 	}
 	return nil

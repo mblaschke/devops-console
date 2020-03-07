@@ -4,6 +4,7 @@ type (
 	AppConfigKubernetes struct {
 		Namespace struct {
 			Settings []AppConfigNamespaceSettings
+			NetworkPolicy []AppConfigNamespaceNetworkPolicy
 		}
 	}
 
@@ -19,5 +20,10 @@ type (
 		Placeholder    string
 		Validation     AppInputValidation
 		Transformation AppInputTransformation
+	}
+
+	AppConfigNamespaceNetworkPolicy struct {
+		Name string
+		Description string
 	}
 )

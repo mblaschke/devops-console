@@ -13,6 +13,7 @@ import (
 	"github.com/kataras/iris/v12/view"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	networkingV1 "k8s.io/api/networking/v1"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -137,8 +138,23 @@ func (c *Server) setupKubernetes() {
 			panic(err)
 		}
 	}
-
 	c.config.App.Kubernetes.ObjectsList = KubeNamespaceConfig
+
+	c.logger.Infof("setup kubernetes NetworkPolicy configuration (for namespaces)")
+
+	for key, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+		if netpol.Path != "" {
+			c.logger.Infof(" - parsing %v", netpol.Path)
+			k8sObject := KubeParseConfig(filepath.Clean(netpol.Path))
+
+			switch k8sObject.GetObjectKind().GroupVersionKind().Kind {
+			case "NetworkPolicy":
+				c.config.App.Kubernetes.Namespace.NetworkPolicy[key].SetKubernetesObject(k8sObject.(*networkingV1.NetworkPolicy))
+			default:
+				panic("Not allowed object found: " + k8sObject.GetObjectKind().GroupVersionKind().Kind)
+			}
+		}
+	}
 }
 
 func (c *Server) initApp() {

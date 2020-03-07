@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	networkingV1 "k8s.io/api/networking/v1"
+	"time"
+)
 
 type (
 	Application struct {
@@ -97,9 +100,9 @@ type (
 		}
 
 		Annotations struct {
-			Description string
-			Immortal    string
-			Netpol      string
+			Description   string
+			Immortal      string
+			NetworkPolicy string `yaml:"networkPolicy"`
 		}
 
 		Labels struct {
@@ -119,5 +122,22 @@ type (
 			User int
 			Team int
 		}
+
+		NetworkPolicy []ApplicationKubernetesNetworkPolicy `yaml:"networkPolicy"`
+	}
+
+	ApplicationKubernetesNetworkPolicy struct {
+		Name string
+		Description string
+		Path string
+		netpol *networkingV1.NetworkPolicy
 	}
 )
+
+func (netpol *ApplicationKubernetesNetworkPolicy) SetKubernetesObject(obj *networkingV1.NetworkPolicy) {
+	netpol.netpol = obj
+}
+
+func (netpol *ApplicationKubernetesNetworkPolicy) GetKubernetesObject() *networkingV1.NetworkPolicy {
+	return netpol.netpol
+}
