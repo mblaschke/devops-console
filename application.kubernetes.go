@@ -699,16 +699,21 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 }
 
 func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.KubernetesNamespace) (error) {
+	var err error
+
 	if namespace.Annotations == nil {
 		return nil
 	}
 
 	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
 		// delete default netpol
-		deleteOpts := metav1.DeleteOptions{}
-		err := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete("default", &deleteOpts)
-		if err != nil {
-			c.logger.Info(fmt.Sprintf("Deletion of NetworkPolicy/default in namespace %v failed: %v", namespace.Name, err))
+		getOpts := metav1.GetOptions{}
+		if kubeObject, _ := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Get("default", getOpts); kubeObject != nil && kubeObject.GetUID() != "" {
+			deleteOpts := metav1.DeleteOptions{}
+			err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete("default", &deleteOpts)
+			if err != nil {
+				c.logger.Info(fmt.Sprintf("Deletion of NetworkPolicy/default in namespace %v failed: %v", namespace.Name, err))
+			}
 		}
 
 		// create netpol
@@ -717,6 +722,9 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 				k8sObject := netpol.GetKubernetesObject()
 				if k8sObject != nil {
 					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(k8sObject)
+					if err != nil {
+						c.logger.Error(fmt.Sprintf("Creation of NetworkPolicy in namespace %v failed: %v", namespace.Name, err))
+					}
 				}
 				break
 			}
