@@ -300,12 +300,12 @@ class K8sNamespace extends BaseComponent {
             });
         }
 
-
         ret = ret.sort(function(a,b) {
             if(a.Name < b.Name) return -1;
             if(a.Name > b.Name) return 1;
             return 0;
         });
+        ret = this.sortDataset(ret);
 
         return ret;
     }
@@ -388,12 +388,12 @@ class K8sNamespace extends BaseComponent {
                                 </colgroup>
                                 <thead>
                                 <tr>
-                                    <th>Namespace</th>
-                                    <th>Pods</th>
-                                    <th>Owner</th>
+                                    <th>{this.sortBy("Name", "Namespace")}</th>
+                                    <th>{this.sortBy("PodCount", "Pods")}</th>
+                                    <th>{this.sortBy("OwnerTeam", "Owner")}</th>
                                     <th>Settings</th>
-                                    <th>Created</th>
-                                    <th>Status</th>
+                                    <th>{this.sortBy("Created", "Created")}</th>
+                                    <th>{this.sortBy("Status", "Status")}</th>
                                     <th className="toolbox">
                                         <button type="button" className="btn btn-secondary" onClick={this.createNamespace.bind(this)}>
                                             <i className="fas fa-plus"></i>

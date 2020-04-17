@@ -740,6 +740,8 @@ class MonitoringAlertmanager extends BaseComponent {
             );
 
             if (isVisible) {
+                alertList = this.sortDataset(alertList);
+
                 alertList.map((row) => {
                     htmlTableRows.push(
                         <tr className="alertmanager-alertname-item">
@@ -801,10 +803,10 @@ class MonitoringAlertmanager extends BaseComponent {
                         </colgroup>
                         <thead>
                         <tr>
-                            <th>Alert</th>
-                            <th>Started</th>
-                            <th>Last update</th>
-                            <th>Status</th>
+                            <th>{this.sortBy("annotations.summary", "Alert", (a) => {return a.annotations.summary})}</th>
+                            <th>{this.sortBy("startsAt", "Started")}</th>
+                            <th>{this.sortBy("updatedAt", "Last update")}</th>
+                            <th>{this.sortBy("status.state", "Status", (a) => {return a.status.state})}</th>
                             <th></th>
                         </tr>
                         </thead>

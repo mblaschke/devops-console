@@ -8,7 +8,89 @@ class BaseComponent extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            sortField: null,
+            sortDir: "asc"
+        }
+
         this.startHeartbeat();
+    }
+
+    sortBy(field, text, callback) {
+        let symbol = <i className="fas fa-sort disabled"></i>;
+        if (this.state.sort && this.state.sort.field === field) {
+            if (this.state.sort.dir === "asc") {
+                symbol = <i className="fas fa-sort-up"></i>;
+            } else {
+                symbol = <i className="fas fa-sort-down"></i>;
+            }
+        }
+
+        return (<a className="sortable" onClick={this.triggerSortBy.bind(this, field, callback)}>{text}{symbol}</a>)
+    }
+
+    triggerSortBy(field, callback) {
+        let sort;
+        if (!this.state.sort) {
+            sort = {
+                field: field,
+                dir: "desc",
+                callback: callback
+            };
+        } else {
+            sort = this.state.sort;
+            sort.callback = callback;
+
+            if (sort.field === field) {
+                if (sort.dir === "asc") {
+                    sort.dir = "desc";
+                } else {
+                    sort.dir = "asc";
+                }
+            } else {
+                sort.field = field;
+                sort.dir = "asc";
+            }
+        }
+
+        this.setState({
+            sort: sort
+        })
+    }
+
+    sortDataset(list) {
+        if (!this.state.sort) {
+            return list;
+        }
+
+        let sort = this.state.sort;
+        list = list.sort(function(a,b) {
+            let aVal;
+            let bVal;
+
+            if (sort.callback) {
+                // value by callback
+                aVal = sort.callback(a)
+                bVal = sort.callback(b)
+            } else if (a[sort.field] && b[sort.field]) {
+                // value by field
+                aVal = a[sort.field];
+                bVal = b[sort.field]
+            }
+
+            // do sort
+            if (sort.dir === "asc") {
+                if (aVal < bVal) return -1;
+                if (aVal > bVal) return 1;
+            } else {
+                if (aVal < bVal) return 1;
+                if (aVal > bVal) return -1;
+            }
+
+            return 0;
+        });
+
+        return list;
     }
 
     startHeartbeat() {

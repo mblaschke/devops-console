@@ -135,6 +135,15 @@ visibility: collapse !important;
 border-top: 0;
 }
 
+.sortable {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.sortable .fas.disabled {
+    opacity: 0.25;
+}
+
 .navbar-brand {
 font-weight: lighter;
 }
