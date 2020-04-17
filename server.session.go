@@ -6,6 +6,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"math"
 	"time"
 )
 
@@ -56,7 +57,8 @@ func (c *Server) initSessionSecureCookie() {
 
 func (c *Server) initSessionRedis() {
 	for i := 0; i < 25; i++ {
-		retryTime := time.Duration(time.Duration(i*2) * time.Second)
+		durationTime := math.Min(15, float64(i*2))
+		retryTime := time.Duration(time.Duration(durationTime) * time.Second)
 
 		c.redisConnection = redis.New(redis.Config{
 			Network:   "tcp",
