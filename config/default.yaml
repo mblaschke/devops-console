@@ -4,6 +4,7 @@ application:
     expiry: {{env "SESSION_EXPIRY" | default "168h" | toJson }}
 
     cookieName: {{env "SESSION_COOKIE_NAME" | default "console-sess" | toJson }}
+    secureTLS: {{env "SESSION_SECURE_TLS" | default "true" }}
 
     internal: {}
 

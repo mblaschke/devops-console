@@ -11,6 +11,7 @@ type (
 			Type       string
 			Expiry     time.Duration
 			CookieName string `yaml:"cookieName"`
+			SecureTls  bool `yaml:"secureTLS"`
 
 			Internal struct {
 			} `yaml:"internal"`
