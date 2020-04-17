@@ -104,6 +104,8 @@ class K8sCluster extends BaseComponent {
             return 0;
         });
 
+        ret = this.sortDataset(ret);
+
         return ret;
     }
 
@@ -126,12 +128,12 @@ class K8sCluster extends BaseComponent {
                                 <table className="table table-hover table-sm spinner-area">
                                     <thead>
                                     <tr>
-                                        <th>Server</th>
-                                        <th>Network</th>
+                                        <th>{this.sortBy("Name", "Server")}</th>
+                                        <th>{this.sortBy("InternalIp", "Network")}</th>
                                         <th>System</th>
-                                        <th>Version</th>
-                                        <th>Created</th>
-                                        <th>Status</th>
+                                        <th>{this.sortBy("Version", "Version")}</th>
+                                        <th>{this.sortBy("Created", "Created")}</th>
+                                        <th>{this.sortBy("Status", "Status")}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
