@@ -3,7 +3,7 @@ application:
     type: {{env "SESSION_TYPE" | default "internal" | toJson }}
     expiry: {{env "SESSION_EXPIRY" | default "168h" | toJson }}
 
-    cookieName: {{env "SESSION_COOKIE_NAME" | default "console-sess" | toJson }}
+    cookieName: {{env "SESSION_COOKIE_NAME" | default "devconsole-sid" | toJson }}
     secureTLS: {{env "SESSION_SECURE_TLS" | default "true" }}
 
     internal: {}
