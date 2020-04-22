@@ -136,8 +136,15 @@ border-top: 0;
 }
 
 .sortable {
+    display:flex;
+    justify-content:space-between;
     cursor: pointer;
     white-space: nowrap;
+    user-select: none;
+}
+
+.sortable .fas {
+    line-height: 1.5;
 }
 
 .sortable .fas.disabled {

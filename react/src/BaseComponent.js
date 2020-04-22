@@ -26,7 +26,7 @@ class BaseComponent extends Component {
             }
         }
 
-        return (<a className="sortable" onClick={this.triggerSortBy.bind(this, field, callback)}>{text}{symbol}</a>)
+        return (<a className="sortable" onClick={this.triggerSortBy.bind(this, field, callback)}><span>{text}</span>{symbol}</a>)
     }
 
     triggerSortBy(field, callback) {
