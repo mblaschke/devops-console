@@ -13,7 +13,7 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 
 func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 	if opts.ErrorPunishmentThreshold >= 0 {
-		s := c.session.Start(ctx)
+		s := c.startSession(ctx)
 
 		// ignore new sessions
 		errorCounter, errorCounterErr := s.GetInt64("__errorCounter")
@@ -43,7 +43,7 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 	c.auditLog(ctx, message, 1)
 
 	if logout {
-		s := c.session.Start(ctx)
+		s := c.startSession(ctx)
 		if !s.IsNew() {
 			s.Clear()
 			s.Destroy()

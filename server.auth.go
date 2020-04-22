@@ -16,7 +16,7 @@ func (c *Server) templateLogin(ctx iris.Context) {
 }
 
 func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
-	c.session.Start(ctx)
+	c.startSession(ctx)
 	user, err := c.getUser(ctx)
 
 	if err != nil {
@@ -30,7 +30,7 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 }
 
 func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 	userJson := s.GetString("user")
 
 	if opts.Debug {

@@ -16,7 +16,7 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 
 	randReader := rand.Reader
 	b := make([]byte, 16)
@@ -38,7 +38,7 @@ func (c *Server) Login(ctx iris.Context) {
 }
 
 func (c *Server) Logout(ctx iris.Context) {
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 	s.Clear()
 	s.Destroy()
 
@@ -47,7 +47,7 @@ func (c *Server) Logout(ctx iris.Context) {
 }
 
 func (c *Server) LogoutForced(ctx iris.Context) {
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 	s.Clear()
 	s.Destroy()
 
@@ -56,7 +56,7 @@ func (c *Server) LogoutForced(ctx iris.Context) {
 }
 
 func (c *Server) LoginViaOauth(ctx iris.Context) {
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 	oauth := c.newServiceOauth(ctx)
 
 	if error := ctx.URLParam("error"); error != "" {
@@ -141,7 +141,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		// regenerate session
 		s.Clear()
 		s.Destroy()
-		s := c.session.Start(ctx)
+		s := c.startSession(ctx)
 
 		s.Set("user", userSession)
 		c.csrfProtectionTokenRegenerate(ctx)

@@ -142,7 +142,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 		return
 	}
 
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 
 	// get token
 	sessionToken := ""
@@ -180,7 +180,7 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 		return ""
 	}
 
-	s := c.session.Start(ctx)
+	s := c.startSession(ctx)
 
 	// set new token
 	token := randomString(64)

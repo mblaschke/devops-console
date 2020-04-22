@@ -7,8 +7,13 @@ import (
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"math"
+	"net/http"
 	"time"
 )
+
+func (c *Server) startSession(ctx iris.Context) (*sessions.Session){
+	return c.session.Start(ctx)
+}
 
 func (c *Server) initSession() {
 	c.logger.Infof(" - using %v session", c.config.App.Session.Type)
@@ -29,14 +34,21 @@ func (c *Server) initSession() {
 		panic(fmt.Sprintf("Invalid session type defined"))
 	}
 
-	c.app.Use(c.session.Handler())
+	c.app.Use(c.session.Handler(func(cookie *http.Cookie) {
+		if c.config.App.Session.CookieSecure {
+			cookie.Secure = true
+		}
+
+		if c.config.App.Session.CookieDomain != "" {
+			cookie.Domain = c.config.App.Session.CookieDomain
+		}
+	}))
 }
 
 func (c *Server) initSessionInternal() {
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
 		Expires:                     c.config.App.Session.Expiry,
-		CookieSecureTLS:             c.config.App.Session.SecureTls,
 		DisableSubdomainPersistence: true,
 	})
 }
@@ -51,7 +63,6 @@ func (c *Server) initSessionSecureCookie() {
 		Cookie:                      c.config.App.Session.CookieName,
 		Encode:                      secureCookie.Encode,
 		Decode:                      secureCookie.Decode,
-		CookieSecureTLS:             c.config.App.Session.SecureTls,
 		AllowReclaim:                true,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
@@ -100,7 +111,6 @@ func (c *Server) initSessionRedis() {
 		Cookie:                      c.config.App.Session.CookieName,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
-		CookieSecureTLS:             c.config.App.Session.SecureTls,
 		AllowReclaim:                true,
 	})
 
