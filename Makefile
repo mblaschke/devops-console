@@ -11,6 +11,14 @@ build: build-frontend build-backend
 
 build-run: build-frontend build-backend run
 
+recreate-go-mod:
+	rm -f go.mod go.sum
+	GO111MODULE=on go mod init
+	GO111MODULE=on go get k8s.io/client-go@v0.17.0
+	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
+	GO111MODULE=on go get
+	GO111MODULE=on go mod vendor
+
 image: build
 	docker build -t $(NAME):$(TAG) .
 
