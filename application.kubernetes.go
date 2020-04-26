@@ -124,7 +124,7 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 	ret := []response.KubernetesNamespace{}
 
 	for _, namespaceNative := range nsList {
-		namespace := models.KubernetesNamespace{&namespaceNative}
+		namespace := models.KubernetesNamespace{Namespace:&namespaceNative}
 
 		if !c.kubernetesNamespaceAccessAllowed(ctx, namespace) {
 			continue
@@ -268,7 +268,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	// set name label
 	labels[c.config.App.Kubernetes.Namespace.Labels.Name] = namespaceName
 
-	namespace := models.KubernetesNamespace{&coreV1.Namespace{}}
+	namespace := models.KubernetesNamespace{Namespace:&coreV1.Namespace{}}
 	namespace.Name = namespaceName
 	namespace.SetLabels(labels)
 	namespace.SettingsApply(nsSettings, c.config.Kubernetes)
@@ -311,7 +311,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// Namespace creation
 	if newNamespace, err := service.NamespaceCreate(*namespace.Namespace); newNamespace != nil && err == nil {
-		if err := c.updateNamespaceSettings(ctx, &models.KubernetesNamespace{newNamespace}); err != nil {
+		if err := c.updateNamespaceSettings(ctx, &models.KubernetesNamespace{Namespace:newNamespace}); err != nil {
 			c.respondError(ctx, err)
 			return
 		}
@@ -820,7 +820,7 @@ func (c *ApplicationKubernetes) getNamespace(ctx iris.Context, namespaceName str
 		return nil, err
 	}
 
-	namespace = &models.KubernetesNamespace{namespaceNative}
+	namespace = &models.KubernetesNamespace{Namespace:namespaceNative}
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, *namespace) {
 		return nil, errors.New(fmt.Sprintf("Access to namespace \"%s\" denied", namespace.Name))

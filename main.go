@@ -16,7 +16,6 @@ const (
 
 var (
 	argparser *flags.Parser
-	args      []string
 
 	PrometheusActions *prometheus.GaugeVec
 	startupTime       time.Time

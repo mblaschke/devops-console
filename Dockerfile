@@ -29,11 +29,11 @@ RUN set -x \
 FROM golang:1.14 as backend
 WORKDIR /go/src/devops-console
 COPY ./ /go/src/devops-console
-RUN go mod vendor
+RUN make vendor
 COPY --from=frontend /app/templates /go/src/devops-console/templates
 COPY --from=frontend /app/static /go/src/devops-console/static
-RUN set -x \
-    && CGO_ENABLED=0 GOOS=linux go build -o devops-console
+RUN make lint
+RUN make build-backend
 RUN ./devops-console --help
 
 #############################################

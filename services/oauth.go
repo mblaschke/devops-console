@@ -120,8 +120,7 @@ func (o *OAuth) buildConfig() (config *oauth2.Config) {
 
 	switch strings.ToLower(o.Config.Provider) {
 	case "azuread":
-		aadTenant := "common"
-		aadTenant = o.Config.Azure.Tenant
+		aadTenant := o.Config.Azure.Tenant
 
 		provider, err := oidc.NewProvider(ctx, fmt.Sprintf("https://sts.windows.net/%s/", aadTenant))
 		if err != nil {

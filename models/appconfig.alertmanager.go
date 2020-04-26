@@ -62,7 +62,7 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 	}
 
 	transport := httptransport.New(net.JoinHostPort(hostName, hostPort), fmt.Sprintf("%v/api/v2/", configUrl.Path), []string{hostScheme})
-	context, _ := context.WithTimeout(context.Background(), time.Duration(20*time.Second))
+	context, _ := context.WithTimeout(context.Background(), time.Duration(20*time.Second)) //nolint:golint,govet
 	transport.Context = context
 
 	if config.Auth != nil {

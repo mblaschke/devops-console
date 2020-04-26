@@ -123,21 +123,6 @@ func IsK8sConfigFile(path string) bool {
 	return false
 }
 
-func recursiveFileListByPath(path string) (list []string) {
-	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-		if IsK8sConfigFile(path) {
-			list = append(list, path)
-		}
-		return nil
-	})
-
-	if err != nil {
-		fmt.Println(fmt.Sprintf("ERROR: %s", err))
-	}
-
-	return
-}
-
 func KubeParseConfig(path string) runtime.Object {
 	data, err := ioutil.ReadFile(filepath.Clean(path))
 	if err != nil {
@@ -150,10 +135,6 @@ func KubeParseConfig(path string) runtime.Object {
 		panic(err)
 	}
 	return obj
-}
-
-func stringToPtr(val string) *string {
-	return &val
 }
 
 func randomString(length int) string {

@@ -104,7 +104,7 @@ func (c *Server) initRoutes() {
 
 func (c *Server) notFound(ctx iris.Context) {
 	defer func() {
-		recover()
+		recover() //nolint:golint,errcheck
 	}()
 
 	c.respondErrorWithPenalty(ctx, errors.New("Document not found"))
