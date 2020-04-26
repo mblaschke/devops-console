@@ -12,6 +12,22 @@ label {
     user-select: none;
 }
 
+main,
+#wrapper,
+#wrapper #content-wrapper,
+#wrapper #content-wrapper > .container-fluid,
+#root {
+    min-height: 100%;
+}
+
+#wrapper #content-wrapper {
+    padding-bottom: 0;
+}
+
+#wrapper #content-wrapper > .container-fluid {
+    max-height: 100%;
+}
+
 @media (min-width: 768px) {
     .sidebar .nav-item .dropdown-menu {
         display: block;
@@ -153,11 +169,13 @@ border-top: 0;
 
 .navbar-brand {
     font-weight: lighter;
+    user-select: none;
 }
 
 .navbar-brand .version {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     padding-left: 0.25rem;
+    font-weight: normal;
 }
 
 .globalmessages {
