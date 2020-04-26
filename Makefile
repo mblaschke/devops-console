@@ -16,7 +16,7 @@ image: build
 
 build-backend:
 	#go-bindata ./templates/...
-	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o $(NAME) .
+	CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o $(NAME) .
 
 run:
 	./devops-console
