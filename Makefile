@@ -1,4 +1,4 @@
-.PHONY: all build-run build-backend build-backend run
+.PHONY: all build-run build-backend build-backend run vendor
 
 NAME				:= devops-console
 TAG					:= $(shell git rev-parse --short HEAD)
