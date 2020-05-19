@@ -40,11 +40,8 @@ type (
 		Oauth OAuthConfig `yaml:"oauth"`
 
 		Notification struct {
-			Slack struct {
-				Webhook string
-				Channel string
-				Message string
-			}
+			Channels []string
+			Message string
 		}
 
 		Kubernetes struct {

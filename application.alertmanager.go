@@ -128,7 +128,7 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		return
 	}
 
-	c.notificationMessageWithContext(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" updated", *silenceResp.Payload.ID, formData.Team), formData.ToMarkdown(*silenceResp.Payload.ID))
+	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" updated", *silenceResp.Payload.ID, formData.Team))
 
 	resp := response.GeneralMessage{
 		Message: fmt.Sprintf("Silence \"%s\" updated", *silenceResp.Payload.ID),
@@ -162,7 +162,7 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 		return
 	}
 
-	c.notificationMessageWithContext(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" create", silenceResp.Payload.SilenceID, formData.Team), formData.ToMarkdown(silenceResp.Payload.SilenceID))
+	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" create", silenceResp.Payload.SilenceID, formData.Team))
 
 	resp := response.GeneralMessage{
 		Message: fmt.Sprintf("Silence \"%s\" created", silenceResp.Payload.SilenceID),

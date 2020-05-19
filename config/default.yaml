@@ -41,10 +41,8 @@ application:
       usernameBlacklist: {{env "OAUTH_USERNAME_FILTER_BLACKLIST" | toJson }}
 
   notification:
-    slack:
-      webhook: {{env "NOTIFICATION_SLACK_WEBHOOK" | toJson }}
-      channel: {{env "NOTIFICATION_SLACK_CHANNEL" | toJson }}
-      message: {{env "NOTIFICATION_SLACK_MESSAGE" | default "%s: %s" | toJson }}
+    channels: {{ env "NOTIFICATION" | splitList " " | toJson }}
+    message: {{env "NOTIFICATION_SLACK_MESSAGE" | default "%s: %s" | toJson }}
 
   kubernetes:
     objectsPath: ./config/kubernetes

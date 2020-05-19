@@ -12,6 +12,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/containrrr/shoutrrr v0.0.0-20200423175557-f8dbb8b0ad2a
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
