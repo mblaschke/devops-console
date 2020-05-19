@@ -3,7 +3,7 @@ package models
 type (
 	AppConfigKubernetes struct {
 		Namespace struct {
-			Settings []AppConfigNamespaceSettings
+			Settings      []AppConfigNamespaceSettings
 			NetworkPolicy []AppConfigNamespaceNetworkPolicy
 		}
 	}
@@ -23,7 +23,7 @@ type (
 	}
 
 	AppConfigNamespaceNetworkPolicy struct {
-		Name string
+		Name        string
 		Description string
 	}
 )

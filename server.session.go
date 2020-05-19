@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (c *Server) startSession(ctx iris.Context) (*sessions.Session){
+func (c *Server) startSession(ctx iris.Context) *sessions.Session {
 	return c.session.Start(ctx)
 }
 

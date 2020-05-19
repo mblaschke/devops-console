@@ -84,7 +84,7 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 	ret.Kubernetes = c.config.Kubernetes
 	for _, row := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
 		tmp := models.AppConfigNamespaceNetworkPolicy{
-			Name: row.Name,
+			Name:        row.Name,
 			Description: row.Description,
 		}
 

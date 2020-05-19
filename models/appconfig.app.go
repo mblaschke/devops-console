@@ -8,10 +8,10 @@ import (
 type (
 	Application struct {
 		Session struct {
-			Type       string
-			Expiry     time.Duration
-			CookieName string `yaml:"cookieName"`
-			CookieSecure bool `yaml:"cookieSecure"`
+			Type         string
+			Expiry       time.Duration
+			CookieName   string `yaml:"cookieName"`
+			CookieSecure bool   `yaml:"cookieSecure"`
 			CookieDomain string `yaml:"cookieDomain"`
 
 			Internal struct {
@@ -129,10 +129,10 @@ type (
 	}
 
 	ApplicationKubernetesNetworkPolicy struct {
-		Name string
+		Name        string
 		Description string
-		Path string
-		netpol *networkingV1.NetworkPolicy
+		Path        string
+		netpol      *networkingV1.NetworkPolicy
 	}
 )
 
