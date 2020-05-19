@@ -36,5 +36,12 @@ services:
   ###########################
   redis:
     image: redis
+    command:
+      - sh
+      - -c
+      - 'exec redis-server --requirepass "$${REDIS_PASS}"'
+    environment:
+      REDIS_PASS: "t!#%est-_+|123"
     ports:
-      - "6379:6379"
+    - "6379:6379"
+
