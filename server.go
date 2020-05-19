@@ -50,6 +50,7 @@ func NewServer(pathList []string) *Server {
 }
 
 func (c *Server) Init() {
+	c.logger.Infof("Starting DevOps Console v%v (%v)", gitTag, gitCommit)
 	c.config = models.AppConfig{}
 
 	if opts.EnableNamespacePodCount {

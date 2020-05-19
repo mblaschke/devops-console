@@ -1,7 +1,9 @@
 .PHONY: all build-run build-backend build-backend run vendor
 
 NAME				:= devops-console
-TAG					:= $(shell git rev-parse --short HEAD)
+GIT_TAG				:= $(shell git describe --dirty --tags --always)
+GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
+LDFLAGS             := -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMMIT)" -extldflags "-static"
 
 FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
@@ -23,8 +25,7 @@ image: build
 	docker build -t $(NAME):$(TAG) .
 
 build-backend:
-	#go-bindata ./templates/...
-	CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o $(NAME) .
+	CGO_ENABLED=0 go build -a -ldflags '$(LDFLAGS)' -o $(NAME) .
 
 run:
 	./devops-console

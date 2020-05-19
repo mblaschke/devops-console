@@ -11,7 +11,8 @@ func (c *Server) initTemplateEngine() {
 
 	c.tmpl = iris.Jet("./templates", ".jet")
 
-	c.tmpl.AddVar("appVersion", Version)
+	c.tmpl.AddVar("appVersion", gitTag)
+	c.tmpl.AddVar("appVersionCommit", gitCommit)
 	c.tmpl.AddVar("runtimeVersion", runtime.Version())
 	c.tmpl.AddVar("irisVersion", iris.Version)
 	c.tmpl.AddVar("azureSdkVersion", azureSdkVersion.Number)

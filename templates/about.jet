@@ -10,22 +10,10 @@
     <div class="card mb-3">
         <div class="card-header">
             <i class="fas fa-terminal"></i>
-            /devops/console <span class="version">v{{appVersion}}</span>
+            /devops/console <span class="version">v{{appVersion}} ({{appVersionCommit}})</span>
         </div>
         <div class="card-body">
             <p><i>self service for DevOps people</i></p>
-
-            <p>
-                created by:
-                <ul>
-                    <li>Markus Blaschke</li>
-                    <li>Vibin Ittiachan</li>
-                    <li>Jonathan Buerkle</li>
-                    <li>Thomas Renger</li>
-                    <li>Marc Ritter</li>
-                    <li>Michael Kowatsch</li>
-                </ul>
-            </p>
 
             <p>
                 <dl>

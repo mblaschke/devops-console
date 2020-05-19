@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-const (
-	Version = "20.4.0"
-)
-
 var (
 	argparser *flags.Parser
 
 	PrometheusActions *prometheus.GaugeVec
 	startupTime       time.Time
 	startupDuration   time.Duration
+
+	// Git version information
+	gitCommit = "<unknown>"
+	gitTag    = "<unknown>"
 )
 
 var opts struct {
