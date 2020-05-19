@@ -41,7 +41,7 @@ application:
       usernameBlacklist: {{env "OAUTH_USERNAME_FILTER_BLACKLIST" | toJson }}
 
   notification:
-    channels: {{ env "NOTIFICATION" | splitList " " | toJson }}
+    channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
     message: {{env "NOTIFICATION_SLACK_MESSAGE" | default "%s: %s" | toJson }}
 
   kubernetes:
