@@ -1,3 +1,4 @@
+/.idea
 /bindata.go
 /static/js/*.js
 /static/js/*.js.map
@@ -8,4 +9,3 @@
 /public/dist/*
 /react/node_modules
 /devops-console
-/Dockerfile

@@ -21,7 +21,8 @@ COPY ./ /app
 COPY --from=npm-dependencies /app/react/node_modules/ /app/react/node_modules/
 RUN set -x \
     && make build-frontend \
-    && rm -rf /app/react
+    && rm -rf /app/react \
+    && touch /app/static/dist/.gitkeep
 
 #############################################
 # BUILD GO APP
@@ -32,6 +33,7 @@ COPY ./ /go/src/devops-console
 RUN make vendor
 COPY --from=frontend /app/templates /go/src/devops-console/templates
 COPY --from=frontend /app/static /go/src/devops-console/static
+RUN git status
 RUN make lint
 RUN make build-backend
 RUN ./devops-console --help
