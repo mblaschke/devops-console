@@ -42,7 +42,7 @@ application:
 
   notification:
     channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
-    message: {{env "NOTIFICATION_SLACK_MESSAGE" | default "%s: %s" | toJson }}
+    message: {{env "NOTIFICATION_MESSAGE" | default "%s: %s" | toJson }}
 
   kubernetes:
     objectsPath: ./config/kubernetes
