@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"devops-console/models"
 	"errors"
 	"fmt"
@@ -64,7 +65,8 @@ func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 
 // Returns list of (filtered) namespaces
 func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error) {
-	result, error := k.Client().CoreV1().Namespaces().List(metav1.ListOptions{})
+	ctx := context.Background()
+	result, error := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 
 	if error == nil {
 		nsList = make(map[string]v1.Namespace, len(result.Items))
@@ -104,61 +106,63 @@ func (k *Kubernetes) NamespaceCount(regexp *regexp.Regexp) (count int, err error
 
 // Returns list of nodes
 func (k *Kubernetes) Nodes() (*v1.NodeList, error) {
-	opts := metav1.ListOptions{}
-	return k.Client().CoreV1().Nodes().List(opts)
+	ctx := context.Background()
+	return k.Client().CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 }
 
 // Returns one namespace
 func (k *Kubernetes) NamespaceGet(namespace string) (*v1.Namespace, error) {
+	ctx := context.Background()
 	if err := k.namespaceValidate(namespace); err != nil {
 		return nil, err
 	}
 
-	opts := metav1.GetOptions{}
-	return k.Client().CoreV1().Namespaces().Get(namespace, opts)
+	return k.Client().CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
 }
 
 // Create one namespace
 func (k *Kubernetes) NamespaceCreate(namespace v1.Namespace) (*v1.Namespace, error) {
+	ctx := context.Background()
 	if err := k.namespaceValidate(namespace.Name); err != nil {
 		return nil, err
 	}
 
-	namespaceNew, err := k.Client().CoreV1().Namespaces().Create(&namespace)
+	namespaceNew, err := k.Client().CoreV1().Namespaces().Create(ctx, &namespace, metav1.CreateOptions{})
 
 	return namespaceNew, err
 }
 
 // Updates namespace
 func (k *Kubernetes) NamespaceUpdate(namespace *v1.Namespace) (*v1.Namespace, error) {
+	ctx := context.Background()
 	if err := k.namespaceValidate(namespace.Name); err != nil {
 		return nil, err
 	}
 
-	namespaceNew, err := k.Client().CoreV1().Namespaces().Update(namespace)
+	namespaceNew, err := k.Client().CoreV1().Namespaces().Update(ctx, namespace, metav1.UpdateOptions{})
 
 	return namespaceNew, err
 }
 
 // Delete one namespace
 func (k *Kubernetes) NamespaceDelete(namespace string) error {
+	ctx := context.Background()
+
 	if err := k.namespaceValidate(namespace); err != nil {
 		return err
 	}
 
-	opts := metav1.DeleteOptions{}
-	return k.Client().CoreV1().Namespaces().Delete(namespace, &opts)
+	return k.Client().CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{})
 }
 
 func (k *Kubernetes) NamespacePodCount(namespace string) (podcount *int64) {
+	ctx := context.Background()
 	if err := k.namespaceValidate(namespace); err != nil {
 		return
 	}
 
-	opts := metav1.ListOptions{}
-
 	count := int64(0)
-	result, err := k.Client().CoreV1().Pods(namespace).List(opts)
+	result, err := k.Client().CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
 	if err == nil {
 		count += int64(len(result.Items))
 		if result.RemainingItemCount != nil {
@@ -171,12 +175,11 @@ func (k *Kubernetes) NamespacePodCount(namespace string) (podcount *int64) {
 
 // Create cluster rolebinding for user for general access
 func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (roleBinding *v12.ClusterRoleBinding, error error) {
+	ctx := context.Background()
 	roleBindName := fmt.Sprintf("user:%s", username)
 
-	getOpts := metav1.GetOptions{}
-	if rb, _ := k.Client().RbacV1().ClusterRoleBindings().Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
-		deleteOpts := metav1.DeleteOptions{}
-		err := k.Client().RbacV1().ClusterRoleBindings().Delete(roleBindName, &deleteOpts)
+	if rb, _ := k.Client().RbacV1().ClusterRoleBindings().Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
+		err := k.Client().RbacV1().ClusterRoleBindings().Delete(ctx, roleBindName, metav1.DeleteOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -199,17 +202,16 @@ func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (
 	roleBinding.RoleRef = role
 	roleBinding.Subjects = []v12.Subject{subject}
 
-	return k.Client().RbacV1().ClusterRoleBindings().Create(roleBinding)
+	return k.Client().RbacV1().ClusterRoleBindings().Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for user to gain access to namespace
 func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid, roleName string) (roleBinding *v12.RoleBinding, error error) {
+	ctx := context.Background()
 	roleBindName := fmt.Sprintf("user:%s", username)
 
-	getOpts := metav1.GetOptions{}
-	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
-		deleteOpts := metav1.DeleteOptions{}
-		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(ctx, roleBindName, metav1.DeleteOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -233,17 +235,16 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 	roleBinding.RoleRef = role
 	roleBinding.Subjects = []v12.Subject{subject}
 
-	return k.Client().RbacV1().RoleBindings(namespace).Create(roleBinding)
+	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for group to gain access to namespace
 func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName string, permission models.TeamK8sPermissions) (roleBinding *v12.RoleBinding, error error) {
+	ctx := context.Background()
 	roleBindName := fmt.Sprintf("team:%s:%s", teamName, permission.Name)
 
-	getOpts := metav1.GetOptions{}
-	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
-		deleteOpts := metav1.DeleteOptions{}
-		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(ctx, roleBindName, metav1.DeleteOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -281,17 +282,16 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 	roleBinding.RoleRef = role
 	roleBinding.Subjects = subjectList
 
-	return k.Client().RbacV1().RoleBindings(namespace).Create(roleBinding)
+	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for group to gain access to namespace
 func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName string) (roleBinding *v12.RoleBinding, error error) {
+	ctx := context.Background()
 	roleBindName := fmt.Sprintf("group:%s", group)
 
-	getOpts := metav1.GetOptions{}
-	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
-		deleteOpts := metav1.DeleteOptions{}
-		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(ctx, roleBindName, metav1.DeleteOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -315,17 +315,16 @@ func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName 
 	roleBinding.RoleRef = role
 	roleBinding.Subjects = []v12.Subject{subject}
 
-	return k.Client().RbacV1().RoleBindings(namespace).Create(roleBinding)
+	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for group to gain access to namespace
 func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, serviceaccount, roleName string) (roleBinding *v12.RoleBinding, error error) {
+	ctx := context.Background()
 	roleBindName := fmt.Sprintf("serviceaccount:%s", serviceaccount)
 
-	getOpts := metav1.GetOptions{}
-	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(roleBindName, getOpts); rb != nil && rb.GetUID() != "" {
-		deleteOpts := metav1.DeleteOptions{}
-		err := k.Client().RbacV1().RoleBindings(namespace).Delete(roleBindName, &deleteOpts)
+	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
+		err := k.Client().RbacV1().RoleBindings(namespace).Delete(ctx, roleBindName, metav1.DeleteOptions{})
 		if err != nil {
 			panic(err)
 		}
@@ -349,7 +348,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 	roleBinding.RoleRef = role
 	roleBinding.Subjects = []v12.Subject{subject}
 
-	return k.Client().RbacV1().RoleBindings(namespace).Create(roleBinding)
+	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 func (k *Kubernetes) buildResourceListItem(cpu, memory string) *v1.ResourceList {

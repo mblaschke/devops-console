@@ -5,24 +5,33 @@
     {{include "includes/html-header.jet"}}
 </head>
 <body class="hide-search">
+
   <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
     <a class="navbar-brand mr-1" href="/"><i class="fas fa-terminal"></i> /devops/console<span class="version">v{{appVersion}}</span></a>
+    <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
+    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
     {{include "includes/navbar-search.jet"}}
     {{include "includes/navbar-right.jet"}}
+    </form>
   </nav>
 
-<main role="main">
   <div id="wrapper">
-    {{include "includes/sidebar.jet"}}
+     <div id="layoutSidenav">
+       <div id="layoutSidenav_nav">
+            {{include "includes/sidebar.jet"}}
+        </div>
 
-    <div id="content-wrapper">
-      <div class="container-fluid">
-        {{yield messages()}}
-        {{block documentBody()}}{{end}}
-      </div>
+       <div id="layoutSidenav_content">
+           <main role="main">
+               <div id="content-wrapper">
+                  <div class="container-fluid">
+                {{yield messages()}}
+                {{block documentBody()}}{{end}}
+              </div>
+            </div>
+        </main>
     </div>
   </div>
-</main>
 <script>
 {{if isset(CSRF_TOKEN_JSON) && CSRF_TOKEN_JSON}}
 window.CSRF_TOKEN = {{ CSRF_TOKEN_JSON | raw }};

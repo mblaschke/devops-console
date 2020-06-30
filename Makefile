@@ -15,8 +15,8 @@ build-run: build-frontend build-backend run
 
 recreate-go-mod:
 	rm -f go.mod go.sum
-	GO111MODULE=on go mod init
-	GO111MODULE=on go get k8s.io/client-go@v0.17.0
+	GO111MODULE=on go mod init devops-console
+	GO111MODULE=on go get k8s.io/client-go@v0.18.0
 	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
 	GO111MODULE=on go get
 	GO111MODULE=on go mod vendor
@@ -44,10 +44,10 @@ build-frontend:
 	cp -a react/node_modules/bootstrap/dist/ static/dist/bootstrap
 	cp -a react/node_modules/popper.js/dist/umd/ static/dist/popper.js
 	mkdir -p static/dist/sb-admin static/dist/webfonts
-	cp -a react/node_modules/startbootstrap-sb-admin/css/sb-admin.css static/dist/sb-admin/sb-admin.css
-	cp -a react/node_modules/startbootstrap-sb-admin/js/sb-admin.js static/dist/sb-admin/sb-admin.js
-	cp -a react/node_modules/startbootstrap-sb-admin/vendor/fontawesome-free/css/all.min.css static/dist/sb-admin/fontawesome.css
-	cp -a react/node_modules/startbootstrap-sb-admin/vendor/fontawesome-free/webfonts/* static/dist/webfonts/
+	cp -a react/node_modules/startbootstrap-sb-admin/dist/css/styles.css static/dist/sb-admin/sb-admin.css
+	cp -a react/node_modules/startbootstrap-sb-admin/dist/js/scripts.js static/dist/sb-admin/sb-admin.js
+	cp -a react/node_modules/@fortawesome/fontawesome-free/css/all.min.css static/dist/sb-admin/fontawesome.css
+	cp -a react/node_modules/@fortawesome/fontawesome-free/webfonts/* static/dist/webfonts/
 	touch static/js/.gitkeep
 
 .PHONY: lint

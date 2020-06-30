@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"devops-console/models"
 	"devops-console/models/formdata"
 	"devops-console/models/response"
@@ -699,6 +700,7 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 }
 
 func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.KubernetesNamespace) error {
+	ctx := context.Background()
 	var err error
 
 	if namespace.Annotations == nil {
@@ -707,10 +709,8 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 
 	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
 		// delete default netpol
-		getOpts := metav1.GetOptions{}
-		if kubeObject, _ := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Get("default", getOpts); kubeObject != nil && kubeObject.GetUID() != "" {
-			deleteOpts := metav1.DeleteOptions{}
-			err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete("default", &deleteOpts)
+		if kubeObject, _ := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Get(ctx, "default", metav1.GetOptions{}); kubeObject != nil && kubeObject.GetUID() != "" {
+			err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete(ctx, "default", metav1.DeleteOptions{})
 			if err != nil {
 				c.logger.Info(fmt.Sprintf("Deletion of NetworkPolicy/default in namespace %v failed: %v", namespace.Name, err))
 			}
@@ -721,7 +721,7 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 			if netpol.Name == val {
 				k8sObject := netpol.GetKubernetesObject()
 				if k8sObject != nil {
-					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(k8sObject)
+					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(ctx, k8sObject ,metav1.CreateOptions{})
 					if err != nil {
 						c.logger.Error(fmt.Sprintf("Creation of NetworkPolicy in namespace %v failed: %v", namespace.Name, err))
 					}

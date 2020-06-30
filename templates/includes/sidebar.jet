@@ -1,46 +1,23 @@
 {{import "includes/blocks.jet"}}
-    <ul class="sidebar navbar-nav">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>Kubernetes</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-        {{yield navigationItem(title="Cluster", href="/kubernetes/cluster")}}
-        {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
-        {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
-        </div>
-      </li>
+<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    <div class="sb-sidenav-menu">
+        <div class="nav">
+            <div class="sb-sidenav-menu-heading">Kubernetes</div>
+            {{yield navigationItem(title="Cluster", href="/kubernetes/cluster")}}
+            {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
+            {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
 
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>Azure</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
-        </div>
-      </li>
+            <div class="sb-sidenav-menu-heading">Azure</div>
+            {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
 
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>Monitoring</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-        {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
-        </div>
-      </li>
+            <div class="sb-sidenav-menu-heading">Monitoring</div>
+            {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
 
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>General</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          {{yield navigationItem(title="Settings", href="/general/settings")}}
-          {{yield navigationItem(title="About", href="/general/about")}}
-        </div>
-      </li>
 
-    </ul>
+            <div class="sb-sidenav-menu-heading">General</div>
+            {{yield navigationItem(title="Settings", href="/general/settings")}}
+            {{yield navigationItem(title="About", href="/general/about")}}
+
+        </div>
+    </div>
+</nav>

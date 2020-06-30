@@ -13,7 +13,10 @@
             /devops/console <span class="version">v{{appVersion}} ({{appVersionCommit}})</span>
         </div>
         <div class="card-body">
-            <p><i>self service for DevOps people</i></p>
+            <p>self service for DevOps people, built in Germany with love</p>
+            <p class="text-center">
+                <i>Great things in business are never done by one person; they're done by a team of people.</i><br>Steve Jobs
+            ️</p>
 
             <p>
                 <dl>
