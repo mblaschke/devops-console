@@ -8,7 +8,7 @@
         "jquery": "^3.5.1",
         "lodash.get": "^4.4.2",
         "moment": "^2.27.0",
-        "npm": "^6.14.5",
+        "npm": "^7.0.9",
         "popper.js": "^1.16.1",
         "react": "^16.13.1",
         "react-copy-to-clipboard": "^5.0.2",
@@ -16,7 +16,7 @@
         "react-lodash": "^0.1.2",
         "react-onclickoutside": "^6.9.0",
         "react-router-dom": "^4.3.1",
-        "react-scripts": "^3.4.1",
+        "react-scripts": "^4.0.0",
         "startbootstrap-sb-admin": "^6.0.1",
         "typescript": "^3.9.5"
     },

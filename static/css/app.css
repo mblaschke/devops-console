@@ -76,12 +76,20 @@ main,
     height: 30rem;
     overflow:scroll;
 }
+
 .table-responsive thead tr:nth-child(1) th{
     background: white;
     position: sticky;
     top: 0;
     z-index: 10;
 }
+
+.table-responsive thead a,
+.table-responsive thead a:hover {
+    color: black;
+    text-decoration: none;
+}
+
 
 td.not-found {
     text-align: center;
