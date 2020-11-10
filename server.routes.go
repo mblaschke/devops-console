@@ -118,7 +118,7 @@ func (c *Server) before(ctx iris.Context) {
 
 func (c *Server) defaultHeaders(ctx iris.Context) {
 	// security headers
-	ctx.Header("X-Frame-Options", "BLOCK")
+	ctx.Header("X-Frame-Options", "DENY")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
 	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")
