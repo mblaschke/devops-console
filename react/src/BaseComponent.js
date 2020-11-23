@@ -142,6 +142,10 @@ class BaseComponent extends Component {
         });
 
         jqxhr.done((jqxhr) => {
+            if (!jqxhr) {
+                return
+            }
+
             if (jqxhr.Message) {
                 window.App.pushGlobalMessage("success", jqxhr.Message);
             } else if (jqxhr.responseJSON && jqxhr.responseJSON.Message) {

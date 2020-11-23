@@ -5,8 +5,17 @@ type (
 		Vault struct {
 			Url string
 		}
+
+		Kubeconfig map[string]AppConfigKubeconfig
+
 		User []AppConfigSettingItem
 		Team []AppConfigSettingItem
+	}
+
+	AppConfigKubeconfig struct {
+		Name string
+		Description string
+		Content string
 	}
 
 	AppConfigSettingItem struct {

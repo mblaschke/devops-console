@@ -178,3 +178,9 @@ func (c *Server) responseJson(ctx iris.Context, v interface{}) {
 		c.logger.Errorln(err)
 	}
 }
+
+func (c *Server) responseString(ctx iris.Context, format string, v interface{}) {
+	if _, err := ctx.Text(format, v); err != nil {
+		c.logger.Errorln(err)
+	}
+}

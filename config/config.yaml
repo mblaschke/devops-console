@@ -28,6 +28,18 @@ settings:
   vault:
     url: {{env "AZURE_VAULT_URL" | toJson }}
 
+  kubeconfig:
+    default:
+      name: Default kubeconfig
+      description: This is the default configuration
+      content: |-
+        EXAMPLE KUBECONFIG
+    default2:
+      name: Default2 kubeconfig
+      description: This is the second default configuration
+      content: |-
+        EXAMPLE KUBECONFIG2
+
   user:
     - name: SshPubKey
       label: SSH Public Key
