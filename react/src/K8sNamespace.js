@@ -49,8 +49,16 @@ class K8sNamespace extends BaseComponent {
 
         window.App.enableSearch();
 
-        $(document).on('show.bs.modal', ".modal", this.disableRefresh.bind(this));
-        $(document).on('hide.bs.modal', ".modal", this.refresh.bind(this));
+        $(document).on('show.bs.modal', ".modal", () => {
+            this.disableRefresh();
+        });
+        $(document).on('hide.bs.modal', ".modal", () => {
+            this.setState({
+                namespaceEditModalShow: false,
+                isStartupNamespaces: true
+            });
+            this.refresh();
+        });
     }
 
     loadNamespaces() {
@@ -157,7 +165,7 @@ class K8sNamespace extends BaseComponent {
 
         setTimeout(() => {
             $("#editQuestion").modal('show');
-        }, 200);
+        }, 200)
     }
 
     handleNamespaceClick(row, event) {
