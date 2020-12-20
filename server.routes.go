@@ -103,7 +103,7 @@ func (c *Server) initRoutes() {
 
 	apiServiceParty := c.app.Party("/api", requestLogger, c.defaultHeaders)
 	{
-		apiServiceParty.Post("/kubernetes/namespace/{namespace:string}/ensure", func(ctx iris.Context) { c.ensureServiceUser(ctx, applicationKubernetes.ApiServiceNamespaceEnsure) })
+		apiServiceParty.Post("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureServiceUser(ctx, applicationKubernetes.ApiServiceNamespaceEnsure) })
 	}
 
 	c.app.OnErrorCode(iris.StatusNotFound, c.notFound)
