@@ -17,21 +17,22 @@ label {
     user-select: none;
 }
 
+html,
+body,
 main,
 #wrapper,
 #wrapper #content-wrapper,
+#layoutSidenav,
+#layoutSidenav_content,
 #wrapper #content-wrapper > .container-fluid,
 #root {
     min-height: 100%;
+    height: 100%
 }
 
 #wrapper #content-wrapper {
     padding-bottom: 0;
     padding-top: 1rem;
-}
-
-#wrapper #content-wrapper > .container-fluid {
-    max-height: 100%;
 }
 
 @media (min-width: 768px) {

@@ -65,7 +65,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         let jqxhr = this.ajax({
             type: 'PUT',
             contentType: 'application/json; charset=UTF-8',
-            url: "/api/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id),
+            url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id),
             data: JSON.stringify({
                 team: this.state.team,
                 silence: this.state.silence
@@ -97,7 +97,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         let jqxhr = this.ajax({
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
-            url: "/api/alertmanager/" + encodeURI(this.props.instance) + "/silence",
+            url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence",
             data: JSON.stringify({
                 team: this.state.team,
                 silence: this.state.silence

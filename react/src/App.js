@@ -135,7 +135,7 @@ class App extends BaseComponent {
     handleLogin() {
         this.ajax({
             type: 'POST',
-            url: "/api/_login",
+            url: "/_webapi/_login",
             data: {
                 username: this.state.username,
                 password: this.state.password

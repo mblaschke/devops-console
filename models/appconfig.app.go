@@ -129,6 +129,7 @@ type (
 		Name        string
 		Description string
 		Path        string
+		Default		bool
 		netpol      *networkingV1.NetworkPolicy
 	}
 )

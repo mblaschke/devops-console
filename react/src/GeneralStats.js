@@ -24,7 +24,7 @@ class GeneralStats extends BaseComponent {
     refresh() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/general/stats'
+            url: '/_webapi/general/stats'
         }).done((jqxhr) => {
             this.setState({
                 stats: jqxhr,

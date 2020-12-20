@@ -64,7 +64,7 @@ class K8sNamespace extends BaseComponent {
     loadNamespaces() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/kubernetes/namespace'
+            url: '/_webapi/kubernetes/namespace'
         }).done((jqxhr) => {
             this.setState({
                 namespaces: jqxhr,
@@ -76,7 +76,7 @@ class K8sNamespace extends BaseComponent {
     loadConfig() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/app/config'
+            url: '/_webapi/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
                 if (this.state.isStartup) {
@@ -183,7 +183,7 @@ class K8sNamespace extends BaseComponent {
     resetNamespace(namespace) {
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/api/kubernetes/namespace/" + encodeURI(namespace.Name) + "/reset"
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(namespace.Name) + "/reset"
         });
     }
 
@@ -259,7 +259,7 @@ class K8sNamespace extends BaseComponent {
     handleDescriptionSubmit(event) {
         let jqxhr = this.ajax({
             type: 'PUT',
-            url: "/api/kubernetes/namespace/" + encodeURI(this.state.namespaceDescriptionEdit),
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.state.namespaceDescriptionEdit),
             data: JSON.stringify({
                 description: this.state.namespaceDescriptionEditValue
             })

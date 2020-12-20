@@ -95,6 +95,7 @@ application:
         - name: deny-all
           description: Deny all traffic
           path: ./config/networkpolicy/deny-all.yaml
+          default: true
 
 settings:
   vault:

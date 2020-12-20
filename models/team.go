@@ -23,6 +23,10 @@ type (
 		Role        string `yaml:"role"`
 	}
 
+	TeamServiceConnections struct {
+		Token string `yaml:"token"`
+	}
+
 	Team struct {
 		Name                 string                     `json:"-"`
 		K8sPermissions       []TeamK8sPermissions       `json:"-"`

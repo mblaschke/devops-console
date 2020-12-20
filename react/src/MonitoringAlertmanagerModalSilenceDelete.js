@@ -28,7 +28,7 @@ class MonitoringAlertmanagerModalSilenceDelete extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'DELETE',
-            url: "/api/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id)
+            url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id)
         }).done(() => {
             if (this.props.callback) {
                 this.props.callback()

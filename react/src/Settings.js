@@ -42,7 +42,7 @@ class Settings extends BaseComponent {
     loadConfig() {
         let jqxhr = this.ajax({
             type: 'GET',
-            url: '/api/app/config'
+            url: '/_webapi/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
                 if (!jqxhr.Teams) {
@@ -64,7 +64,7 @@ class Settings extends BaseComponent {
     loadSettings() {
         let jqxhr = this.ajax({
             type: 'GET',
-            url: '/api/general/settings'
+            url: '/_webapi/general/settings'
         }).done((jqxhr) => {
             if (jqxhr) {
                 var state = this.state;
@@ -124,7 +124,7 @@ class Settings extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/api/general/settings/user",
+            url: "/_webapi/general/settings/user",
             data: JSON.stringify(this.state.user)
         }).always(() => {
             this.setState({
@@ -144,7 +144,7 @@ class Settings extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/api/general/settings/team/" + encodeURI(team),
+            url: "/_webapi/general/settings/team/" + encodeURI(team),
             data: JSON.stringify(this.getTeamConfig(team))
         }).always(() => {
             this.setState({

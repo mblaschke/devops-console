@@ -37,7 +37,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/api/kubernetes/namespace",
+            url: "/_webapi/kubernetes/namespace",
             data: JSON.stringify(this.state.namespace)
         }).done((jqxhr) => {
             this.setState({

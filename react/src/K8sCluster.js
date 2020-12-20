@@ -29,7 +29,7 @@ class K8sCluster extends BaseComponent {
     loadNodes() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/kubernetes/cluster'
+            url: '/_webapi/kubernetes/cluster'
         }).done((jqxhr) => {
             let countMasters = 0;
             let countAgents = 0;

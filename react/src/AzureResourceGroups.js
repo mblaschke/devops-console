@@ -44,7 +44,7 @@ class AzureResourceGroups extends BaseComponent {
     loadConfig() {
         this.ajax({
             type: "GET",
-            url: '/api/app/config'
+            url: '/_webapi/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
                 if (!jqxhr.Teams) {
@@ -119,7 +119,7 @@ class AzureResourceGroups extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/api/azure/resourcegroup",
+            url: "/_webapi/azure/resourcegroup",
             data: JSON.stringify(this.state.resourceGroup)
         }).done((jqxhr) => {
             let state = this.state;

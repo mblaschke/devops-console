@@ -75,7 +75,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'GET',
-            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/alerts'
+            url: '/_webapi/alertmanager/' + encodeURI(this.state.instance) + '/alerts'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
                 this.setInputFocus();
@@ -102,7 +102,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'GET',
-            url: '/api/alertmanager/' + encodeURI(this.state.instance) + '/silences'
+            url: '/_webapi/alertmanager/' + encodeURI(this.state.instance) + '/silences'
         }).done((jqxhr) => {
             if (this.state.isStartup) {
                 this.setInputFocus();
@@ -121,7 +121,7 @@ class MonitoringAlertmanager extends BaseComponent {
     loadConfig() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/app/config'
+            url: '/_webapi/app/config'
         }).done((jqxhr) => {
             if (jqxhr) {
                 if (!jqxhr.Teams) {

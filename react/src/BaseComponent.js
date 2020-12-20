@@ -104,7 +104,7 @@ class BaseComponent extends Component {
     heartbeat() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/heartbeat'
+            url: '/_webapi/heartbeat'
         });
 
         this.handleXhr(jqxhr);

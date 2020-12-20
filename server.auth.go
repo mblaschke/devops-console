@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"os"
+	"strings"
 )
 
 func (c *Server) templateLogin(ctx iris.Context) {
@@ -13,6 +14,55 @@ func (c *Server) templateLogin(ctx iris.Context) {
 	if err := ctx.View("login.jet"); err != nil {
 		c.logger.Errorln(err)
 	}
+}
+
+func (c *Server) getServiceConnectionUser(ctx iris.Context) (user *models.User) {
+	authToken := ctx.GetHeader("Authorization")
+	if authToken == "" {
+		c.respondError(ctx, fmt.Errorf("missing Authorization header"))
+		ctx.StopExecution()
+		panic(ctx)
+		return
+	}
+	if !strings.HasPrefix(authToken, "Bearer ") {
+		c.respondError(ctx, fmt.Errorf("wrong or invalid Authorization method"))
+		ctx.StopExecution()
+		panic(ctx)
+		return
+	}
+
+	authToken = strings.TrimPrefix(authToken, "Bearer ")
+	if authToken == "" {
+		c.respondError(ctx, fmt.Errorf("empty Authorization token"))
+		ctx.StopExecution()
+		panic(ctx)
+		return
+	}
+
+	for teamName, teamConfig := range c.config.Permissions.Team {
+		for _, serviceConnction := range teamConfig.ServiceConnections {
+			if len(serviceConnction.Token) > 0 && serviceConnction.Token == authToken {
+				user = &models.User{}
+				user.Uuid = "ServiceConnection"
+				user.Username = teamName
+				user.Teams = []models.Team{models.Team{Name: teamName, K8sPermissions: teamConfig.K8sRoleBinding, AzureRoleAssignments: teamConfig.AzureRoleAssignments}}
+			}
+		}
+	}
+
+	return
+}
+
+func (c *Server) ensureServiceUser(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
+	user := c.getServiceConnectionUser(ctx)
+	if user == nil {
+		c.handleError(ctx, errors.New("invalid serviceconnection"), true)
+		return
+	}
+
+	ctx.ViewData("user", user)
+	ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
+	callback(ctx, user)
 }
 
 func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
@@ -33,9 +83,9 @@ func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
 	s := c.startSession(ctx)
 	userJson := s.GetString("user")
 
-	if opts.Debug {
+	if opts.Debug && len(userJson) == 0 {
 		if val := os.Getenv("DEBUG_SESSION_USER"); val != "" {
-			s.Set("user", "DEBUG_SESSION_USER")
+			s.Set("user", userJson)
 			userJson = val
 		}
 	}

@@ -16,7 +16,7 @@ class K8sAccess extends BaseComponent {
     loadKubeconfig() {
         let jqxhr = this.ajax({
             type: "GET",
-            url: '/api/kubernetes/kubeconfig'
+            url: '/_webapi/kubernetes/kubeconfig'
         }).done((jqxhr) => {
             this.setState({
                 isStartup: false,
@@ -60,7 +60,7 @@ class K8sAccess extends BaseComponent {
                                 <textarea id="textareaKubeconfig" className="kubeconfig" readOnly="readOnly" value={kubeconfigs[name].Content}/>
                                 <small className="form-text text-muted">Save as ~/.kube/config</small>
                                 <div className="d-flex justify-content-end">
-                                    <a href={"/api/kubernetes/kubeconfig/" + name} download="kubeconfig.json" className="btn btn-secondary btn-lg active" role="button" aria-pressed="true">Download kubeconfig</a>
+                                    <a href={"/_webapi/kubernetes/kubeconfig/" + name} download="kubeconfig.json" className="btn btn-secondary btn-lg active" role="button" aria-pressed="true">Download kubeconfig</a>
                                 </div>
                             </div>
                         </div>

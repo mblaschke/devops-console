@@ -28,7 +28,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'PUT',
-            url: "/api/kubernetes/namespace/" + encodeURI(this.props.namespace.Name),
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.Name),
             data: JSON.stringify(this.state.namespace)
         }).done((jqxhr) => {
             this.setState({

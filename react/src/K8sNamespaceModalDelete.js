@@ -28,7 +28,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'DELETE',
-            url: "/api/kubernetes/namespace/" + encodeURI(this.props.namespace.Name)
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.Name)
         }).done(() => {
             this.setState({
                 confirmNamespace: ""
