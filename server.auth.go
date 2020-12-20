@@ -18,17 +18,17 @@ func (c *Server) templateLogin(ctx iris.Context) {
 
 func (c *Server) getServiceConnectionUser(ctx iris.Context) (user *models.User) {
 	authToken := ctx.GetHeader("Authorization")
+
 	if authToken == "" {
 		c.respondError(ctx, fmt.Errorf("missing Authorization header"))
 		ctx.StopExecution()
 		panic(ctx)
-		return
 	}
+
 	if !strings.HasPrefix(authToken, "Bearer ") {
 		c.respondError(ctx, fmt.Errorf("wrong or invalid Authorization method"))
 		ctx.StopExecution()
 		panic(ctx)
-		return
 	}
 
 	authToken = strings.TrimPrefix(authToken, "Bearer ")
@@ -36,7 +36,6 @@ func (c *Server) getServiceConnectionUser(ctx iris.Context) (user *models.User) 
 		c.respondError(ctx, fmt.Errorf("empty Authorization token"))
 		ctx.StopExecution()
 		panic(ctx)
-		return
 	}
 
 	for teamName, teamConfig := range c.config.Permissions.Team {

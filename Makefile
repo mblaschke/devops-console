@@ -1,5 +1,3 @@
-.PHONY: all build-run build-backend build-backend run vendor
-
 NAME				:= devops-console
 GIT_TAG				:= $(shell git describe --dirty --tags --always)
 GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
@@ -8,11 +6,16 @@ LDFLAGS             := -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMM
 FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
 
+.PHONY: all
 all: vendor build-frontend build-backend
+
+.PHONY: build
 build: build-frontend build-backend
 
+.PHONY: build-run
 build-run: build-frontend build-backend run
 
+.PHONY: recreate-go-mod
 recreate-go-mod:
 	rm -f go.mod go.sum
 	GO111MODULE=on go mod init devops-console
@@ -21,20 +24,25 @@ recreate-go-mod:
 	GO111MODULE=on go get
 	GO111MODULE=on go mod vendor
 
+.PHONY: image
 image: build
 	docker build -t $(NAME):$(TAG) .
 
+.PHONY: build-backend
 build-backend:
 	CGO_ENABLED=0 go build -a -ldflags '$(LDFLAGS)' -o $(NAME) .
 
+.PHONY: run
 run:
 	./devops-console
 
+.PHONY: vendor
 vendor:
 	go mod tidy
 	go mod vendor
 	go mod verify
 
+.PHONY: build-frontend
 build-frontend:
 	npm run --prefix=react build
 	cp react/build/index.html templates/includes/react.jet
@@ -56,8 +64,8 @@ lint: $(GOLANGCI_LINT_BIN)
 	# instead, use the unused, gosimple, and staticcheck linters directly
 	$(GOLANGCI_LINT_BIN) run -D megacheck -E unused,gosimple,staticcheck --timeout=10m
 
+.PHONY: dependencies
 dependencies: $(GOLANGCI_LINT_BIN)
 
 $(GOLANGCI_LINT_BIN):
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.23.8
-
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.32.2
