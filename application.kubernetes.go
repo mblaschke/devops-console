@@ -767,7 +767,6 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 		// Team rolebinding
 		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
 			for _, permission := range namespaceTeam.K8sPermissions {
-				fmt.Println(permission)
 				if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceTeam(namespace.Name, labelTeamVal, permission); err != nil {
 					return fmt.Errorf(fmt.Sprintf("Error: %v", err))
 				}
