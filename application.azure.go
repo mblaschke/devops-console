@@ -63,10 +63,6 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	if teamObj, err := user.GetTeam(formData.Team); err == nil {
 		for _, teamRoleAssignment := range teamObj.AzureRoleAssignments {
-			if formData.Personal {
-				teamRoleAssignment.Role = "Reader"
-			}
-
 			roleAssignmentList = append(roleAssignmentList, teamRoleAssignment)
 		}
 	}
@@ -215,15 +211,10 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	response := response.GeneralMessage{}
 
-	if formData.Personal {
-		response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name)
-		c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name))
-		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (personal access)", formData.Name), 1)
-	} else {
-		response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name)
-		c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
-		c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
-	}
+
+	response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name)
+	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
+	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
 
 	c.responseJson(ctx, response)
 }

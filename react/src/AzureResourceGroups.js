@@ -16,7 +16,6 @@ class AzureResourceGroups extends BaseComponent {
                 team: "",
                 name: "",
                 location: "westeurope",
-                personal: false,
                 tag: {}
             },
 
@@ -258,13 +257,6 @@ class AzureResourceGroups extends BaseComponent {
                                     <small className="form-text text-muted">{setting.Description}</small>
                                 </div>
                             )}
-
-                            <div className="form-group">
-                                <div className="form-check">
-                                    <input type="checkbox" className="form-check-input" id="az-resourcegroup-personal" checked={this.getResourceGroupItemBool("personal")} onChange={this.handleResourceGroupCheckboxChange.bind(this, "personal")} />
-                                    <label className="form-check-label" htmlFor="az-resourcegroup-personal">Personal ResourceGroup (only read access to team)</label>
-                                </div>
-                            </div>
                             <div className="toolbox">
                                 <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateCreateButton()} onClick={this.createResourceGroup.bind(this)}>{this.state.buttonText}</button>
                             </div>
