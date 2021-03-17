@@ -112,11 +112,15 @@ func (n *KubernetesNamespace) SettingsExtract(config AppConfigKubernetes) (ret m
 		case "label":
 			if val, ok := n.Labels[setting.K8sName]; ok {
 				ret[setting.Name] = val
+			} else {
+				ret[setting.Name] = ""
 			}
 			break
 		case "annotation":
 			if val, ok := n.Annotations[setting.K8sName]; ok {
 				ret[setting.Name] = val
+			} else {
+				ret[setting.Name] = ""
 			}
 			break
 		}
