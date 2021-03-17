@@ -177,7 +177,6 @@ class K8sNamespace extends BaseComponent {
         this.setState({
             selectedNamespace: row
         });
-        event.stopPropagation();
     }
 
     resetNamespace(namespace) {
@@ -474,13 +473,13 @@ class K8sNamespace extends BaseComponent {
                                                 default:
                                                     return (
                                                         <div className="btn-group" role="group">
-                                                            <button id="btnGroupDrop1" type="button"
+                                                            <button id={'btnGroupDrop-' + row.Name } type="button"
                                                                     className="btn btn-secondary dropdown-toggle"
                                                                     data-toggle="dropdown" aria-haspopup="true"
                                                                     aria-expanded="false">
                                                                 Action
                                                             </button>
-                                                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                            <div className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.Name }>
                                                                 <a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a>
                                                                 <a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a>
                                                                 <a className={row.Deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>

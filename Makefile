@@ -19,7 +19,7 @@ build-run: build-frontend build-backend run
 recreate-go-mod:
 	rm -f go.mod go.sum
 	GO111MODULE=on go mod init devops-console
-	GO111MODULE=on go get k8s.io/client-go@v0.18.0
+	GO111MODULE=on go get k8s.io/client-go@v0.19.0
 	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
 	GO111MODULE=on go get
 	GO111MODULE=on go mod vendor
@@ -60,9 +60,7 @@ build-frontend:
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
-	# megacheck fails to respect build flags, causing compilation failure during linting.
-	# instead, use the unused, gosimple, and staticcheck linters directly
-	$(GOLANGCI_LINT_BIN) run -D megacheck -E unused,gosimple,staticcheck --timeout=10m
+	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=10m
 
 .PHONY: dependencies
 dependencies: $(GOLANGCI_LINT_BIN)
