@@ -217,7 +217,7 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 
 	labels := map[string]string{
 		c.config.App.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
-		c.config.App.Kubernetes.Namespace.Labels.Team: *formData.Team,
+		c.config.App.Kubernetes.Namespace.Labels.Team:        *formData.Team,
 	}
 
 	// validation
@@ -878,7 +878,7 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 			if netpol.Name == val {
 				k8sObject := netpol.GetKubernetesObject()
 				if k8sObject != nil {
-					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(ctx, k8sObject ,metav1.CreateOptions{})
+					_, err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Create(ctx, k8sObject, metav1.CreateOptions{})
 					if err != nil {
 						c.logger.Error(fmt.Sprintf("Creation of NetworkPolicy in namespace %v failed: %v", namespace.Name, err))
 					}

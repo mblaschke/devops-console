@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/kataras/iris/v12"
 	"github.com/containrrr/shoutrrr"
+	"github.com/kataras/iris/v12"
 )
 
 func (c *Server) auditLog(ctx iris.Context, message string, depth int) {

@@ -13,9 +13,9 @@ type (
 	}
 
 	AppConfigKubeconfig struct {
-		Name string
+		Name        string
 		Description string
-		Content string
+		Content     string
 	}
 
 	AppConfigSettingItem struct {

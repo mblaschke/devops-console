@@ -41,7 +41,7 @@ type (
 
 		Notification struct {
 			Channels []string
-			Message string
+			Message  string
 		}
 
 		Kubernetes struct {
@@ -129,7 +129,7 @@ type (
 		Name        string
 		Description string
 		Path        string
-		Default		bool
+		Default     bool
 		netpol      *networkingV1.NetworkPolicy
 	}
 )

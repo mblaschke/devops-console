@@ -211,7 +211,6 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	response := response.GeneralMessage{}
 
-
 	response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name)
 	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
 	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
