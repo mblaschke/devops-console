@@ -45,6 +45,6 @@ FROM gcr.io/distroless/static
 
 WORKDIR /app
 COPY --from=backend /go/src/devops-console/ /app/
-USER 65534
+USER 1000:1000
 EXPOSE 9000
 CMD ["/app/devops-console"]
