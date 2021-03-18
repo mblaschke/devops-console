@@ -3,7 +3,6 @@
     <div class="sb-sidenav-menu">
         <div class="nav">
             <div class="sb-sidenav-menu-heading">Kubernetes</div>
-            {{yield navigationItem(title="Cluster", href="/kubernetes/cluster")}}
             {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
             {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
 

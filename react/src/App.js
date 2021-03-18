@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import BaseComponent from './BaseComponent';
-import K8sCluster from './K8sCluster';
 import K8sNamespace from './K8sNamespace';
 import K8sAccess from './K8sAccess';
 import AzureResourceGroups from './AzureResourceGroups';
@@ -224,7 +223,6 @@ class App extends BaseComponent {
             <Router>
                 <div>
                     <div className="globalmessages">{this.renderGlobalMessages()}</div>
-                    <Route path="/kubernetes/cluster" component={K8sCluster} />
                     <Route path="/kubernetes/namespaces" component={K8sNamespace} />
                     <Route path="/kubernetes/access" component={K8sAccess} />
 
