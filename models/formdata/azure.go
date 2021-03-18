@@ -2,9 +2,9 @@ package formdata
 
 type (
 	AzureResourceGroup struct {
-		Name     string
-		Location string
-		Team     string
-		Tag      map[string]string
+		Name     string            `json:"name"`
+		Location string            `json:"location"`
+		Team     string            `json:"team"`
+		Tag      map[string]string `json:"tag"`
 	}
 )

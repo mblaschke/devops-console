@@ -28,7 +28,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'PUT',
-            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.Name),
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.name),
             data: JSON.stringify(this.state.namespace)
         }).done((jqxhr) => {
             this.setState({
@@ -63,11 +63,11 @@ class K8sNamespaceModalEdit extends BaseComponent {
     handleNamespaceSettingInputChange(name, event) {
         var state = this.state;
 
-        if (!state.namespace.Settings) {
-            state.namespace.Settings = {}
+        if (!state.namespace.settings) {
+            state.namespace.settings = {}
         }
 
-        state.namespace.Settings[name] = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
+        state.namespace.settings[name] = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
         this.setState(state);
     }
 
@@ -84,8 +84,8 @@ class K8sNamespaceModalEdit extends BaseComponent {
     getNamespaceSettingItem(name) {
         var ret = "";
 
-        if (this.state.namespace.Settings && this.state.namespace.Settings[name]) {
-            ret = this.state.namespace.Settings[name];
+        if (this.state.namespace.settings && this.state.namespace.settings[name]) {
+            ret = this.state.namespace.settings[name];
         }
 
         return ret;
@@ -107,7 +107,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
             return
         }
 
-        if (!nextProps.namespace.Name) {
+        if (!nextProps.namespace.name) {
             // invalid namespace
             return
         }
@@ -151,17 +151,17 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                 <div className="modal-body">
                                     <div className="form-group">
                                         <label htmlFor="inputNsApp" className="inputRg">Namespace</label>
-                                        <input className="form-control" type="text" value={this.state.namespace.Name} readOnly />
+                                        <input className="form-control" type="text" value={this.state.namespace.name} readOnly />
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsDescription" className="inputRg">Description</label>
-                                        <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("Description")} onChange={this.handleNamespaceInputChange.bind(this, "Description")} />
+                                        <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("description")} onChange={this.handleNamespaceInputChange.bind(this, "description")} />
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
-                                        <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("NetworkPolicy")} onChange={this.handleNamespaceInputChange.bind(this, "NetworkPolicy")}>
+                                        <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("networkPolicy")} onChange={this.handleNamespaceInputChange.bind(this, "networkPolicy")}>
                                             {this.props.config.Kubernetes.Namespace.NetworkPolicy.map((row) =>
                                                 <option key={row.Name} value={row.Name}>{row.Description}</option>
                                             )}

@@ -28,7 +28,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
 
         let jqxhr = this.ajax({
             type: 'DELETE',
-            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.Name)
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.name)
         }).done(() => {
             this.setState({
                 confirmNamespace: ""
@@ -46,7 +46,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (!this.props.namespace || this.props.namespace.Name !== nextProps.namespace.Name) {
+        if (!this.props.namespace || this.props.namespace.name !== nextProps.namespace.name) {
             this.setState({
                 confirmNamespace: ""
             });
@@ -64,7 +64,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
             return this.state.buttonState;
         }
 
-        if (this.state.confirmNamespace !== this.props.namespace.Name) {
+        if (this.state.confirmNamespace !== this.props.namespace.name) {
             return "disabled";
         }
     }
@@ -85,7 +85,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
                                 <div className="modal-body">
                                     <div className="row">
                                         <div className="col">
-                                            Do you really want to delete namespace <strong className="k8s-namespace">{this.props.namespace.Name}</strong>?
+                                            Do you really want to delete namespace <strong className="k8s-namespace">{this.props.namespace.name}</strong>?
                                         </div>
                                     </div>
                                     <div className="row">

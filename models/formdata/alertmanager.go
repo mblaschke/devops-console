@@ -10,8 +10,8 @@ import (
 
 type (
 	AlertmanagerForm struct {
-		Team    string
-		Silence models.Silence
+		Team    string         `json:"team"`
+		Silence models.Silence `json:"silence"`
 	}
 )
 

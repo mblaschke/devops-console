@@ -2,11 +2,11 @@ package formdata
 
 type (
 	KubernetesNamespaceCreate struct {
-		Environment   *string
-		Team          *string
-		App           *string
-		Description   *string
-		NetworkPolicy *string `json:"networkPolicy"`
-		Settings      *map[string]string
+		Environment   *string            `json:"environment"`
+		Team          *string            `json:"team"`
+		App           *string            `json:"app"`
+		Description   *string            `json:"description"`
+		NetworkPolicy *string            `json:"networkPolicy"`
+		Settings      *map[string]string `json:"settings"`
 	}
 )

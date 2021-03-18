@@ -170,7 +170,7 @@ class K8sNamespace extends BaseComponent {
 
     handleNamespaceClick(row, event) {
         // close descripton if clicked somewhere else
-        if (this.state.namespaceDescriptionEdit !== false && this.state.namespaceDescriptionEdit !== row.Name) {
+        if (this.state.namespaceDescriptionEdit !== false && this.state.namespaceDescriptionEdit !== row.name) {
             this.handleDescriptionEditClose();
         }
 
@@ -182,7 +182,7 @@ class K8sNamespace extends BaseComponent {
     resetNamespace(namespace) {
         let jqxhr = this.ajax({
             type: 'POST',
-            url: "/_webapi/kubernetes/namespace/" + encodeURI(namespace.Name) + "/reset"
+            url: "/_webapi/kubernetes/namespace/" + encodeURI(namespace.name) + "/reset"
         });
     }
 
@@ -191,16 +191,16 @@ class K8sNamespace extends BaseComponent {
         let teamBadge = "";
         let userBadge = "";
 
-        if (row.Name.match(/^user-[^-]+-.*/i)) {
+        if (row.name.match(/^user-[^-]+-.*/i)) {
             personalBadge = <span className="badge badge-light">Personal Namespace</span>
         }
 
-        if (row.OwnerTeam !== "") {
-            teamBadge = <div><span className="badge badge-light">Team: {this.highlight(row.OwnerTeam)}</span></div>
+        if (row.ownerTeam !== "") {
+            teamBadge = <div><span className="badge badge-light">Team: {this.highlight(row.ownerTeam)}</span></div>
         }
 
-        if (row.OwnerUser !== "") {
-            userBadge = <div><span className="badge badge-light">User: {this.highlight(row.OwnerUser)}</span></div>
+        if (row.ownerUser !== "") {
+            userBadge = <div><span className="badge badge-light">User: {this.highlight(row.ownerUser)}</span></div>
         }
 
         return <span className="badge-list">{personalBadge}{teamBadge}{userBadge}</span>
@@ -240,8 +240,8 @@ class K8sNamespace extends BaseComponent {
 
     handleDescriptionEdit(row, event) {
         this.setState({
-            namespaceDescriptionEdit: row.Name,
-            namespaceDescriptionEditValue: row.Description
+            namespaceDescriptionEdit: row.name,
+            namespaceDescriptionEditValue: row.description
         });
 
         setTimeout(() => {
@@ -282,16 +282,16 @@ class K8sNamespace extends BaseComponent {
             let re = new RegExp(term, "i");
 
             ret = ret.filter((row) => {
-                if (row.Name.search(re) !== -1) return true;
-                if (row.OwnerTeam.search(re) !== -1) return true;
-                if (row.OwnerUser.search(re) !== -1) return true;
-                if (row.Description.search(re) !== -1) return true;
-                if (row.CreatedAgo.search(re) !== -1) return true;
-                if (row.Status.search(re) !== -1) return true;
+                if (row.name.search(re) !== -1) return true;
+                if (row.ownerTeam.search(re) !== -1) return true;
+                if (row.ownerUser.search(re) !== -1) return true;
+                if (row.description.search(re) !== -1) return true;
+                if (row.createdAgo.search(re) !== -1) return true;
+                if (row.status.search(re) !== -1) return true;
 
-                if (row.Settings) {
-                    for(var i in row.Settings) {
-                        if (row.Settings[i].search(re) !== -1) return true;
+                if (row.settings) {
+                    for(var i in row.settings) {
+                        if (row.settings[i].search(re) !== -1) return true;
                     }
                 }
 
@@ -302,14 +302,14 @@ class K8sNamespace extends BaseComponent {
         // filter by team
         if (this.state.team !== "*") {
             ret = ret.filter((row) => {
-                if (row.OwnerTeam === this.state.team) return true;
+                if (row.ownerTeam === this.state.team) return true;
                 return false;
             });
         }
 
         ret = ret.sort(function(a,b) {
-            if(a.Name < b.Name) return -1;
-            if(a.Name > b.Name) return 1;
+            if(a.name < b.name) return -1;
+            if(a.name > b.name) return 1;
             return 0;
         });
         ret = this.sortDataset(ret);
@@ -347,10 +347,10 @@ class K8sNamespace extends BaseComponent {
            try {
                if (this.state.config && this.state.config.Kubernetes.Namespace.Settings) {
                    this.state.config.Kubernetes.Namespace.Settings.map((setting) => {
-                       if (row.Settings && row.Settings[setting.Name]) {
+                       if (row.settings && row.settings[setting.Name]) {
                            ret.push({
                               Label: setting.Label,
-                              Value: row.Settings[setting.Name]
+                              Value: row.settings[setting.Name]
                            });
                        }
                    });
@@ -395,12 +395,12 @@ class K8sNamespace extends BaseComponent {
                                 </colgroup>
                                 <thead>
                                 <tr>
-                                    <th>{this.sortBy("Name", "Namespace")}</th>
-                                    <th>{this.sortBy("PodCount", "Pods")}</th>
-                                    <th>{this.sortBy("OwnerTeam", "Owner")}</th>
+                                    <th>{this.sortBy("name", "Namespace")}</th>
+                                    <th>{this.sortBy("podCount", "Pods")}</th>
+                                    <th>{this.sortBy("ownerTeam", "Owner")}</th>
                                     <th>Settings</th>
-                                    <th>{this.sortBy("Created", "Created")}</th>
-                                    <th>{this.sortBy("Status", "Status")}</th>
+                                    <th>{this.sortBy("created", "Created")}</th>
+                                    <th>{this.sortBy("status", "Status")}</th>
                                     <th className="toolbox">
                                         <button type="button" className="btn btn-secondary" onClick={this.createNamespace.bind(this)}>
                                             <i className="fas fa-plus"></i>
@@ -415,34 +415,34 @@ class K8sNamespace extends BaseComponent {
                                 </tr>
                                 }
                                 {namespaces.map((row) =>
-                                    <tr key={row.Name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
+                                    <tr key={row.name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
                                         <td>
                                             <div class="button-copy-box">
-                                                {this.highlight(row.Name)}
-                                                <CopyToClipboard text={row.Name}>
+                                                {this.highlight(row.name)}
+                                                <CopyToClipboard text={row.name}>
                                                     <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
                                                 </CopyToClipboard>
                                             </div>
                                             <br/>
                                             {(() => {
-                                               if (this.state.namespaceDescriptionEdit === row.Name) {
+                                               if (this.state.namespaceDescriptionEdit === row.name) {
                                                    return <form onSubmit={this.handleDescriptionSubmit.bind(this)}>
                                                        <input type="text" className="form-control description-edit" placeholder="Description" value={this.state.namespaceDescriptionEditValue} onChange={this.handleDescriptionChange.bind(this)}/>
                                                    </form>
                                                } else {
-                                                   return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.Description ? this.highlight(row.Description) : <i>no description set</i>}</small>
+                                                   return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.description ? this.highlight(row.description) : <i>no description set</i>}</small>
                                                }
                                             })()}
                                         </td>
                                         <td>
-                                            <p className="text-right">{row.PodCount !== null ? row.PodCount : "n/a" }</p>
+                                            <p className="text-right">{row.podCount !== null ? row.podCount : "n/a" }</p>
                                         </td>
                                         <td>
                                             {this.renderRowOwner(row)}
                                         </td>
                                         <td class="small">
                                             <div>
-                                                <span className="badge badge-warning">NetworkPolicy: {row.NetworkPolicy || "none"}</span>
+                                                <span className="badge badge-warning">NetworkPolicy: {row.networkPolicy || "none"}</span>
                                             </div>
                                             {namespaceSettings(row).map((setting, index) =>
                                                 <div>
@@ -450,39 +450,39 @@ class K8sNamespace extends BaseComponent {
                                                 </div>
                                             )}
                                         </td>
-                                        <td><div title={row.Created}>{this.highlight(row.CreatedAgo)}</div></td>
+                                        <td><div title={row.created}>{this.highlight(row.createdAgo)}</div></td>
                                         <td>
                                             {(() => {
-                                                switch (row.Status.toLowerCase()) {
+                                                switch (row.status.toLowerCase()) {
                                                     case "terminating":
-                                                        return <span className="badge badge-danger">{this.highlight(row.Status)}</span>;
+                                                        return <span className="badge badge-danger">{this.highlight(row.status)}</span>;
                                                     case "active":
-                                                        return <span className="badge badge-success">{this.highlight(row.Status)}</span>;
+                                                        return <span className="badge badge-success">{this.highlight(row.status)}</span>;
                                                     default:
-                                                        return <span className="badge badge-warning">{this.highlight(row.Status)}</span>;
+                                                        return <span className="badge badge-warning">{this.highlight(row.status)}</span>;
                                                 }
                                             })()}
                                             <br/>
-                                            <span className={row.Deleteable ? 'hidden' : 'badge badge-info'}>Not deletable</span>
+                                            <span className={row.deleteable ? 'hidden' : 'badge badge-info'}>Not deletable</span>
                                         </td>
                                         <td className="toolbox">
                                             {(() => {
-                                                switch (row.Status) {
+                                                switch (row.status) {
                                                 case "Terminating":
                                                     return <div></div>
                                                 default:
                                                     return (
                                                         <div className="btn-group" role="group">
-                                                            <button id={'btnGroupDrop-' + row.Name } type="button"
+                                                            <button id={'btnGroupDrop-' + row.name } type="button"
                                                                     className="btn btn-secondary dropdown-toggle"
                                                                     data-toggle="dropdown" aria-haspopup="true"
                                                                     aria-expanded="false">
                                                                 Action
                                                             </button>
-                                                            <div className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.Name }>
+                                                            <div className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.name }>
                                                                 <a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a>
                                                                 <a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a>
-                                                                <a className={row.Deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
+                                                                <a className={row.deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
                                                             </div>
                                                         </div>
                                                     );

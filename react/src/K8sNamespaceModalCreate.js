@@ -163,7 +163,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
         try {
             let lastSelectedTeam = "" + localStorage.getItem("team");
             this.props.config.Teams.map((row, value) => {
-                if (row.Name === lastSelectedTeam) {
+                if (row.name === lastSelectedTeam) {
                     state.namespace.team = lastSelectedTeam;
                 }
             });
