@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"strings"
@@ -23,8 +22,8 @@ func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 
 		if errorCounter >= opts.ErrorPunishmentThreshold {
 			// counter threshold reached, PUNISH
-			c.auditLog(ctx, "Error threshold reached, punishing user by killing session, original error was: "+err.Error(), 2)
-			err = errors.New("Sorry, too many errors occurred. Your session was terminated, please login again.")
+			c.auditLog(ctx, "error threshold reached, punishing user by killing session, original error was: "+err.Error(), 2)
+			err = fmt.Errorf("sorry, too many errors occurred. Your session was terminated, please login again")
 
 			c.handleError(ctx, err, true)
 			return

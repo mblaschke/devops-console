@@ -59,11 +59,8 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 						// label has no content, delete it
 						delete(n.Labels, setting.K8sName)
 					}
-
-					break
 				default:
 					n.Labels[setting.K8sName] = val
-					break
 				}
 			} else {
 				// label has no content, delete it
@@ -88,11 +85,8 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 						// label has no content, delete it
 						delete(n.Annotations, setting.K8sName)
 					}
-
-					break
 				default:
 					n.Annotations[setting.K8sName] = val
-					break
 				}
 			} else {
 				// annotation has no content, delete it
@@ -100,8 +94,6 @@ func (n *KubernetesNamespace) SettingsApply(settings map[string]string, config A
 			}
 		}
 	}
-
-	return
 }
 
 func (n *KubernetesNamespace) SettingsExtract(config AppConfigKubernetes) (ret map[string]string) {
@@ -115,14 +107,12 @@ func (n *KubernetesNamespace) SettingsExtract(config AppConfigKubernetes) (ret m
 			} else {
 				ret[setting.Name] = ""
 			}
-			break
 		case "annotation":
 			if val, ok := n.Annotations[setting.K8sName]; ok {
 				ret[setting.Name] = val
 			} else {
 				ret[setting.Name] = ""
 			}
-			break
 		}
 
 		switch setting.Type {
@@ -134,7 +124,6 @@ func (n *KubernetesNamespace) SettingsExtract(config AppConfigKubernetes) (ret m
 				}
 				ret[setting.Name] = backendBoolToFrontendBool(val)
 			}
-			break
 		}
 	}
 

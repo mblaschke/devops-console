@@ -3,11 +3,9 @@ package services
 import (
 	"context"
 	"devops-console/models"
-	"errors"
 	"fmt"
 	"k8s.io/api/core/v1"
 	v12 "k8s.io/api/rbac/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -26,14 +24,6 @@ type Kubernetes struct {
 	}
 }
 
-// Return path to homedir using HOME and USERPROFILE env vars
-func (k *Kubernetes) homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
-}
-
 // Create cached kubernetes client
 func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 	var err error
@@ -44,19 +34,19 @@ func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 			// KUBECONFIG
 			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 			if err != nil {
-				panic(err.Error())
+				panic(err)
 			}
 		} else {
 			// K8S in cluster
 			config, err = rest.InClusterConfig()
 			if err != nil {
-				panic(err.Error())
+				panic(err)
 			}
 		}
 
 		k.clientset, err = kubernetes.NewForConfig(config)
 		if err != nil {
-			panic(err.Error())
+			panic(err)
 		}
 	}
 
@@ -66,9 +56,9 @@ func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 // Returns list of (filtered) namespaces
 func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error) {
 	ctx := context.Background()
-	result, error := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+	result, kubeErr := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 
-	if error == nil {
+	if kubeErr == nil {
 		nsList = make(map[string]v1.Namespace, len(result.Items))
 		for _, ns := range result.Items {
 			if err := k.namespaceValidate(ns.Name); err == nil {
@@ -76,7 +66,7 @@ func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error)
 			}
 		}
 	} else {
-		err = error
+		err = kubeErr
 	}
 
 	return
@@ -351,27 +341,9 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
-func (k *Kubernetes) buildResourceListItem(cpu, memory string) *v1.ResourceList {
-	if cpu == "" && memory == "" {
-		return nil
-	}
-
-	item := v1.ResourceList{}
-
-	if cpu != "" {
-		item[v1.ResourceCPU] = resource.MustParse(cpu)
-	}
-
-	if memory != "" {
-		item[v1.ResourceMemory] = resource.MustParse(memory)
-	}
-
-	return &item
-}
-
 func (k *Kubernetes) namespaceValidate(name string) (err error) {
 	if k.Filter.Namespace != nil && !k.Filter.Namespace.MatchString(name) {
-		err = errors.New(fmt.Sprintf("Namespace %v not allowed", name))
+		err = fmt.Errorf("namespace %v not allowed", name)
 	}
 
 	return

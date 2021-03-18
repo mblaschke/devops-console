@@ -10,6 +10,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/Azure/go-autorest/autorest/to"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 	"strings"
@@ -86,7 +87,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 	for _, setting := range c.config.Settings.User {
 		if val, ok := formData[setting.Name]; ok {
 			if !setting.Validation.Validate(val) {
-				validationMessages = append(validationMessages, fmt.Sprintf("Validation of \"%s\" failed (%v)", setting.Label, setting.Validation.HumanizeString()))
+				validationMessages = append(validationMessages, fmt.Sprintf("validation of \"%s\" failed (%v)", setting.Label, setting.Validation.HumanizeString()))
 			}
 		}
 	}
@@ -100,7 +101,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 	for _, setting := range c.config.Settings.User {
 		secretTags := map[string]*string{}
 		for name, value := range setting.Tags {
-			secretTags[name] = &value
+			secretTags[name] = to.StringPtr(value)
 		}
 
 		secretTags["user"] = &user.Username
@@ -114,17 +115,17 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 			)
 
 			if err != nil {
-				c.respondError(ctx, errors.New(fmt.Sprintf("Failed setting keyvault")))
+				c.respondError(ctx, fmt.Errorf("failed updating keyvault"))
 				return
 			}
 		}
 	}
 
-	c.auditLog(ctx, "Updated personal settings", 1)
+	c.auditLog(ctx, "updated personal settings", 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "settings", "type": "updatePersonal"}).Inc()
 
 	resp := response.GeneralMessage{
-		Message: "Updated personal settings",
+		Message: "updated personal settings",
 	}
 
 	c.responseJson(ctx, resp)
@@ -135,12 +136,12 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 
 	team := ctx.Params().GetString("team")
 	if team == "" {
-		c.respondError(ctx, errors.New("Invalid team"))
+		c.respondError(ctx, errors.New("invalid team"))
 		return
 	}
 	// membership check
 	if !user.IsMemberOf(team) {
-		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", team)))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", team))
 		return
 	}
 
@@ -156,7 +157,7 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 	for _, setting := range c.config.Settings.Team {
 		if val, ok := formData[setting.Name]; ok {
 			if !setting.Validation.Validate(val) {
-				validationMessages = append(validationMessages, fmt.Sprintf("Validation of \"%s\" failed (%v)", setting.Label, setting.Validation.HumanizeString()))
+				validationMessages = append(validationMessages, fmt.Sprintf("validation of \"%s\" failed (%v)", setting.Label, setting.Validation.HumanizeString()))
 			}
 		}
 	}
@@ -171,7 +172,7 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 		secretTags := map[string]*string{}
 
 		for name, value := range setting.Tags {
-			secretTags[name] = &value
+			secretTags[name] = to.StringPtr(value)
 		}
 
 		secretTags["team"] = &team
@@ -185,17 +186,17 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 			)
 
 			if err != nil {
-				c.respondError(ctx, errors.New(fmt.Sprintf("Failed setting keyvault")))
+				c.respondError(ctx, fmt.Errorf("failed setting keyvault"))
 				return
 			}
 		}
 	}
 
-	c.auditLog(ctx, fmt.Sprintf("Updated team \"%s\" settings", team), 1)
+	c.auditLog(ctx, fmt.Sprintf("updated team \"%s\" settings", team), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "settings", "type": "updateTeam"}).Inc()
 
 	resp := response.GeneralMessage{
-		Message: fmt.Sprintf("Updated team \"%s\" settings", team),
+		Message: fmt.Sprintf("updated team \"%s\" settings", team),
 	}
 
 	c.responseJson(ctx, resp)
@@ -209,7 +210,7 @@ func (c *ApplicationSettings) teamSecretName(team, name string) string {
 	return fmt.Sprintf("team---%s---%s", team, name)
 }
 
-func (c *ApplicationSettings) getKeyvaultClient(vaultUrl string) *keyvault.BaseClient {
+func (c *ApplicationSettings) getKeyvaultClient() *keyvault.BaseClient {
 	var err error
 	var keyvaultAuth autorest.Authorizer
 
@@ -242,7 +243,7 @@ func (c *ApplicationSettings) setKeyvaultSecret(secretName, secretValue string, 
 
 	secretParamSet.Tags = tags
 
-	client := c.getKeyvaultClient("")
+	client := c.getKeyvaultClient()
 	_, err := client.SetSecret(ctx, c.config.Settings.Vault.Url, secretName, secretParamSet)
 
 	return err
@@ -253,7 +254,7 @@ func (c *ApplicationSettings) getKeyvaultSecret(secretName string) (secretValue 
 	var secretBundle keyvault.SecretBundle
 	ctx := context.Background()
 
-	client := c.getKeyvaultClient("")
+	client := c.getKeyvaultClient()
 	secretBundle, err = client.GetSecret(ctx, c.config.Settings.Vault.Url, secretName, "")
 
 	if err == nil {

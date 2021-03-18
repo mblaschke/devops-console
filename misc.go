@@ -54,7 +54,7 @@ func addK8sConfigsFromPath(configPath string, list *models.KubernetesObjectList)
 	})
 
 	if err != nil {
-		fmt.Println(fmt.Sprintf("ERROR: %s", err))
+		fmt.Printf("ERROR: %s\n", err)
 	}
 
 	for _, path := range fileList {
@@ -88,7 +88,7 @@ func addK8sConfigsFromPath(configPath string, list *models.KubernetesObjectList)
 			item.Name = item.Object.(*v1.ResourceQuota).Name
 			list.ResourceQuotas[item.Name] = item
 		default:
-			panic("Not allowed object found: " + item.Object.GetObjectKind().GroupVersionKind().Kind)
+			panic("not allowed object found: " + item.Object.GetObjectKind().GroupVersionKind().Kind)
 		}
 	}
 }
@@ -146,7 +146,7 @@ func randomString(length int) string {
 	var b strings.Builder
 	for i := 0; i < length; i++ {
 		if _, err := b.WriteRune(chars[rand.Intn(len(chars))]); err != nil {
-			fmt.Println(fmt.Sprintf("ERROR: %s", err))
+			fmt.Printf("ERROR: %s\n", err)
 		}
 	}
 	return b.String()

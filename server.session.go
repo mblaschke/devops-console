@@ -23,15 +23,12 @@ func (c *Server) initSession() {
 	switch c.config.App.Session.Type {
 	case "internal":
 		c.initSessionInternal()
-		break
 	case "securecookie":
 		c.initSessionSecureCookie()
-		break
 	case "redis":
 		c.initSessionRedis()
-		break
 	default:
-		panic(fmt.Sprintf("Invalid session type defined"))
+		panic("invalid session type defined")
 	}
 
 	c.app.Use(c.session.Handler(func(cookie *http.Cookie) {
@@ -90,15 +87,15 @@ func (c *Server) initSessionRedis() {
 			break
 		}
 
-		c.logger.Errorln(fmt.Sprintf("Redis connection failed, retrying in %v", retryTime.String()))
+		c.logger.Errorln(fmt.Sprintf("redis connection failed, retrying in %v", retryTime.String()))
 		time.Sleep(retryTime)
 	}
 
 	if c.redisConnection == nil {
-		c.logger.Fatalln("Redis connection failed, cannot connect to session database")
+		c.logger.Fatalln("redis connection failed, cannot connect to session database")
 	}
 
-	c.logger.Infoln("Redis connection established")
+	c.logger.Infoln("redis connection established")
 
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {

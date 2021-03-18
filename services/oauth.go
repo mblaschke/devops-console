@@ -129,7 +129,7 @@ func (o *OAuth) buildConfig() (config *oauth2.Config) {
 
 		o.oidcProvider = provider
 		endpoint = provider.Endpoint()
-		scopes = []string{oidc.ScopeOpenID, "profile", "email"}
+		scopes = append(scopes, oidc.ScopeOpenID, "profile", "email")
 	default:
 		o.error(fmt.Sprintf("oauth.provider \"%s\" is not valid", OAuthProvider))
 	}

@@ -118,10 +118,8 @@ func (v *AppInputTransformation) Transform(value string) (ret *string) {
 			}
 		}
 
-		break
 	case "":
 		ret = &value
-		break
 	}
 
 	return

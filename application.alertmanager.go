@@ -75,7 +75,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 	}
 
 	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload.Matchers) {
-		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
+		c.respondErrorWithPenalty(ctx, errors.New("access to silence denied"))
 		return
 	}
 
@@ -90,10 +90,10 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 	if val := c.getSilenceMatcherTeam(ctx, user, silenceResp.Payload.Matchers); val != nil {
 		team = *val
 	}
-	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" deleted", *silenceResp.Payload.ID, team))
+	c.notificationMessage(ctx, fmt.Sprintf("alertmanager silence %s for team \"%v\" deleted", *silenceResp.Payload.ID, team))
 
 	resp := response.GeneralMessage{
-		Message: fmt.Sprintf("Silence \"%s\" deleted", *silenceResp.Payload.ID),
+		Message: fmt.Sprintf("silence \"%s\" deleted", *silenceResp.Payload.ID),
 	}
 
 	c.responseJson(ctx, resp)
@@ -128,10 +128,10 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 		return
 	}
 
-	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" updated", *silenceResp.Payload.ID, formData.Team))
+	c.notificationMessage(ctx, fmt.Sprintf("alertmanager silence %s for team \"%v\" updated", *silenceResp.Payload.ID, formData.Team))
 
 	resp := response.GeneralMessage{
-		Message: fmt.Sprintf("Silence \"%s\" updated", *silenceResp.Payload.ID),
+		Message: fmt.Sprintf("silence \"%s\" updated", *silenceResp.Payload.ID),
 	}
 
 	c.responseJson(ctx, resp)
@@ -152,7 +152,7 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 	}
 
 	if !c.checkSilenceAccess(ctx, user, postParams.Silence.Matchers) {
-		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
+		c.respondErrorWithPenalty(ctx, errors.New("access to silence denied"))
 		return
 	}
 
@@ -162,10 +162,10 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 		return
 	}
 
-	c.notificationMessage(ctx, fmt.Sprintf("Alertmanager silence %s for team \"%v\" create", silenceResp.Payload.SilenceID, formData.Team))
+	c.notificationMessage(ctx, fmt.Sprintf("alertmanager silence %s for team \"%v\" create", silenceResp.Payload.SilenceID, formData.Team))
 
 	resp := response.GeneralMessage{
-		Message: fmt.Sprintf("Silence \"%s\" created", silenceResp.Payload.SilenceID),
+		Message: fmt.Sprintf("silence \"%s\" created", silenceResp.Payload.SilenceID),
 	}
 
 	c.responseJson(ctx, resp)

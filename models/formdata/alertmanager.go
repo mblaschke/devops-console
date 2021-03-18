@@ -20,19 +20,19 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 	err = nil
 
 	if ret.Team == "" {
-		return nil, errors.New("Invalid or empty team")
+		return nil, errors.New("invalid or empty team")
 	}
 
 	if ret.Silence.Comment == nil {
-		return nil, errors.New("Invalid or empty comment")
+		return nil, errors.New("invalid or empty comment")
 	}
 
 	if ret.Silence.StartsAt == nil {
-		return nil, errors.New("Invalid or empty startsAt")
+		return nil, errors.New("invalid or empty startsAt")
 	}
 
 	if ret.Silence.EndsAt == nil {
-		return nil, errors.New("Invalid or empty endsAt")
+		return nil, errors.New("invalid or empty endsAt")
 	}
 
 	// check if time range is correct
@@ -49,11 +49,11 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 		}
 
 		if matcher.Name == nil || *matcher.Name == "" {
-			return nil, errors.New("Matche label cannot be empty")
+			return nil, errors.New("match label cannot be empty")
 		}
 
 		if matcher.Value == nil || *matcher.Value == "" {
-			return nil, errors.New("Match value cannot be empty")
+			return nil, errors.New("match value cannot be empty")
 		}
 
 		if matcher.IsRegex == nil {
@@ -66,7 +66,7 @@ func (a *AlertmanagerForm) Validate() (ret *AlertmanagerForm, err error) {
 	ret.Silence.Matchers = matcherList
 
 	if len(ret.Silence.Matchers) == 0 {
-		return nil, errors.New("At least one matcher needed")
+		return nil, errors.New("at least one matcher needed")
 	}
 
 	return

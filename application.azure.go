@@ -41,12 +41,12 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	subscriptionId := os.Getenv("AZURE_SUBSCRIPTION_ID")
 
 	if formData.Name == "" {
-		validationMessages = append(validationMessages, "Validation of ResourceGroup name failed (empty)")
+		validationMessages = append(validationMessages, "validation of ResourceGroup name failed (empty)")
 	}
 
 	// validate name
 	if !c.config.Azure.ResourceGroup.Validation.Validate(formData.Name) {
-		validationMessages = append(validationMessages, fmt.Sprintf("Validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Validation.HumanizeString()))
+		validationMessages = append(validationMessages, fmt.Sprintf("validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Validation.HumanizeString()))
 	}
 
 	roleAssignmentList := []models.TeamAzureRoleAssignments{}
@@ -57,14 +57,12 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	// membership check
 	if !user.IsMemberOf(formData.Team) {
-		c.respondErrorWithPenalty(ctx, errors.New(fmt.Sprintf("Access to team \"%s\" denied", err)))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", err))
 		return
 	}
 
 	if teamObj, err := user.GetTeam(formData.Team); err == nil {
-		for _, teamRoleAssignment := range teamObj.AzureRoleAssignments {
-			roleAssignmentList = append(roleAssignmentList, teamRoleAssignment)
-		}
+		roleAssignmentList = append(roleAssignmentList, teamObj.AzureRoleAssignments...)
 	}
 
 	// create ResourceGroup tagList
@@ -78,13 +76,13 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		}
 
 		if !tagConfig.Validation.Validate(tagValue) {
-			validationMessages = append(validationMessages, fmt.Sprintf("Validation of \"%s\" failed (%v)", tagConfig.Label, tagConfig.Validation.HumanizeString()))
+			validationMessages = append(validationMessages, fmt.Sprintf("validation of \"%s\" failed (%v)", tagConfig.Label, tagConfig.Validation.HumanizeString()))
 		}
 
 		if val := tagConfig.Transformation.Transform(tagValue); val != nil {
 			tagValue = *val
 		} else {
-			validationMessages = append(validationMessages, fmt.Sprintf("Parsing of \"%s\" failed", tagConfig.Label))
+			validationMessages = append(validationMessages, fmt.Sprintf("parsing of \"%s\" failed", tagConfig.Label))
 		}
 
 		if tagValue != "" {
@@ -106,7 +104,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	// azure authorizer
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Unable to setup Azure Authorizer: %v", err)))
+		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %v", err))
 		return
 	}
 
@@ -134,7 +132,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 			tagLine = fmt.Sprintf(" tags:%v", tagList)
 		}
 
-		c.respondError(ctx, errors.New(fmt.Sprintf("Azure ResourceGroup already exists: \"%s\"%s", formData.Name, tagLine)))
+		c.respondError(ctx, fmt.Errorf("failed to create already existing Azure ResourceGroup: \"%s\"%s", formData.Name, tagLine))
 		return
 	}
 
@@ -150,7 +148,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 			roleDefinitions, err := roleDefinitionsClient.List(azureContext, "", filter)
 
 			if len(roleDefinitions.Values()) != 1 {
-				c.respondError(ctx, errors.New(fmt.Sprintf("Error generating UUID for Role Assignment: %v", err)))
+				c.respondError(ctx, fmt.Errorf("error generating UUID for Azure RoleAssignment: %v", err))
 				return
 			}
 
@@ -174,7 +172,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	group, err = groupsClient.CreateOrUpdate(azureContext, formData.Name, resourceGroup)
 	if err != nil {
-		c.respondError(ctx, errors.New(fmt.Sprintf("Unable to create Azure ResourceGroup: %v", err)))
+		c.respondError(ctx, fmt.Errorf("unable to create Azure ResourceGroup: %v", err))
 		return
 	}
 
@@ -194,13 +192,13 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 			// create uuid
 			roleAssignmentId, err := uuid.GenerateUUID()
 			if err != nil {
-				c.respondError(ctx, errors.New(fmt.Sprintf("Unable to build UUID: %v", err)))
+				c.respondError(ctx, fmt.Errorf("unable to build UUID: %v", err))
 				return
 			}
 
 			_, err = roleAssignmentsClient.Create(azureContext, to.String(group.ID), roleAssignmentId, properties)
 			if err != nil {
-				c.respondError(ctx, errors.New(fmt.Sprintf("Unable to create Azure RoleAssignment: %v", err)))
+				c.respondError(ctx, fmt.Errorf("unable to create Azure RoleAssignment: %v", err))
 				return
 			}
 		}(roleAssignment)
@@ -209,11 +207,11 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createResourceGroup"}).Inc()
 
-	response := response.GeneralMessage{}
+	resp := response.GeneralMessage{}
 
-	response.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name)
-	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name))
-	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created (team access)", formData.Name), 1)
+	resp.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name)
+	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name))
+	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name), 1)
 
-	c.responseJson(ctx, response)
+	c.responseJson(ctx, resp)
 }

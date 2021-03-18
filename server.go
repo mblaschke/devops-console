@@ -50,7 +50,7 @@ func NewServer(pathList []string) *Server {
 }
 
 func (c *Server) Init() {
-	c.logger.Infof("Starting DevOps Console v%v (%v)", gitTag, gitCommit)
+	c.logger.Infof("starting DevOps Console v%v (%v)", gitTag, gitCommit)
 	c.config = models.AppConfig{}
 
 	if opts.EnableNamespacePodCount {
@@ -152,7 +152,7 @@ func (c *Server) setupKubernetes() {
 			case "NetworkPolicy":
 				c.config.App.Kubernetes.Namespace.NetworkPolicy[key].SetKubernetesObject(k8sObject.(*networkingV1.NetworkPolicy))
 			default:
-				panic("Not allowed object found: " + k8sObject.GetObjectKind().GroupVersionKind().Kind)
+				panic("not allowed object found: " + k8sObject.GetObjectKind().GroupVersionKind().Kind)
 			}
 		}
 	}
@@ -175,12 +175,6 @@ func (c *Server) Run(addr string) {
 
 func (c *Server) responseJson(ctx iris.Context, v interface{}) {
 	if _, err := ctx.JSON(v); err != nil {
-		c.logger.Errorln(err)
-	}
-}
-
-func (c *Server) responseString(ctx iris.Context, format string, v interface{}) {
-	if _, err := ctx.Text(format, v); err != nil {
 		c.logger.Errorln(err)
 	}
 }

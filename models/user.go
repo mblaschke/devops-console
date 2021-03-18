@@ -77,13 +77,14 @@ func (u *User) initTeams(config *AppConfig) (teams []Team) {
 func (u *User) GetTeam(name string) (team *Team, err error) {
 	for _, val := range u.Teams {
 		if val.Name == name {
-			team = &val
+			teamVal := val
+			team = &teamVal
 			break
 		}
 	}
 
 	if team == nil {
-		err = errors.New("Team not found")
+		err = errors.New("team not found")
 	}
 
 	return

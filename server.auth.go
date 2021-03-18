@@ -44,7 +44,13 @@ func (c *Server) getServiceConnectionUser(ctx iris.Context) (user *models.User) 
 				user = &models.User{}
 				user.Uuid = "ServiceConnection"
 				user.Username = teamName
-				user.Teams = []models.Team{models.Team{Name: teamName, K8sPermissions: teamConfig.K8sRoleBinding, AzureRoleAssignments: teamConfig.AzureRoleAssignments}}
+				user.Teams = []models.Team{
+					{
+						Name:                 teamName,
+						K8sPermissions:       teamConfig.K8sRoleBinding,
+						AzureRoleAssignments: teamConfig.AzureRoleAssignments,
+					},
+				}
 			}
 		}
 	}
@@ -69,7 +75,7 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 	user, err := c.getUser(ctx)
 
 	if err != nil {
-		c.handleError(ctx, errors.New("Invalid session or not logged in"), true)
+		c.handleError(ctx, errors.New("invalid session or not logged in"), true)
 		return
 	}
 
@@ -98,7 +104,7 @@ func (c *Server) getUserOrStop(ctx iris.Context) (user *models.User) {
 	user, err = c.getUser(ctx)
 
 	if err != nil || user == nil {
-		c.handleError(ctx, errors.New("Invalid session or not logged in"), true)
+		c.handleError(ctx, errors.New("invalid session or not logged in"), true)
 	}
 
 	return

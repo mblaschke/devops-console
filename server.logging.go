@@ -27,7 +27,7 @@ func (c *Server) notificationMessage(ctx iris.Context, message string) {
 	// send notification
 	for _, url := range c.config.App.Notification.Channels {
 		if err := shoutrrr.Send(url, message); err != nil {
-			c.logger.Errorf("Unable to send shoutrrr notification: %v", err.Error())
+			c.logger.Errorf("unable to send shoutrrr notification: %v", err.Error())
 		}
 	}
 }

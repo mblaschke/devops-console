@@ -39,7 +39,7 @@ func main() {
 	startPrometheus()
 
 	devopsConsole := NewServer(opts.Config)
-	startupDuration = time.Now().Sub(startupTime)
+	startupDuration = time.Since(startupTime)
 	devopsConsole.Run(opts.ServerBind)
 }
 
@@ -77,7 +77,7 @@ func startPrometheus() {
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		if err := http.ListenAndServe(opts.MetricsBind, nil); err != nil {
-			fmt.Println(fmt.Sprintf("ERROR: %s", err))
+			panic(err)
 		}
 	}()
 }

@@ -59,12 +59,12 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	s := c.startSession(ctx)
 	oauth := c.newServiceOauth(ctx)
 
-	if error := ctx.URLParam("error"); error != "" {
-		message := error
+	if err := ctx.URLParam("error"); err != "" {
+		message := err
 		if errorDesc := ctx.URLParam("error_description"); errorDesc != "" {
-			message = fmt.Sprintf("%s:\n%s", error, errorDesc)
+			message = fmt.Sprintf("%s:\n%s", err, errorDesc)
 		}
-		c.logger.Errorln(error)
+		c.logger.Errorln(err)
 		ctx.ViewData("messageError", message)
 		c.templateLogin(ctx)
 		return
@@ -146,7 +146,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		s.Set("user", userSession)
 		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
-		ctx.ViewData("messageError", "Unable to set session")
+		ctx.ViewData("messageError", "unable to set session")
 		c.templateLogin(ctx)
 		return
 	}

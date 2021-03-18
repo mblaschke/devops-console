@@ -32,13 +32,14 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 
 	for _, row := range a.Instances {
 		if row.Name == name {
-			config = &row
+			rowVal := row
+			config = &rowVal
 			break
 		}
 	}
 
 	if config == nil {
-		return nil, errors.New("Invalid alertmanager instance")
+		return nil, errors.New("invalid alertmanager instance")
 	}
 
 	configUrl, err := url.Parse(config.Url)
@@ -54,10 +55,8 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 		switch hostScheme {
 		case "http":
 			hostPort = "80"
-			break
 		case "https":
 			hostPort = "443"
-			break
 		}
 	}
 
@@ -69,9 +68,8 @@ func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmana
 		switch config.Auth.Type {
 		case "basic":
 			transport.DefaultAuthentication = httptransport.BasicAuth(config.Auth.Username, config.Auth.Password)
-			break
 		default:
-			return nil, errors.New("Invalid authentication")
+			return nil, errors.New("invalid authentication")
 		}
 	}
 
