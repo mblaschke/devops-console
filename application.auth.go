@@ -122,7 +122,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	if c.config.App.Oauth.Filter.UsernameWhitelist != "" {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameWhitelist)
 		if !filterRegexp.MatchString(user.Username) {
-			ctx.ViewData("messageError", fmt.Sprintf("User %s is not allowed to use this application", user.Username))
+			ctx.ViewData("messageError", fmt.Sprintf("user %s is not allowed to use this application", user.Username))
 			c.templateLogin(ctx)
 			return
 		}
@@ -131,7 +131,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	if c.config.App.Oauth.Filter.UsernameBlacklist != "" {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameBlacklist)
 		if filterRegexp.MatchString(c.config.App.Oauth.Filter.UsernameBlacklist) {
-			ctx.ViewData("messageError", fmt.Sprintf("User %s is not allowed to use this application", user.Username))
+			ctx.ViewData("messageError", fmt.Sprintf("user %s is not allowed to use this application", user.Username))
 			c.templateLogin(ctx)
 			return
 		}

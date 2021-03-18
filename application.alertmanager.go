@@ -9,8 +9,8 @@ import (
 	"github.com/go-openapi/strfmt"
 	iris "github.com/kataras/iris/v12"
 	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
-	"github.com/prometheus/alertmanager/api/v2/client/alert"
-	"github.com/prometheus/alertmanager/api/v2/client/silence"
+	alertmanagerAlert "github.com/prometheus/alertmanager/api/v2/client/alert"
+	alertmanagerSilence "github.com/prometheus/alertmanager/api/v2/client/silence"
 	alertmanagerModels "github.com/prometheus/alertmanager/api/v2/models"
 )
 
@@ -32,7 +32,7 @@ func (c *ApplicationAlertmanager) ApiAlertsList(ctx iris.Context, user *models.U
 
 	filter := []string{}
 
-	params := alert.NewGetAlertsParams()
+	params := alertmanagerAlert.NewGetAlertsParams()
 	params.SetFilter(filter)
 	alerts, err := client.Alert.GetAlerts(params)
 	if err != nil {
@@ -50,7 +50,7 @@ func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context, user *models
 
 	filter := []string{}
 
-	params := silence.NewGetSilencesParams()
+	params := alertmanagerSilence.NewGetSilencesParams()
 	params.SetFilter(filter)
 	silences, err := client.Silence.GetSilences(params)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *ApplicationAlertmanager) ApiSilencesList(ctx iris.Context, user *models
 func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
 
-	getParams := silence.NewGetSilenceParams()
+	getParams := alertmanagerSilence.NewGetSilenceParams()
 	getParams.SilenceID = strfmt.UUID(ctx.Params().GetString("silence"))
 	silenceResp, err := client.Silence.GetSilence(getParams)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 		return
 	}
 
-	deleteParams := silence.NewDeleteSilenceParams()
+	deleteParams := alertmanagerSilence.NewDeleteSilenceParams()
 	deleteParams.SilenceID = strfmt.UUID(*silenceResp.Payload.ID)
 	if _, err := client.Silence.DeleteSilence(deleteParams); err != nil {
 		c.respondError(ctx, err)
@@ -102,7 +102,7 @@ func (c *ApplicationAlertmanager) ApiSilencesDelete(ctx iris.Context, user *mode
 func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *models.User) {
 	client := c.getClient(ctx, ctx.Params().GetString("instance"))
 
-	getParams := silence.NewGetSilenceParams()
+	getParams := alertmanagerSilence.NewGetSilenceParams()
 	getParams.SilenceID = strfmt.UUID(ctx.Params().GetString("silence"))
 	silenceResp, err := client.Silence.GetSilence(getParams)
 	if err != nil {
@@ -111,14 +111,14 @@ func (c *ApplicationAlertmanager) ApiSilencesUpdate(ctx iris.Context, user *mode
 	}
 
 	if !c.checkSilenceAccess(ctx, user, silenceResp.Payload.Matchers) {
-		c.respondErrorWithPenalty(ctx, errors.New("Access to silence denied"))
+		c.respondErrorWithPenalty(ctx, errors.New("access to silence denied"))
 		return
 	}
 
 	formData := c.getSilenceFormData(ctx)
 	formData.Silence.CreatedBy = silenceResp.Payload.CreatedBy
 
-	postParams := silence.NewPostSilencesParams()
+	postParams := alertmanagerSilence.NewPostSilencesParams()
 	postParams.Silence = &alertmanagerModels.PostableSilence{
 		ID:      *silenceResp.Payload.ID,
 		Silence: formData.Silence,
@@ -146,7 +146,7 @@ func (c *ApplicationAlertmanager) ApiSilencesCreate(ctx iris.Context, user *mode
 	username := fmt.Sprintf("%v [%v]", user.Username, user.Uuid)
 	formData.Silence.CreatedBy = &username
 
-	postParams := silence.NewPostSilencesParams()
+	postParams := alertmanagerSilence.NewPostSilencesParams()
 	postParams.Silence = &alertmanagerModels.PostableSilence{
 		Silence: formData.Silence,
 	}
@@ -209,7 +209,7 @@ func (c *ApplicationAlertmanager) getSilenceFormData(ctx iris.Context) *formdata
 	return formData
 }
 
-func (c *ApplicationAlertmanager) filterAlerts(ctx iris.Context, alerts *alert.GetAlertsOK) *alert.GetAlertsOK {
+func (c *ApplicationAlertmanager) filterAlerts(ctx iris.Context, alerts *alertmanagerAlert.GetAlertsOK) *alertmanagerAlert.GetAlertsOK {
 	user := c.getUserOrStop(ctx)
 
 	filteredAlerts := alertmanagerModels.GettableAlerts{}
@@ -236,7 +236,7 @@ func (c *ApplicationAlertmanager) checkAlertAccess(ctx iris.Context, user *model
 	return
 }
 
-func (c *ApplicationAlertmanager) filterSilences(ctx iris.Context, silences *silence.GetSilencesOK) *silence.GetSilencesOK {
+func (c *ApplicationAlertmanager) filterSilences(ctx iris.Context, silences *alertmanagerSilence.GetSilencesOK) *alertmanagerSilence.GetSilencesOK {
 	user := c.getUserOrStop(ctx)
 
 	filteredSilences := alertmanagerModels.GettableSilences{}

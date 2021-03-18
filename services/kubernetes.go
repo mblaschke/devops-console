@@ -5,7 +5,7 @@ import (
 	"devops-console/models"
 	"fmt"
 	"k8s.io/api/core/v1"
-	v12 "k8s.io/api/rbac/v1"
+	rbacV1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -164,7 +164,7 @@ func (k *Kubernetes) NamespacePodCount(namespace string) (podcount *int64) {
 }
 
 // Create cluster rolebinding for user for general access
-func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (roleBinding *v12.ClusterRoleBinding, error error) {
+func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (roleBinding *rbacV1.ClusterRoleBinding, error error) {
 	ctx := context.Background()
 	roleBindName := fmt.Sprintf("user:%s", username)
 
@@ -175,28 +175,28 @@ func (k *Kubernetes) ClusterRoleBindingUser(username, userid, roleName string) (
 		}
 	}
 
-	annotiations := map[string]string{}
-	annotiations["user"] = strings.ToLower(username)
+	annotations := map[string]string{}
+	annotations["user"] = strings.ToLower(username)
 
-	subject := v12.Subject{}
+	subject := rbacV1.Subject{}
 	subject.Name = userid
 	subject.Kind = "User"
 
-	role := v12.RoleRef{}
+	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
 	role.Name = roleName
 
-	roleBinding = &v12.ClusterRoleBinding{}
-	roleBinding.SetAnnotations(annotiations)
+	roleBinding = &rbacV1.ClusterRoleBinding{}
+	roleBinding.SetAnnotations(annotations)
 	roleBinding.SetName(roleBindName)
 	roleBinding.RoleRef = role
-	roleBinding.Subjects = []v12.Subject{subject}
+	roleBinding.Subjects = []rbacV1.Subject{subject}
 
 	return k.Client().RbacV1().ClusterRoleBindings().Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for user to gain access to namespace
-func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid, roleName string) (roleBinding *v12.RoleBinding, error error) {
+func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid, roleName string) (roleBinding *rbacV1.RoleBinding, error error) {
 	ctx := context.Background()
 	roleBindName := fmt.Sprintf("user:%s", username)
 
@@ -207,29 +207,29 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 		}
 	}
 
-	annotiations := map[string]string{}
-	annotiations["user"] = strings.ToLower(username)
+	annotations := map[string]string{}
+	annotations["user"] = strings.ToLower(username)
 
-	subject := v12.Subject{}
+	subject := rbacV1.Subject{}
 	subject.Name = userid
 	subject.Kind = "User"
 
-	role := v12.RoleRef{}
+	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
 	role.Name = roleName
 
-	roleBinding = &v12.RoleBinding{}
-	roleBinding.SetAnnotations(annotiations)
+	roleBinding = &rbacV1.RoleBinding{}
+	roleBinding.SetAnnotations(annotations)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
-	roleBinding.Subjects = []v12.Subject{subject}
+	roleBinding.Subjects = []rbacV1.Subject{subject}
 
 	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for group to gain access to namespace
-func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName string, permission models.TeamK8sPermissions) (roleBinding *v12.RoleBinding, error error) {
+func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName string, permission models.TeamK8sPermissions) (roleBinding *rbacV1.RoleBinding, error error) {
 	ctx := context.Background()
 	roleBindName := fmt.Sprintf("team:%s:%s", teamName, permission.Name)
 
@@ -240,16 +240,16 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 		}
 	}
 
-	annotiations := map[string]string{}
-	annotiations["team"] = strings.ToLower(teamName)
+	annotations := map[string]string{}
+	annotations["team"] = strings.ToLower(teamName)
 
-	subjectList := []v12.Subject{}
+	subjectList := []rbacV1.Subject{}
 	for _, group := range permission.Groups {
-		subjectList = append(subjectList, v12.Subject{Kind: "Group", Name: group})
+		subjectList = append(subjectList, rbacV1.Subject{Kind: "Group", Name: group})
 	}
 
 	for _, user := range permission.Users {
-		subjectList = append(subjectList, v12.Subject{Kind: "User", Name: user})
+		subjectList = append(subjectList, rbacV1.Subject{Kind: "User", Name: user})
 	}
 
 	for _, serviceAccount := range permission.ServiceAccounts {
@@ -258,15 +258,15 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 			serviceAccount.Namespace = namespace
 		}
 
-		subjectList = append(subjectList, v12.Subject{Kind: "ServiceAccount", Name: serviceAccount.Name, Namespace: serviceAccount.Namespace})
+		subjectList = append(subjectList, rbacV1.Subject{Kind: "ServiceAccount", Name: serviceAccount.Name, Namespace: serviceAccount.Namespace})
 	}
 
-	role := v12.RoleRef{}
+	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
 	role.Name = permission.ClusterRole
 
-	roleBinding = &v12.RoleBinding{}
-	roleBinding.SetAnnotations(annotiations)
+	roleBinding = &rbacV1.RoleBinding{}
+	roleBinding.SetAnnotations(annotations)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
@@ -276,7 +276,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 }
 
 // Create rolebinding for group to gain access to namespace
-func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName string) (roleBinding *v12.RoleBinding, error error) {
+func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName string) (roleBinding *rbacV1.RoleBinding, error error) {
 	ctx := context.Background()
 	roleBindName := fmt.Sprintf("group:%s", group)
 
@@ -287,29 +287,29 @@ func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName 
 		}
 	}
 
-	annotiations := map[string]string{}
-	annotiations["group"] = strings.ToLower(group)
+	annotations := map[string]string{}
+	annotations["group"] = strings.ToLower(group)
 
-	subject := v12.Subject{}
+	subject := rbacV1.Subject{}
 	subject.Name = group
 	subject.Kind = "Group"
 
-	role := v12.RoleRef{}
+	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
 	role.Name = roleName
 
-	roleBinding = &v12.RoleBinding{}
-	roleBinding.SetAnnotations(annotiations)
+	roleBinding = &rbacV1.RoleBinding{}
+	roleBinding.SetAnnotations(annotations)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
-	roleBinding.Subjects = []v12.Subject{subject}
+	roleBinding.Subjects = []rbacV1.Subject{subject}
 
 	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
 
 // Create rolebinding for group to gain access to namespace
-func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, serviceaccount, roleName string) (roleBinding *v12.RoleBinding, error error) {
+func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, serviceaccount, roleName string) (roleBinding *rbacV1.RoleBinding, error error) {
 	ctx := context.Background()
 	roleBindName := fmt.Sprintf("serviceaccount:%s", serviceaccount)
 
@@ -320,23 +320,23 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 		}
 	}
 
-	annotiations := map[string]string{}
-	annotiations["serviceaccount"] = strings.ToLower(serviceaccount)
+	annotations := map[string]string{}
+	annotations["serviceaccount"] = strings.ToLower(serviceaccount)
 
-	subject := v12.Subject{}
+	subject := rbacV1.Subject{}
 	subject.Name = serviceaccount
 	subject.Kind = "ServiceAccount"
 
-	role := v12.RoleRef{}
+	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
 	role.Name = roleName
 
-	roleBinding = &v12.RoleBinding{}
-	roleBinding.SetAnnotations(annotiations)
+	roleBinding = &rbacV1.RoleBinding{}
+	roleBinding.SetAnnotations(annotations)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
-	roleBinding.Subjects = []v12.Subject{subject}
+	roleBinding.Subjects = []rbacV1.Subject{subject}
 
 	return k.Client().RbacV1().RoleBindings(namespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 }
