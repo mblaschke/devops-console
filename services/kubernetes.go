@@ -6,11 +6,17 @@ import (
 	"fmt"
 	"k8s.io/api/core/v1"
 	rbacV1 "k8s.io/api/rbac/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/discovery/cached/memory"
 	"os"
 	"regexp"
 	"strings"
@@ -18,6 +24,8 @@ import (
 
 type Kubernetes struct {
 	clientset *kubernetes.Clientset
+	dynClient dynamic.Interface
+	discoveryClient *discovery.DiscoveryClient
 
 	Filter struct {
 		Namespace *regexp.Regexp
@@ -25,26 +33,32 @@ type Kubernetes struct {
 }
 
 // Create cached kubernetes client
+func (k *Kubernetes) getKubeClientConfig() (config *rest.Config) {
+	var err error
+
+	if kubeconfig := os.Getenv("KUBECONFIG"); kubeconfig != "" {
+		// KUBECONFIG
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		// K8S in cluster
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return config
+}
+
+// Create cached kubernetes client
 func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 	var err error
-	var config *rest.Config
 
 	if k.clientset == nil {
-		if kubeconfig := os.Getenv("KUBECONFIG"); kubeconfig != "" {
-			// KUBECONFIG
-			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			// K8S in cluster
-			config, err = rest.InClusterConfig()
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		k.clientset, err = kubernetes.NewForConfig(config)
+		k.clientset, err = kubernetes.NewForConfig(k.getKubeClientConfig())
 		if err != nil {
 			panic(err)
 		}
@@ -53,9 +67,45 @@ func (k *Kubernetes) Client() (clientset *kubernetes.Clientset) {
 	return k.clientset
 }
 
+// Create cached kubernetes client
+func (k *Kubernetes) DynClient() (clientset dynamic.Interface) {
+	var err error
+
+	if k.clientset == nil {
+		k.dynClient, err = dynamic.NewForConfig(k.getKubeClientConfig())
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return k.dynClient
+}
+
+
+// Create cached kubernetes client
+func (k *Kubernetes) DiscoveryClient() (discoveryClient *discovery.DiscoveryClient) {
+	var err error
+
+	if k.discoveryClient == nil {
+		k.discoveryClient, err = discovery.NewDiscoveryClientForConfig(k.getKubeClientConfig())
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return k.discoveryClient
+}
+
+// find the corresponding GVR (available in *meta.RESTMapping) for gvk
+func (k *Kubernetes) findGVR(gvk schema.GroupVersionKind) (*meta.RESTMapping, error) {
+	mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(k.DiscoveryClient()))
+	return mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+}
+
 // Returns list of (filtered) namespaces
 func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error) {
 	ctx := context.Background()
+
 	result, kubeErr := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 
 	if kubeErr == nil {
