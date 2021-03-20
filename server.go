@@ -29,7 +29,7 @@ type Server struct {
 
 	config models.AppConfig
 
-	logger *zap.SugaredLogger
+	logger      *zap.SugaredLogger
 	auditLogger *zap.SugaredLogger
 }
 

@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 	log = logger.Sugar()
-	defer log.Sync() // flushes buffer, if any
+	defer log.Sync() //nolint flushes buffer, if any
 
 	startPrometheus()
 
