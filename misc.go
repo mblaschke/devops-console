@@ -4,10 +4,6 @@ import (
 	"devops-console/models"
 	"fmt"
 	"io/ioutil"
-	v1 "k8s.io/api/core/v1"
-	v1Networking "k8s.io/api/networking/v1"
-	v1Rbac "k8s.io/api/rbac/v1"
-	"k8s.io/api/settings/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	"math/rand"
@@ -17,34 +13,25 @@ import (
 	"time"
 )
 
-func createKubernetesObjectList() (list *models.KubernetesObjectList) {
-	list = &models.KubernetesObjectList{}
-	list.ConfigMaps = map[string]models.KubernetesObject{}
-	list.ServiceAccounts = map[string]models.KubernetesObject{}
-	list.Roles = map[string]models.KubernetesObject{}
-	list.RoleBindings = map[string]models.KubernetesObject{}
-	list.ResourceQuotas = map[string]models.KubernetesObject{}
-	list.NetworkPolicies = map[string]models.KubernetesObject{}
-	list.PodPresets = map[string]models.KubernetesObject{}
-	list.LimitRanges = map[string]models.KubernetesObject{}
-	return
+func createKubernetesObjectList() (models.KubernetesObjectList) {
+	return models.KubernetesObjectList{}
 }
 
-func buildKubeConfigList(defaultPath, path string) *models.KubernetesObjectList {
+func buildKubeConfigList(defaultPath, path string) models.KubernetesObjectList {
 	kubeConfigList := createKubernetesObjectList()
 
 	if defaultPath != "" {
-		addK8sConfigsFromPath(defaultPath, kubeConfigList)
+		kubeConfigList = addK8sConfigsFromPath(defaultPath, kubeConfigList)
 	}
 
 	if path != "" {
-		addK8sConfigsFromPath(path, kubeConfigList)
+		kubeConfigList = addK8sConfigsFromPath(path, kubeConfigList)
 	}
 
 	return kubeConfigList
 }
 
-func addK8sConfigsFromPath(configPath string, list *models.KubernetesObjectList) {
+func addK8sConfigsFromPath(configPath string, list models.KubernetesObjectList) (models.KubernetesObjectList) {
 	var fileList []string
 	err := filepath.Walk(configPath, func(path string, f os.FileInfo, err error) error {
 		if IsK8sConfigFile(path) {
@@ -62,35 +49,10 @@ func addK8sConfigsFromPath(configPath string, list *models.KubernetesObjectList)
 		item.Path = path
 		item.Object = KubeParseConfig(path)
 
-		switch item.Object.GetObjectKind().GroupVersionKind().Kind {
-		case "ConfigMap":
-			item.Name = item.Object.(*v1.ConfigMap).Name
-			list.ConfigMaps[item.Name] = item
-		case "ServiceAccount":
-			item.Name = item.Object.(*v1.ServiceAccount).Name
-			list.ServiceAccounts[item.Name] = item
-		case "Role":
-			item.Name = item.Object.(*v1Rbac.Role).Name
-			list.Roles[item.Name] = item
-		case "RoleBinding":
-			item.Name = item.Object.(*v1Rbac.RoleBinding).Name
-			list.RoleBindings[item.Name] = item
-		case "NetworkPolicy":
-			item.Name = item.Object.(*v1Networking.NetworkPolicy).Name
-			list.NetworkPolicies[item.Name] = item
-		case "LimitRange":
-			item.Name = item.Object.(*v1.LimitRange).Name
-			list.LimitRanges[item.Name] = item
-		case "PodPreset":
-			item.Name = item.Object.(*v1alpha1.PodPreset).Name
-			list.PodPresets[item.Name] = item
-		case "ResourceQuota":
-			item.Name = item.Object.(*v1.ResourceQuota).Name
-			list.ResourceQuotas[item.Name] = item
-		default:
-			panic("not allowed object found: " + item.Object.GetObjectKind().GroupVersionKind().Kind)
-		}
+		list = append(list, item)
 	}
+
+	return list
 }
 
 func IsDirectory(path string) bool {

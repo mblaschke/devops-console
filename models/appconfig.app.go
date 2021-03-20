@@ -47,7 +47,7 @@ type (
 		Kubernetes struct {
 			ObjectsPath string `yaml:"objectsPath"`
 
-			ObjectsList map[string]*KubernetesObjectList
+			ObjectsList map[string]KubernetesObjectList
 
 			Environments []AppConfigKubernetesEnvironment `yaml:"environments"`
 

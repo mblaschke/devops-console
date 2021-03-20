@@ -711,68 +711,20 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 
 	if environment, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; ok {
 		if configObjects, ok := c.config.App.Kubernetes.ObjectsList[environment]; ok {
-			kubeObjectList = configObjects
+			kubeObjectList = &configObjects
 		}
 	}
 
 	// if empty, try default
 	if kubeObjectList == nil {
 		if configObjects, ok := c.config.App.Kubernetes.ObjectsList["_default"]; ok {
-			kubeObjectList = configObjects
+			kubeObjectList = &configObjects
 		}
 	}
 
 	if kubeObjectList != nil {
-		for _, kubeObject := range kubeObjectList.ConfigMaps {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.ServiceAccounts {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.Roles {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.RoleBindings {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.NetworkPolicies {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.LimitRanges {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.PodPresets {
-			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
-			if error != nil {
-				return
-			}
-		}
-
-		for _, kubeObject := range kubeObjectList.ResourceQuotas {
+		for _, kubeObject := range *kubeObjectList {
+			fmt.Println(kubeObject)
 			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
 			if error != nil {
 				return

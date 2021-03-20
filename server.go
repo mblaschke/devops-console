@@ -94,7 +94,7 @@ func (c *Server) setupConfig(path string) {
 }
 
 func (c *Server) setupKubernetes() {
-	KubeNamespaceConfig := map[string]*models.KubernetesObjectList{}
+	KubeNamespaceConfig := map[string]models.KubernetesObjectList{}
 
 	c.logger.Infof("setup kubernetes object configuration (for namespaces)")
 

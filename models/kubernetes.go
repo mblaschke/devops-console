@@ -7,16 +7,7 @@ import (
 )
 
 type (
-	KubernetesObjectList struct {
-		ConfigMaps      map[string]KubernetesObject
-		ServiceAccounts map[string]KubernetesObject
-		Roles           map[string]KubernetesObject
-		RoleBindings    map[string]KubernetesObject
-		PodPresets      map[string]KubernetesObject
-		NetworkPolicies map[string]KubernetesObject
-		LimitRanges     map[string]KubernetesObject
-		ResourceQuotas  map[string]KubernetesObject
-	}
+	KubernetesObjectList []KubernetesObject
 
 	KubernetesObject struct {
 		Name   string
