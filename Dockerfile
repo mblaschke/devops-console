@@ -42,7 +42,7 @@ RUN ./devops-console --help
 # FINAL IMAGE
 #############################################
 FROM gcr.io/distroless/static
-
+ENV LOG_JSON=1
 WORKDIR /app
 COPY --from=backend /go/src/devops-console/ /app/
 USER 1000:1000

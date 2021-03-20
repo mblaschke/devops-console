@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/securecookie"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"go.uber.org/zap"
 	"math"
 	"net/http"
 	"time"
@@ -16,9 +16,10 @@ func (c *Server) startSession(ctx iris.Context) *sessions.Session {
 }
 
 func (c *Server) initSession() {
-	c.logger.Infof(" - using %v session", c.config.App.Session.Type)
-	c.logger.Infof("   - cookie name: %v", c.config.App.Session.CookieName)
-	c.logger.Infof("   - session expiry: %v", c.config.App.Session.Expiry)
+	contextLogger := c.logger.With(zap.String("setup", "session"))
+	contextLogger.Infof("using %v session", c.config.App.Session.Type)
+	contextLogger.Infof("cookie name: %v", c.config.App.Session.CookieName)
+	contextLogger.Infof("session expiry: %v", c.config.App.Session.Expiry)
 
 	switch c.config.App.Session.Type {
 	case "internal":
@@ -67,6 +68,11 @@ func (c *Server) initSessionSecureCookie() {
 }
 
 func (c *Server) initSessionRedis() {
+	contextLogger := c.logger.With(
+		zap.String("setup", "session"),
+		zap.String("session", "redis"),
+	)
+
 	for i := 0; i < 25; i++ {
 		durationTime := math.Min(15, float64(i*2))
 		retryTime := time.Duration(time.Duration(durationTime) * time.Second)
@@ -87,20 +93,20 @@ func (c *Server) initSessionRedis() {
 			break
 		}
 
-		c.logger.Errorln(fmt.Sprintf("redis connection failed, retrying in %v", retryTime.String()))
+		contextLogger.Error("redis connection failed, retrying in %v", retryTime.String())
 		time.Sleep(retryTime)
 	}
 
 	if c.redisConnection == nil {
-		c.logger.Fatalln("redis connection failed, cannot connect to session database")
+		contextLogger.Fatal("redis connection failed, cannot connect to session database")
 	}
 
-	c.logger.Infoln("redis connection established")
+	contextLogger.Info("redis connection established")
 
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {
 		if err := c.redisConnection.Close(); err != nil {
-			c.logger.Errorln(err)
+			contextLogger.Error(err)
 		}
 	})
 

@@ -72,12 +72,12 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 		if logout {
 			ctx.ViewData("title", "Login")
 			if err := ctx.View("login.jet"); err != nil {
-				c.logger.Errorln(err)
+				c.logger.Error(err)
 			}
 		} else {
 			ctx.ViewData("title", "Error")
 			if err := ctx.View("error.jet"); err != nil {
-				c.logger.Errorln(err)
+				c.logger.Error(err)
 			}
 		}
 	}

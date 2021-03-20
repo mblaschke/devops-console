@@ -3,11 +3,14 @@ package main
 import (
 	azureSdkVersion "github.com/Azure/azure-sdk-for-go/version"
 	iris "github.com/kataras/iris/v12"
+	"go.uber.org/zap"
 	"runtime"
 )
 
 func (c *Server) initTemplateEngine() {
-	c.logger.Infof(" - init jet template engine")
+	contextLogger := c.logger.With(zap.String("setup", "templateEngine"))
+
+	contextLogger.Infof("init jet template engine")
 
 	c.tmpl = iris.Jet("./templates", ".jet")
 

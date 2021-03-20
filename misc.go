@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func createKubernetesObjectList() (models.KubernetesObjectList) {
+func createKubernetesObjectList() models.KubernetesObjectList {
 	return models.KubernetesObjectList{}
 }
 
@@ -31,7 +31,7 @@ func buildKubeConfigList(defaultPath, path string) models.KubernetesObjectList {
 	return kubeConfigList
 }
 
-func addK8sConfigsFromPath(configPath string, list models.KubernetesObjectList) (models.KubernetesObjectList) {
+func addK8sConfigsFromPath(configPath string, list models.KubernetesObjectList) models.KubernetesObjectList {
 	var fileList []string
 	err := filepath.Walk(configPath, func(path string, f os.FileInfo, err error) error {
 		if IsK8sConfigFile(path) {

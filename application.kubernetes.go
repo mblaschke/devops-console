@@ -45,7 +45,7 @@ func (c *ApplicationKubernetes) KubeconfigDownload(ctx iris.Context, user *model
 		ctx.Header("ContentType", "text/yaml")
 		ctx.Header("Content-Disposition", "attachment; filename=\"kubeconfig.yaml\"")
 		if _, err := ctx.Binary([]byte(val.Content)); err != nil {
-			c.logger.Errorln(err)
+			c.logger.Error(err)
 		}
 	} else {
 		c.respondError(ctx, fmt.Errorf("kubeconfig name not valid"))
@@ -84,7 +84,7 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			Settings:    namespace.SettingsExtract(c.config.Kubernetes),
 		}
 
-		if opts.EnableNamespacePodCount {
+		if opts.Kubernetes.EnableNamespacePodCount {
 			row.PodCount = c.serviceKubernetes().NamespacePodCount(namespace.Name)
 		}
 
@@ -724,7 +724,6 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 
 	if kubeObjectList != nil {
 		for _, kubeObject := range *kubeObjectList {
-			fmt.Println(kubeObject)
 			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
 			if error != nil {
 				return

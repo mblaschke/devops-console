@@ -12,7 +12,7 @@ import (
 func (c *Server) templateLogin(ctx iris.Context) {
 	ctx.ViewData("title", "Login")
 	if err := ctx.View("login.jet"); err != nil {
-		c.logger.Errorln(err)
+		c.logger.Error(err)
 	}
 }
 

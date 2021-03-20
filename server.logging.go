@@ -3,8 +3,42 @@ package main
 import (
 	"fmt"
 	"github.com/containrrr/shoutrrr"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
+	"go.uber.org/zap"
+	"runtime"
 )
+
+func (c *Server) initLogging() {
+	c.app.Logger().Handle(func(l *golog.Log) bool {
+		_, fn, line, _ := runtime.Caller(5)
+
+		message := l.Message
+		source := fmt.Sprintf("%s#%d", fn, line)
+
+		contextLogger := log.With(
+			zap.String("file", source),
+		)
+
+		switch l.Level {
+		case golog.DisableLevel:
+		case golog.DebugLevel:
+			contextLogger.Debug(l.Message)
+		case golog.InfoLevel:
+			contextLogger.Info(message)
+		case golog.WarnLevel:
+			contextLogger.Warn(message)
+		case golog.ErrorLevel:
+			contextLogger.Error(message)
+		case golog.FatalLevel:
+			contextLogger.Fatal(message)
+		default:
+			contextLogger.Info(message)
+		}
+
+		return true
+	})
+}
 
 func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 	username := "*anonymous*"
@@ -13,7 +47,10 @@ func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
 	}
 
-	c.logger.InfoDepth(depth, fmt.Sprintf("AUDIT: user[%s]: %s", username, message))
+	c.auditLogger.With(
+		zap.String("context", "audit"),
+		zap.String("user", username),
+	).Info(message)
 }
 
 func (c *Server) notificationMessage(ctx iris.Context, message string) {

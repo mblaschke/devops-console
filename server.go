@@ -5,12 +5,12 @@ import (
 	"devops-console/models"
 	"fmt"
 	"github.com/Masterminds/sprig"
-	glogger "github.com/google/logger"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/recover"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"github.com/kataras/iris/v12/view"
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	networkingV1 "k8s.io/api/networking/v1"
@@ -29,14 +29,18 @@ type Server struct {
 
 	config models.AppConfig
 
-	logger *glogger.Logger
+	logger *zap.SugaredLogger
+	auditLogger *zap.SugaredLogger
 }
 
 func NewServer(pathList []string) *Server {
 	server := Server{}
 
 	server.app = iris.New()
-	server.logger = glogger.Init("Verbose", true, false, ioutil.Discard)
+	server.logger = log
+	auditLogger := log.Desugar()
+	auditLogger = auditLogger.WithOptions(zap.AddCallerSkip(1))
+	server.auditLogger = auditLogger.Sugar()
 	server.app.Use(recover.New())
 
 	server.Init()
@@ -53,7 +57,7 @@ func (c *Server) Init() {
 	c.logger.Infof("starting DevOps Console v%v (%v)", gitTag, gitCommit)
 	c.config = models.AppConfig{}
 
-	if opts.EnableNamespacePodCount {
+	if opts.Kubernetes.EnableNamespacePodCount {
 		c.logger.Infof("enable namespace pod count")
 	}
 }
@@ -61,7 +65,8 @@ func (c *Server) Init() {
 func (c *Server) setupConfig(path string) {
 	var config []byte
 
-	c.logger.Infof("reading configuration from file %v", path)
+	contextLogger := c.logger.With(zap.String("config", path))
+	contextLogger.Infof("reading configuration from file %v", path)
 
 	if data, err := ioutil.ReadFile(filepath.Clean(path)); err == nil {
 		config = data
@@ -69,7 +74,7 @@ func (c *Server) setupConfig(path string) {
 		panic(err)
 	}
 
-	c.logger.Info(" -  preprocessing with template engine")
+	contextLogger.Info("preprocessing with template engine")
 	var tmplBytes bytes.Buffer
 	parsedConfig, err := template.New("yaml").Funcs(sprig.TxtFuncMap()).Parse(string(config))
 	if err != nil {
@@ -80,12 +85,12 @@ func (c *Server) setupConfig(path string) {
 		panic(err)
 	}
 
-	if opts.DumpConfig {
+	if opts.Config.Dump {
 		fmt.Println(tmplBytes.String())
 		os.Exit(1)
 	}
 
-	c.logger.Info(" -  parsing with yaml")
+	contextLogger.Info("parsing with yaml")
 
 	if err := yaml.Unmarshal(tmplBytes.Bytes(), &c.config); err != nil {
 		panic(err)
@@ -111,7 +116,7 @@ func (c *Server) setupKubernetes() {
 		// default namespace settings
 		k8sDefaultPath := filepath.Join(objectsPath, "_default")
 		if IsDirectory(k8sDefaultPath) {
-			c.logger.Infof(" - using default path %v", k8sDefaultPath)
+			c.logger.Infof("using default path %v", k8sDefaultPath)
 		} else {
 			k8sDefaultPath = ""
 		}
@@ -127,7 +132,7 @@ func (c *Server) setupKubernetes() {
 
 			// parse configs in dir but don't jump recursive into it
 			if info.IsDir() && path != k8sDefaultPath {
-				c.logger.Infof(" - processing %v", path)
+				c.logger.Infof("processing %v", path)
 
 				KubeNamespaceConfig[info.Name()] = buildKubeConfigList(k8sDefaultPath, path)
 				return filepath.SkipDir
@@ -145,7 +150,7 @@ func (c *Server) setupKubernetes() {
 
 	for key, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
 		if netpol.Path != "" {
-			c.logger.Infof(" - parsing %v", netpol.Path)
+			c.logger.Infof("parsing %v", netpol.Path)
 			k8sObject := KubeParseConfig(filepath.Clean(netpol.Path))
 
 			switch k8sObject.GetObjectKind().GroupVersionKind().Kind {
@@ -164,17 +169,18 @@ func (c *Server) initApp() {
 	c.initSession()
 	c.initTemplateEngine()
 	c.initRoutes()
+	c.initLogging()
 }
 
 func (c *Server) Run(addr string) {
 	c.logger.Infof("run app server")
 	if err := c.app.Run(iris.Addr(addr)); err != nil {
-		c.logger.Fatalln(err)
+		c.logger.Fatal(err)
 	}
 }
 
 func (c *Server) responseJson(ctx iris.Context, v interface{}) {
 	if _, err := ctx.JSON(v); err != nil {
-		c.logger.Errorln(err)
+		c.logger.Error(err)
 	}
 }

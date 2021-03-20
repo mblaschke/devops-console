@@ -5,11 +5,14 @@ import (
 	"errors"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
+	"go.uber.org/zap"
+	"time"
 )
 
 func (c *Server) initRoutes() {
-	c.app.Use(c.before)
+	contextLogger := c.logger.With(zap.String("setup", "routes"))
 
+	c.app.Use(c.before)
 	requestLogger := logger.New(logger.Config{
 		// Status displays status code
 		Status: true,
@@ -24,9 +27,23 @@ func (c *Server) initRoutes() {
 		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
 		// will be added to the logs.
 		MessageContextKeys: []string{"userIdentification"},
+
+		LogFunc: func(endTime time.Time, latency time.Duration, status, ip, method, path string, message interface{}, headerMessage interface{}) {
+			contextLogger := c.logger.With(
+				zap.String("type", "request"),
+				zap.Float64("latency", latency.Seconds()),
+				zap.String("status", status),
+				zap.String("ip", ip),
+				zap.String("method", method),
+				zap.String("path", path),
+				zap.Any("context", message),
+			)
+
+			contextLogger.Info()
+		},
 	})
 
-	c.logger.Infof(" - init static file handler")
+	contextLogger.Infof("init static file handler")
 
 	staticParty := c.app.Party("/", c.defaultHeaders)
 	staticParty.HandleDir("/static", "./static", iris.DirOptions{
@@ -37,7 +54,7 @@ func (c *Server) initRoutes() {
 	})
 	c.app.Favicon("./static/img/favicon.ico")
 
-	c.logger.Infof(" - init app routes")
+	contextLogger.Infof("init app routes")
 
 	applicationKubernetes := ApplicationKubernetes{Server: c}
 	applicationAlertmanager := ApplicationAlertmanager{Server: c}

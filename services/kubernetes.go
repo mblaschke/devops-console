@@ -10,21 +10,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/restmapper"
-	"k8s.io/client-go/discovery/cached/memory"
+	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"regexp"
 	"strings"
 )
 
 type Kubernetes struct {
-	clientset *kubernetes.Clientset
-	dynClient dynamic.Interface
+	clientset       *kubernetes.Clientset
+	dynClient       dynamic.Interface
 	discoveryClient *discovery.DiscoveryClient
 
 	Filter struct {
@@ -80,7 +80,6 @@ func (k *Kubernetes) DynClient() (clientset dynamic.Interface) {
 
 	return k.dynClient
 }
-
 
 // Create cached kubernetes client
 func (k *Kubernetes) DiscoveryClient() (discoveryClient *discovery.DiscoveryClient) {

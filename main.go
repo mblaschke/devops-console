@@ -5,6 +5,8 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"net/http"
 	"os"
 	"time"
@@ -12,6 +14,10 @@ import (
 
 var (
 	argparser *flags.Parser
+	opts      ConfigOpts
+	log       *zap.SugaredLogger
+
+	logConfig = zap.NewProductionConfig()
 
 	PrometheusActions *prometheus.GaugeVec
 	startupTime       time.Time
@@ -22,23 +28,20 @@ var (
 	gitTag    = "<unknown>"
 )
 
-var opts struct {
-	Config                   []string `long:"config" env:"CONFIG" description:"Path to config file" default:"./config/default.yaml" env-delim:":"`
-	ServerBind               string   `long:"server-bind" env:"SERVER_BIND" description:"Server address" default:":9000"`
-	MetricsBind              string   `long:"metrics-bind" env:"METRICS_BIND" description:"Server address" default:":9001"`
-	DumpConfig               bool     `long:"dump-config" description:"Dump config"`
-	Debug                    bool     `long:"debug" description:"Enable debug mode"`
-	EnableNamespacePodCount  bool     `long:"enable-namespace-pod-count" env:"ENABLE_NAMESPACE_POD_COUNT" description:"Enable namespace pod count"`
-	DisableCsrfProtection    bool     `long:"disable-csrf" env:"DISABLE_CSRF_PROTECTION" description:"Disable CSFR protection"`
-	ErrorPunishmentThreshold int64    `long:"error-punishment-threshold" env:"ERROR_PUNISHMENT_THRESHOLD" description:"Error threshold when punishment is executed (logout)" default:"5"`
-}
-
 func main() {
 	startupTime = time.Now()
 	initArgparser()
+
+	logger, err := logConfig.Build()
+	if err != nil {
+		panic(err)
+	}
+	log = logger.Sugar()
+	defer log.Sync() // flushes buffer, if any
+
 	startPrometheus()
 
-	devopsConsole := NewServer(opts.Config)
+	devopsConsole := NewServer(opts.Config.Path)
 	startupDuration = time.Since(startupTime)
 	devopsConsole.Run(opts.ServerBind)
 }
@@ -53,11 +56,29 @@ func initArgparser() {
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
 		} else {
-			fmt.Println(err)
 			fmt.Println()
 			argparser.WriteHelp(os.Stdout)
 			os.Exit(1)
 		}
+	}
+
+	logConfig.Encoding = "console"
+
+	// verbose level
+	if opts.Logger.Verbose {
+		logConfig.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	}
+
+	// debug level
+	if opts.Debug {
+		logConfig.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+		logConfig.DisableStacktrace = false
+	}
+
+	// json log format
+	if opts.Logger.LogJson {
+		logConfig.Encoding = "json"
+		logConfig.EncoderConfig.TimeKey = ""
 	}
 }
 
