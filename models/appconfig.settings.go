@@ -19,11 +19,11 @@ type (
 	}
 
 	AppConfigSettingItem struct {
-		Name        string `json:"name"`
-		Label       string `json:"label"`
-		Type        string `json:"type"`
-		Placeholder string `json:"placeholder"`
+		Name        string             `json:"name"`
+		Label       string             `json:"label"`
+		Type        string             `json:"type"`
+		Placeholder string             `json:"placeholder"`
 		Validation  AppInputValidation `json:"validation"`
-		Tags        map[string]string `json:"tags"`
+		Tags        map[string]string  `json:"tags"`
 	}
 )

@@ -73,5 +73,4 @@ type (
 		Template    string
 		Quota       string
 	}
-
 )

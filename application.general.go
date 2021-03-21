@@ -108,7 +108,7 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 				Type:        row.Type,
 				Default:     row.Default,
 				Placeholder: row.Placeholder,
-				Required: row.Validation.Required,
+				Required:    row.Validation.Required,
 			},
 		)
 	}

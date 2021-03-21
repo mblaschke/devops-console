@@ -2,7 +2,7 @@ package response
 
 type (
 	GeneralStats struct {
-		Name  string `json:"name"`
+		Name  string             `json:"name"`
 		Stats []GeneralStatsLine `json:"stats"`
 	}
 
