@@ -44,59 +44,6 @@ application:
     channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
     message: {{env "NOTIFICATION_MESSAGE" | default "%s: %s" | toJson }}
 
-  kubernetes:
-    objectsPath: ./config/kubernetes
-
-    environments: []
-
-    namespace:
-      filter:
-        access: {{env "K8S_NAMESPACE_ACCESS_FILTER" | default "^(dev|test|int|isa|load|play|prod|team|user)\\-([a-zA-Z0-9]+\\-[a-zA-Z0-9]+|[a-zA-Z0-9]+)$" | toJson }}
-        delete: {{env "K8S_NAMESPACE_DELETE_FILTER" | default "^(team|user)\\-.*$" | toJson }}
-        user: {{env "K8S_NAMESPACE_USER_FILTER" | default "^user\\-%s\\-" | toJson }}
-        team: {{env "K8S_NAMESPACE_TEAM_FILTER" | default "^team\\-%s\\-" | toJson }}
-
-      validation:
-        app: {{env "K8S_NAMESPACE_VALIDATION_APP" | default "^[a-zA-Z0-9][-a-zA-Z0-9]{2,}$" | toJson }}
-        team: {{env "K8S_NAMESPACE_VALIDATION_TEAM" | default "^[a-zA-Z0-9]{3,}$" | toJson }}
-
-      annotations:
-        description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
-        immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
-        networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
-
-      labels:
-        name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}
-        user: {{env "K8S_LABEL_USER" | default "user" | toJson }}
-        team: {{env "K8S_LABEL_TEAM" | default "team" | toJson }}
-        environment: {{env "K8S_LABEL_ENV" | default "env" | toJson }}
-
-      role:
-        team: {{env "K8S_TEAM_NAMESPACEROLE" | default "admin" | toJson }}
-        user: {{env "K8S_USER_NAMESPACEROLE" | default "admin" | toJson }}
-        private: {{env "K8S_USER_NAMESPACEROLE_PRIVATE" |default "true" }}
-
-      quota:
-        user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
-        team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
-
-      networkPolicy:
-        - name: none
-          description: No policy (using Cluster defaults)
-        - name: allow-all
-          description: Allow all traffic
-          path: ./config/networkpolicy/allow-all.yaml
-        - name: allow-namespace
-          description: Allow all same namespace traffic
-          path: ./config/networkpolicy/allow-namespace.yaml
-        - name: allow-cluster
-          description: Allow all cluster traffic
-          path: ./config/networkpolicy/allow-cluster.yaml
-        - name: deny-all
-          description: Deny all traffic
-          path: ./config/networkpolicy/deny-all.yaml
-          default: true
-
 settings:
   vault:
     url: {{env "AZURE_VAULT_URL" | toJson }}
@@ -113,8 +60,59 @@ azure:
 
 
 kubernetes:
+  objectsPath: ./config/kubernetes
+
+  environments: []
+
   namespace:
+    filter:
+      access: {{env "K8S_NAMESPACE_ACCESS_FILTER" | default "^(dev|test|int|isa|load|play|prod|team|user)\\-([a-zA-Z0-9]+\\-[a-zA-Z0-9]+|[a-zA-Z0-9]+)$" | toJson }}
+      delete: {{env "K8S_NAMESPACE_DELETE_FILTER" | default "^(team|user)\\-.*$" | toJson }}
+      user: {{env "K8S_NAMESPACE_USER_FILTER" | default "^user\\-%s\\-" | toJson }}
+      team: {{env "K8S_NAMESPACE_TEAM_FILTER" | default "^team\\-%s\\-" | toJson }}
+
+    validation:
+      app: {{env "K8S_NAMESPACE_VALIDATION_APP" | default "^[a-zA-Z0-9][-a-zA-Z0-9]{2,}$" | toJson }}
+      team: {{env "K8S_NAMESPACE_VALIDATION_TEAM" | default "^[a-zA-Z0-9]{3,}$" | toJson }}
+
+    annotations:
+      description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
+      immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
+      networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
+
+    labels:
+      name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}
+      user: {{env "K8S_LABEL_USER" | default "user" | toJson }}
+      team: {{env "K8S_LABEL_TEAM" | default "team" | toJson }}
+      environment: {{env "K8S_LABEL_ENV" | default "env" | toJson }}
+
+    role:
+      team: {{env "K8S_TEAM_NAMESPACEROLE" | default "admin" | toJson }}
+      user: {{env "K8S_USER_NAMESPACEROLE" | default "admin" | toJson }}
+      private: {{env "K8S_USER_NAMESPACEROLE_PRIVATE" |default "true" }}
+
+    quota:
+      user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
+      team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
+
     settings: []
+
+    networkPolicy:
+      - name: none
+        description: No policy (using Cluster defaults)
+      - name: allow-all
+        description: Allow all traffic
+        path: ./config/networkpolicy/allow-all.yaml
+      - name: allow-namespace
+        description: Allow all same namespace traffic
+        path: ./config/networkpolicy/allow-namespace.yaml
+      - name: allow-cluster
+        description: Allow all cluster traffic
+        path: ./config/networkpolicy/allow-cluster.yaml
+      - name: deny-all
+        description: Deny all traffic
+        path: ./config/networkpolicy/deny-all.yaml
+        default: true
 
 permissions:
   default:

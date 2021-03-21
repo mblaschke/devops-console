@@ -62,35 +62,64 @@ func (c *ApplicationGeneral) handleApiAppConfig(ctx iris.Context, user *models.U
 		ret.Teams = append(ret.Teams, row)
 	}
 
-	for _, row := range c.config.App.Kubernetes.Environments {
-		tmp := response.ResponseNamespaceConfig{
-			Environment: row.Name,
-			Description: row.Description,
-			Template:    row.Template,
-		}
-
-		ret.NamespaceEnvironments = append(ret.NamespaceEnvironments, tmp)
-	}
-
 	ret.Quota = map[string]int{
-		"team": c.config.App.Kubernetes.Namespace.Quota.Team,
-		"user": c.config.App.Kubernetes.Namespace.Quota.User,
+		"team": c.config.Kubernetes.Namespace.Quota.Team,
+		"user": c.config.Kubernetes.Namespace.Quota.User,
 	}
 
 	// azure
-	ret.Azure = c.config.Azure
-
-	// kubernetes
-	ret.Kubernetes = c.config.Kubernetes
-	for _, row := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
-		tmp := models.AppConfigNamespaceNetworkPolicy{
+	ret.Azure = response.ResponseConfigAzure{}
+	for _, row := range c.config.Azure.ResourceGroup.Tags {
+		tmp := response.ResponseConfigAzureResourceGroupTag{
 			Name:        row.Name,
+			Label:       row.Label,
 			Description: row.Description,
+			Type:        row.Type,
+			Default:     row.Default,
+			Placeholder: row.Placeholder,
 		}
 
+		ret.Azure.ResourceGroup.Tags = append(ret.Azure.ResourceGroup.Tags, tmp)
+	}
+
+	// kubernetes
+	ret.Kubernetes = response.ResponseConfigKubernetes{}
+
+	for _, row := range c.config.Kubernetes.Environments {
+		ret.Kubernetes.Environments = append(
+			ret.Kubernetes.Environments,
+			response.ResponseConfigKubernetesNamespaceEnvironments{
+				Environment: row.Name,
+				Description: row.Description,
+				Template:    row.Template,
+			},
+		)
+	}
+
+	for _, row := range c.config.Kubernetes.Namespace.Settings {
+		ret.Kubernetes.Namespace.Settings = append(
+			ret.Kubernetes.Namespace.Settings,
+			response.ResponseConfigKubernetesNamespaceSetting{
+				Name:        row.Name,
+				Label:       row.Label,
+				Description: row.Description,
+				K8sType:     row.K8sType,
+				K8sName:     row.K8sName,
+				Type:        row.Type,
+				Default:     row.Default,
+				Placeholder: row.Placeholder,
+				Required: row.Validation.Required,
+			},
+		)
+	}
+
+	for _, row := range c.config.Kubernetes.Namespace.NetworkPolicy {
 		ret.Kubernetes.Namespace.NetworkPolicy = append(
 			ret.Kubernetes.Namespace.NetworkPolicy,
-			tmp,
+			response.ResponseConfigKubernetesNamespaceNetworkPolicy{
+				Name:        row.Name,
+				Description: row.Description,
+			},
 		)
 	}
 

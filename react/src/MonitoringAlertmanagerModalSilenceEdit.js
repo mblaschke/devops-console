@@ -27,8 +27,8 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
         // default team for local storage
         try {
             let lastSelectedTeam = "" + localStorage.getItem("team");
-            this.props.config.Teams.map((row, value) => {
-                if (row.Name === lastSelectedTeam) {
+            this.props.config.teams.map((row, value) => {
+                if (row.name === lastSelectedTeam) {
                     state.team = lastSelectedTeam;
                 }
             });
@@ -36,8 +36,8 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
 
         // select first team if no selection available
         if (!state.team || state.team === "") {
-            if (this.props.config.Teams.length > 0) {
-                state.team = this.props.config.Teams[0].Name;
+            if (this.props.config.teams.length > 0) {
+                state.team = this.props.config.teams[0].name;
             }
         }
 
@@ -166,8 +166,8 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                 silence.matchers = matchersFiltered;
 
                 if (matcherTeam) {
-                    this.props.config.Teams.map((row, value) => {
-                        if (row.Name === matcherTeam) {
+                    this.props.config.teams.map((row, value) => {
+                        if (row.name === matcherTeam) {
                             team = matcherTeam;
                         }
                     });
@@ -271,8 +271,8 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                     <div className="form-group">
                                         <label htmlFor="silence-form-team">Team</label>
                                         <select name="inputTeam" id="silence-form-team" className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
-                                            {this.props.config.Teams.map((row, value) =>
-                                                <option key={row.Id} value={row.Name}>{row.Name}</option>
+                                            {this.props.config.teams.map((row, value) =>
+                                                <option key={row.Id} value={row.name}>{row.name}</option>
                                             )}
                                         </select>
                                     </div>

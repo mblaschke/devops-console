@@ -98,7 +98,7 @@ func startPrometheus() {
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		if err := http.ListenAndServe(opts.MetricsBind, nil); err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 	}()
 }

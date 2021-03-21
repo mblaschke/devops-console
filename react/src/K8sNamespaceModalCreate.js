@@ -126,8 +126,8 @@ class K8sNamespaceModalCreate extends BaseComponent {
         let selectedEnv = this.state.namespace.environment;
         let envConfig = false;
 
-        this.props.config.NamespaceEnvironments.forEach((row) => {
-            if (row.Environment === selectedEnv) {
+        this.props.config.kubernetes.environments.forEach((row) => {
+            if (row.environment === selectedEnv) {
                 envConfig = row;
             }
         });
@@ -135,7 +135,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
         if (envConfig && envConfig.Template) {
             namespace = envConfig.Template;
             namespace = namespace.replace("{env}", selectedEnv);
-            namespace = namespace.replace("{user}", this.props.config.User.Username);
+            namespace = namespace.replace("{user}", this.props.config.user.username);
             namespace = namespace.replace("{team}", this.state.namespace.team);
             namespace = namespace.replace("{app}", this.state.namespace.app);
         }
@@ -162,7 +162,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
         // default team for local storage
         try {
             let lastSelectedTeam = "" + localStorage.getItem("team");
-            this.props.config.Teams.map((row, value) => {
+            this.props.config.teams.map((row, value) => {
                 if (row.name === lastSelectedTeam) {
                     state.namespace.team = lastSelectedTeam;
                 }
@@ -171,23 +171,23 @@ class K8sNamespaceModalCreate extends BaseComponent {
 
         // select first team if no selection available
         if (!state.namespace.team || state.namespace.team === "") {
-            if (this.props.config.Teams.length > 0) {
-                state.namespace.team = this.props.config.Teams[0].Name;
+            if (this.props.config.teams.length > 0) {
+                state.namespace.team = this.props.config.teams[0].name;
             }
         }
 
         if (!state.namespace.environment) {
-            if (this.props.config.NamespaceEnvironments.length > 0) {
-                state.namespace.environment = this.props.config.NamespaceEnvironments[0].Environment;
+            if (this.props.config.kubernetes.environments.length > 0) {
+                state.namespace.environment = this.props.config.kubernetes.environments[0].environment;
             }
         }
 
         state.namespace.settings = {};
         this.kubernetesSettingsConfig().map((setting) => {
-            if (setting.Default) {
-                state.namespace.settings[setting.Name] = setting.Default
+            if (setting.default) {
+                state.namespace.settings[setting.name] = setting.default
             } else {
-                state.namespace.settings[setting.Name] = "";
+                state.namespace.settings[setting.name] = "";
             }
         });
 
@@ -198,8 +198,8 @@ class K8sNamespaceModalCreate extends BaseComponent {
     kubernetesSettingsConfig() {
         let ret = [];
 
-        if (this.props.config.Kubernetes.Namespace.Settings) {
-            ret = this.props.config.Kubernetes.Namespace.Settings;
+        if (this.props.config.kubernetes.namespace.settings) {
+            ret = this.props.config.kubernetes.namespace.settings;
         }
 
         return ret;
@@ -236,16 +236,16 @@ class K8sNamespaceModalCreate extends BaseComponent {
                                         <div className="col-3">
                                             <label htmlFor="inputNsEnvironment">Environment</label>
                                             <select name="nsEnvironment" id="inputNsEnvironment" className="form-control" required value={this.getNamespaceItem("environment")} onChange={this.handleNamespaceInputChange.bind(this, "environment")}>
-                                            {this.props.config.NamespaceEnvironments.map((row) =>
-                                                <option key={row.Environment} value={row.Environment}>{row.Environment} ({row.Description})</option>
+                                            {this.props.config.kubernetes.environments.map((row) =>
+                                                <option key={row.environment} value={row.environment}>{row.environment} ({row.description})</option>
                                             )}
                                             </select>
                                         </div>
                                         <div>
                                             <label htmlFor="inputNsAreaTeam">Team</label>
                                             <select name="nsAreaTeam" id="inputNsAreaTeam" className="form-control namespace-area-team" value={this.getNamespaceItem("team")} onChange={this.handleNamespaceInputChange.bind(this, "team")}>
-                                                {this.props.config.Teams.map((row, value) =>
-                                                    <option key={row.Id} value={row.Name}>{row.Name}</option>
+                                                {this.props.config.teams.map((row, value) =>
+                                                    <option key={row.Id} value={row.name}>{row.name}</option>
                                                 )}
                                             </select>
                                         </div>
@@ -264,14 +264,14 @@ class K8sNamespaceModalCreate extends BaseComponent {
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
                                         <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("networkPolicy")} onChange={this.handleNamespaceInputChange.bind(this, "networkPolicy")}>
-                                            {this.props.config.Kubernetes.Namespace.NetworkPolicy.map((row) =>
-                                                <option key={row.Name} value={row.Name}>{row.Description}</option>
+                                            {this.props.config.kubernetes.namespace.networkPolicy.map((row) =>
+                                                <option key={row.name} value={row.name}>{row.description}</option>
                                             )}
                                         </select>
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.Name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.Name)} />
+                                        <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.name)} />
                                     )}
                                 </div>
                                 <div className="modal-footer">

@@ -14,15 +14,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
         this.state = {
             isStartup: true,
-            config: {
-                User: {
-                    Username: '',
-                },
-                Teams: [],
-                Alertmanager: {
-                    Instances: []
-                },
-            },
+            config: this.buildAppConfig(),
             alerts: [],
             silences: [],
             loadingAlerts: true,
@@ -118,33 +110,6 @@ class MonitoringAlertmanager extends BaseComponent {
         });
     }
 
-    loadConfig() {
-        let jqxhr = this.ajax({
-            type: "GET",
-            url: '/_webapi/app/config'
-        }).done((jqxhr) => {
-            if (jqxhr) {
-                if (!jqxhr.Teams) {
-                    jqxhr.Teams = [];
-                }
-
-                if (!jqxhr.NamespaceEnvironments) {
-                    jqxhr.NamespaceEnvironments = [];
-                }
-
-                this.setState({
-                    config: jqxhr,
-                    isStartup: false
-                });
-
-                // trigger init
-                setTimeout(() => {
-                    this.init();
-                });
-            }
-        });
-    }
-
     componentDidMount() {
         this.loadConfig();
     }
@@ -157,7 +122,7 @@ class MonitoringAlertmanager extends BaseComponent {
         // default team for local storage
         try {
             let lastAlertmangerInstance = "" + localStorage.getItem("alertmanager");
-            this.state.config.Alertmanager.Instances.map((row, value) => {
+            this.state.config.alertmanager.instances.map((row, value) => {
                 if (row === lastAlertmangerInstance) {
                     state.instance = lastAlertmangerInstance;
                 }
@@ -166,8 +131,8 @@ class MonitoringAlertmanager extends BaseComponent {
 
         // select first team if no selection available
         if (!state.instance || state.instance === "") {
-            if (this.state.config.Alertmanager.Instances.length > 0) {
-                state.instance = this.state.config.Alertmanager.Instances[0];
+            if (this.state.config.alertmanager.instances.length > 0) {
+                state.instance = this.state.config.alertmanager.instances[0];
             }
         }
 
@@ -649,7 +614,7 @@ class MonitoringAlertmanager extends BaseComponent {
 
 
     renderInstanceSelector() {
-        let instances = this.state.config.Alertmanager.Instances ? this.state.config.Alertmanager.Instances : [];
+        let instances = this.state.config.alertmanager.instances ? this.state.config.alertmanager.instances : [];
 
         return (
             <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>

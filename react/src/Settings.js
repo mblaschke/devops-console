@@ -12,14 +12,7 @@ class Settings extends BaseComponent {
             isStartupSettings: true,
             buttonState: "",
 
-            config: {
-                User: {
-                    Username: '',
-                },
-                Teams: [],
-                NamespaceEnvironments: [],
-                Quota: {}
-            },
+            config: this.buildAppConfig(),
 
             requestRunning: false,
 
@@ -39,25 +32,9 @@ class Settings extends BaseComponent {
         this.loadSettings();
     }
 
-    loadConfig() {
-        let jqxhr = this.ajax({
-            type: 'GET',
-            url: '/_webapi/app/config'
-        }).done((jqxhr) => {
-            if (jqxhr) {
-                if (!jqxhr.Teams) {
-                    jqxhr.Teams = [];
-                }
-
-                if (!jqxhr.NamespaceEnvironments) {
-                    jqxhr.NamespaceEnvironments = [];
-                }
-
-                this.setState({
-                    config: jqxhr,
-                    isStartupConfig: false
-                });
-            }
+    init() {
+        this.setState({
+            isStartupConfig: false
         });
     }
 
@@ -221,22 +198,22 @@ class Settings extends BaseComponent {
                     </div>
                 </div>
 
-                {this.state.config.Teams.map((team, value) =>
+                {this.state.config.teams.map((team, value) =>
                     <div className="card mb-3">
                         <div className="card-header">
                             <i className="fas fa-users-cog"></i>
-                            Team {team.Name} settings
+                            Team {team.name} settings
                         </div>
                         <div className="card-body">
                             <form method="post">
                                 {this.state.settingConfig.Team.map((setting, value) =>
                                     <div className="form-group">
-                                        <label htmlFor={"team-" + team.Name + "-" + setting.Name} className="inputRg">{setting.Label}</label>
-                                        <input type="text" name={setting.Name} id={"team-" + team.Name + "-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getTeamConfigItem(team.Name, setting.Name)} onChange={this.handleTeamInputChange.bind(this, team.Name, setting.Name)} />
+                                        <label htmlFor={"team-" + team.name + "-" + setting.Name} className="inputRg">{setting.Label}</label>
+                                        <input type="text" name={setting.Name} id={"team-" + team.name + "-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getTeamConfigItem(team.name, setting.Name)} onChange={this.handleTeamInputChange.bind(this, team.name, setting.Name)} />
                                     </div>
                                 )}
                                 <div className="toolbox">
-                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateUpdateButton()} onClick={this.updateTeamSettings.bind(this, team.Name)}>Save</button>
+                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateUpdateButton()} onClick={this.updateTeamSettings.bind(this, team.name)}>Save</button>
                                 </div>
                             </form>
                         </div>

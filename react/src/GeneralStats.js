@@ -61,14 +61,14 @@ class GeneralStats extends BaseComponent {
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th colspan="2">{category.Name}</th>
+                                        <th colspan="2">{category.name}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {category.Stats.map((stat) =>
+                                {category.stats.map((stat) =>
                                     <tr>
-                                        <td>{stat.Name}</td>
-                                        <td>{stat.Value}</td>
+                                        <td>{stat.name}</td>
+                                        <td>{stat.value}</td>
                                     </tr>
                                 )}
                                 </tbody>

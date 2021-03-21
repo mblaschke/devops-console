@@ -24,8 +24,8 @@ type ApplicationKubernetes struct {
 func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernetes) {
 	service = &services.Kubernetes{}
 
-	if c.config.App.Kubernetes.Namespace.Filter.Access != "" {
-		service.Filter.Namespace = regexp.MustCompile(c.config.App.Kubernetes.Namespace.Filter.Access)
+	if c.config.Kubernetes.Namespace.Filter.Access != "" {
+		service.Filter.Namespace = regexp.MustCompile(c.config.Kubernetes.Namespace.Filter.Access)
 	}
 
 	return
@@ -88,11 +88,11 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			row.PodCount = c.serviceKubernetes().NamespacePodCount(namespace.Name)
 		}
 
-		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description]; ok {
+		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description]; ok {
 			row.Description = val
 		}
 
-		if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
+		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
 			row.NetworkPolicy = val
 		}
 
@@ -145,8 +145,8 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 	}
 
 	labels := map[string]string{
-		c.config.App.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
-		c.config.App.Kubernetes.Namespace.Labels.Team:        *formData.Team,
+		c.config.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
+		c.config.Kubernetes.Namespace.Labels.Team:        *formData.Team,
 	}
 
 	// validation
@@ -156,10 +156,10 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 		return
 	}
 
-	labels[c.config.App.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
+	labels[c.config.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
 
 	// set name label
-	labels[c.config.App.Kubernetes.Namespace.Labels.Name] = namespaceName
+	labels[c.config.Kubernetes.Namespace.Labels.Name] = namespaceName
 
 	namespace := models.KubernetesNamespace{Namespace: &coreV1.Namespace{}}
 	namespace.Name = namespaceName
@@ -172,11 +172,11 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 
 	// NetworkPolicy
 	if formData.NetworkPolicy != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
 
 	if formData.Description != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
@@ -213,11 +213,11 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 
 		// NetworkPolicy
 		if formData.NetworkPolicy != nil {
-			existingNs.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
+			existingNs.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 		}
 
 		if formData.Description != nil {
-			existingNs.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+			existingNs.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 		}
 
 		if namespace.Labels == nil {
@@ -225,7 +225,7 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 		}
 
 		if formData.Environment != nil {
-			existingNs.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment] = *formData.Environment
+			existingNs.Labels[c.config.Kubernetes.Namespace.Labels.Environment] = *formData.Environment
 		}
 
 		if _, err = c.updateNamespace(existingNs, true); err != nil {
@@ -277,13 +277,13 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	username := user.Username
 
-	if !regexp.MustCompile(c.config.App.Kubernetes.Namespace.Validation.App).MatchString(*formData.App) {
+	if !regexp.MustCompile(c.config.Kubernetes.Namespace.Validation.App).MatchString(*formData.App) {
 		c.respondError(ctx, fmt.Errorf("invalid app value"))
 		return
 	}
 
 	labels := map[string]string{
-		c.config.App.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
+		c.config.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
 	}
 
 	// validation
@@ -295,7 +295,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// check if environment is allowed
 	environmentAllowed := false
-	for _, env := range c.config.App.Kubernetes.Environments {
+	for _, env := range c.config.Kubernetes.Environments {
 		if env.Name == *formData.Environment {
 			envVal := env
 			environmentAllowed = true
@@ -309,7 +309,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	}
 
 	// team filter check
-	if !regexp.MustCompile(c.config.App.Kubernetes.Namespace.Validation.Team).MatchString(*formData.Team) {
+	if !regexp.MustCompile(c.config.Kubernetes.Namespace.Validation.Team).MatchString(*formData.Team) {
 		c.respondError(ctx, fmt.Errorf("invalid team value"))
 		return
 	}
@@ -335,7 +335,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 			return
 		}
 
-		labels[c.config.App.Kubernetes.Namespace.Labels.User] = strings.ToLower(username)
+		labels[c.config.Kubernetes.Namespace.Labels.User] = strings.ToLower(username)
 	}
 
 	// build namespace name
@@ -349,10 +349,10 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	namespaceName = strings.ToLower(namespaceName)
 	namespaceName = strings.Replace(namespaceName, "_", "", -1)
 
-	labels[c.config.App.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
+	labels[c.config.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
 
 	// set name label
-	labels[c.config.App.Kubernetes.Namespace.Labels.Name] = namespaceName
+	labels[c.config.Kubernetes.Namespace.Labels.Name] = namespaceName
 
 	namespace := models.KubernetesNamespace{Namespace: &coreV1.Namespace{}}
 	namespace.Name = namespaceName
@@ -365,11 +365,11 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// NetworkPolicy
 	if formData.NetworkPolicy != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
 
 	if formData.Description != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
@@ -479,11 +479,11 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	}
 	// description
 	if formData.Description != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Description] = *formData.Description
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
 	// NetworkPolicy
 	if formData.NetworkPolicy != nil {
-		namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
 
 	// labels
@@ -560,11 +560,11 @@ func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesName
 	doUpdate := force
 
 	// add env label
-	if _, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; !ok {
+	if _, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment]; !ok {
 		parts := strings.Split(namespace.Name, "-")
 
 		if len(parts) > 1 {
-			namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment] = parts[0]
+			namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment] = parts[0]
 			doUpdate = true
 		}
 	}
@@ -587,19 +587,19 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 	username = strings.Replace(username, "_", "", -1)
 
 	// USER namespace
-	regexpUser := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
+	regexpUser := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
 	if regexpUser.MatchString(namespace.Name) {
 		return true
 	}
 
-	if val, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; ok {
+	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; ok {
 		if val == user.Username {
 			return true
 		}
 	}
 
 	// ENV namespace (team labels)
-	if val, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		for _, team := range user.Teams {
 			if val == team.Name {
 				return true
@@ -613,16 +613,16 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 		teamsQuoted = append(teamsQuoted, regexp.QuoteMeta(team.Name))
 	}
 
-	regexpTeamStr := fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.Team, "("+strings.Join(teamsQuoted, "|")+")")
+	regexpTeamStr := fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.Team, "("+strings.Join(teamsQuoted, "|")+")")
 	regexpTeam := regexp.MustCompile(regexpTeamStr)
 
 	return regexpTeam.MatchString(namespace.Name)
 }
 
 func (c *ApplicationKubernetes) kubernetesNamespaceDeleteAllowed(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) bool {
-	ret := regexp.MustCompile(c.config.App.Kubernetes.Namespace.Filter.Delete).MatchString(namespace.Name)
+	ret := regexp.MustCompile(c.config.Kubernetes.Namespace.Filter.Delete).MatchString(namespace.Name)
 
-	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.Immortal]; ok {
+	if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Immortal]; ok {
 		if val == "true" {
 			ret = false
 		}
@@ -642,11 +642,11 @@ func (c *ApplicationKubernetes) kubernetesNamespaceCheckOwnership(ctx iris.Conte
 
 	username := user.Username
 
-	if labelUserVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; ok {
+	if labelUserVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; ok {
 		if labelUserVal == username {
 			return true
 		}
-	} else if labelTeamVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+	} else if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		// Team rolebinding
 		if _, err := user.GetTeam(labelTeamVal); err == nil {
 			return true
@@ -680,17 +680,17 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 	username := user.Username
 	k8sUsername := user.Id
 
-	if labelUserVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.User]; c.config.App.Kubernetes.Namespace.Role.Private && ok {
+	if labelUserVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; c.config.Kubernetes.Namespace.Role.Private && ok {
 		if labelUserVal == username {
 			// User rolebinding
-			role := c.config.App.Kubernetes.Namespace.Role.User
+			role := c.config.Kubernetes.Namespace.Role.User
 			if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceUser(namespace.Name, username, k8sUsername, role); err != nil {
 				return err
 			}
 		} else {
 			return fmt.Errorf("namespace \"%s\" not owned by current user", namespace.Name)
 		}
-	} else if labelTeamVal, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Team]; ok {
+	} else if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		// Team rolebinding
 		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
 			for _, permission := range namespaceTeam.K8sPermissions {
@@ -709,15 +709,15 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.KubernetesNamespace) (error error) {
 	var kubeObjectList *models.KubernetesObjectList
 
-	if environment, ok := namespace.Labels[c.config.App.Kubernetes.Namespace.Labels.Environment]; ok {
-		if configObjects, ok := c.config.App.Kubernetes.ObjectsList[environment]; ok {
+	if environment, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment]; ok {
+		if configObjects, ok := c.config.Kubernetes.ObjectsList[environment]; ok {
 			kubeObjectList = &configObjects
 		}
 	}
 
 	// if empty, try default
 	if kubeObjectList == nil {
-		if configObjects, ok := c.config.App.Kubernetes.ObjectsList["_default"]; ok {
+		if configObjects, ok := c.config.Kubernetes.ObjectsList["_default"]; ok {
 			kubeObjectList = &configObjects
 		}
 	}
@@ -742,7 +742,7 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 		return nil
 	}
 
-	if val, ok := namespace.Annotations[c.config.App.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
+	if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy]; ok {
 		// delete default netpol
 		if kubeObject, _ := c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Get(ctx, "default", metav1.GetOptions{}); kubeObject != nil && kubeObject.GetUID() != "" {
 			err = c.serviceKubernetes().Client().NetworkingV1().NetworkPolicies(namespace.Name).Delete(ctx, "default", metav1.DeleteOptions{})
@@ -752,7 +752,7 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 		}
 
 		// create netpol
-		for _, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+		for _, netpol := range c.config.Kubernetes.Namespace.NetworkPolicy {
 			if netpol.Name == val {
 				k8sObject := netpol.GetKubernetesObject()
 				resource := k8sObject.DeepCopyObject()
@@ -769,14 +769,14 @@ func (c *ApplicationKubernetes) updateNamespaceNetworkPolicy(namespace *models.K
 
 func (c *ApplicationKubernetes) checkNamespaceTeamQuota(team string) (err error) {
 	var count int
-	quota := c.config.App.Kubernetes.Namespace.Quota.Team
+	quota := c.config.Kubernetes.Namespace.Quota.Team
 
 	if quota <= 0 {
 		// no quota
 		return
 	}
 
-	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.Team, regexp.QuoteMeta(team)))
+	regexp := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.Team, regexp.QuoteMeta(team)))
 
 	count, err = c.serviceKubernetes().NamespaceCount(regexp)
 	if err != nil {
@@ -793,14 +793,14 @@ func (c *ApplicationKubernetes) checkNamespaceTeamQuota(team string) (err error)
 
 func (c *ApplicationKubernetes) checkNamespaceUserQuota(username string) (err error) {
 	var count int
-	quota := c.config.App.Kubernetes.Namespace.Quota.User
+	quota := c.config.Kubernetes.Namespace.Quota.User
 
 	if quota <= 0 {
 		// no quota
 		return
 	}
 
-	regexp := regexp.MustCompile(fmt.Sprintf(c.config.App.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
+	regexp := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
 
 	count, err = c.serviceKubernetes().NamespaceCount(regexp)
 	if err != nil {
@@ -864,7 +864,7 @@ func (c *ApplicationKubernetes) getNamespace(ctx iris.Context, namespaceName str
 }
 
 func (c *ApplicationKubernetes) detectEnvironmentFromNamespaceName(namespaceName string) (ret *string) {
-	for _, env := range c.config.App.Kubernetes.Environments {
+	for _, env := range c.config.Kubernetes.Environments {
 		envName := env.Name
 		envPattern := env.Template
 		envPattern = strings.Replace(envPattern, "{env}", envName, -1)
@@ -889,7 +889,7 @@ func (c *ApplicationKubernetes) getJsonFromFormData(ctx iris.Context) (formData 
 
 	// inject defaults
 	if formData.NetworkPolicy == nil {
-		for _, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+		for _, netpol := range c.config.Kubernetes.Namespace.NetworkPolicy {
 			if netpol.Default {
 				formData.NetworkPolicy = to.StringPtr(netpol.Name)
 			}

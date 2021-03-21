@@ -128,8 +128,8 @@ class K8sNamespaceModalEdit extends BaseComponent {
     kubernetesSettingsConfig() {
         let ret = [];
 
-        if (this.props.config.Kubernetes.Namespace.Settings) {
-            ret = this.props.config.Kubernetes.Namespace.Settings;
+        if (this.props.config.kubernetes.namespace.settings) {
+            ret = this.props.config.kubernetes.namespace.settings;
         }
 
         return ret;
@@ -162,14 +162,14 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
                                         <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("networkPolicy")} onChange={this.handleNamespaceInputChange.bind(this, "networkPolicy")}>
-                                            {this.props.config.Kubernetes.Namespace.NetworkPolicy.map((row) =>
-                                                <option key={row.Name} value={row.Name}>{row.Description}</option>
+                                            {this.props.config.kubernetes.namespace.networkPolicy.map((row) =>
+                                                <option key={row.name} value={row.name}>{row.description}</option>
                                             )}
                                         </select>
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.Name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.Name)} />
+                                        <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.name)} />
                                     )}
 
                                 <div className="modal-footer">

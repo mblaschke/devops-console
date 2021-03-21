@@ -17,22 +17,9 @@ class K8sNamespace extends BaseComponent {
         this.state = {
             isStartup: true,
             isStartupNamespaces: true,
+            config: this.buildAppConfig(),
             namespaces: [],
             confUser: {},
-            config: {
-                User: {
-                    Username: '',
-                },
-                Teams: [],
-                NamespaceEnvironments: [],
-                Quota: {},
-                Kubernetes: {
-                    Namespace: {
-                        Settings: [],
-                        NetworkPolicy: []
-                    }
-                }
-            },
             team: "*",
             namespaceDescriptionEdit: false,
             namespaceDescriptionEditValue: "",
@@ -70,37 +57,6 @@ class K8sNamespace extends BaseComponent {
                 namespaces: jqxhr,
                 isStartupNamespaces: false
             });
-        });
-    }
-
-    loadConfig() {
-        let jqxhr = this.ajax({
-            type: "GET",
-            url: '/_webapi/app/config'
-        }).done((jqxhr) => {
-            if (jqxhr) {
-                if (this.state.isStartup) {
-                    this.setInputFocus();
-                }
-
-                if (!jqxhr.Teams) {
-                    jqxhr.Teams = [];
-                }
-
-                if (!jqxhr.NamespaceEnvironments) {
-                    jqxhr.NamespaceEnvironments = [];
-                }
-
-                this.setState({
-                    isStartup: false,
-                    config: jqxhr
-                });
-
-                // trigger init
-                setTimeout(() => {
-                    this.init();
-                });
-            }
         });
     }
 
@@ -326,8 +282,8 @@ class K8sNamespace extends BaseComponent {
             <span>
                 Namespaces: {NamespaceCountShown} of {NamespaceCountTotal},&nbsp;
                 Quota:&nbsp;
-                {this.state.config.Quota.team === 0 ? 'unlimited' : this.state.config.Quota.team} team /&nbsp;
-                {this.state.config.Quota.user === 0 ? 'unlimited' : this.state.config.Quota.user} personal
+                {this.state.config.quota.team === 0 ? 'unlimited' : this.state.config.quota.team} team /&nbsp;
+                {this.state.config.quota.user === 0 ? 'unlimited' : this.state.config.quota.user} personal
             </span>
         )
     }
@@ -345,12 +301,12 @@ class K8sNamespace extends BaseComponent {
         let namespaceSettings = (row) => {
            let ret = [];
            try {
-               if (this.state.config && this.state.config.Kubernetes.Namespace.Settings) {
-                   this.state.config.Kubernetes.Namespace.Settings.map((setting) => {
-                       if (row.settings && row.settings[setting.Name]) {
+               if (this.state.config && this.state.config.kubernetes.namespace.settings) {
+                   this.state.config.kubernetes.namespace.settings.map((setting) => {
+                       if (row.settings && row.settings[setting.name]) {
                            ret.push({
-                              Label: setting.Label,
-                              Value: row.settings[setting.Name]
+                              label: setting.label,
+                              value: row.settings[setting.name]
                            });
                        }
                    });
@@ -446,7 +402,7 @@ class K8sNamespace extends BaseComponent {
                                             </div>
                                             {namespaceSettings(row).map((setting, index) =>
                                                 <div>
-                                                    <span className="badge badge-light">{setting.Label}: {this.highlight(setting.Value)}</span>
+                                                    <span className="badge badge-light">{setting.label}: {this.highlight(setting.value)}</span>
                                                 </div>
                                             )}
                                         </td>

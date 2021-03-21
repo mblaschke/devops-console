@@ -1,28 +1,3 @@
-application:
-  kubernetes:
-    environments:
-      - name: dev
-        description: Development
-        template: "{env}-{app}"
-
-      - name: test
-        description: Testing
-        template: "{env}-{app}"
-
-      - name: play
-        description: Playground
-        template: "{env}-{app}"
-
-      - name: team
-        description: Team environment
-        template: "team-{team}-{app}"
-        quota: "team"
-
-      - name: user
-        description: Personal environment
-        template: "user-{user}-{app}"
-        quota: "user"
-
 
 settings:
   vault:
@@ -56,8 +31,41 @@ settings:
     - name: AlertingPagerdutyApi
       label: Pagerduty API key
       type: input
+azure:
+  resourcegroup:
+    validation:
+      regexp: "^(.+)-rg$"
+
+    tags:
+      - name: Foo
+        label: Barfoo
+        placeholder: Description here
+        type: input
 
 kubernetes:
+  environments:
+    - name: dev
+      description: Development
+      template: "{env}-{app}"
+
+    - name: test
+      description: Testing
+      template: "{env}-{app}"
+
+    - name: play
+      description: Playground
+      template: "{env}-{app}"
+
+    - name: team
+      description: Team environment
+      template: "team-{team}-{app}"
+      quota: "team"
+
+    - name: user
+      description: Personal environment
+      template: "user-{user}-{app}"
+      quota: "user"
+
   namespace:
     settings:
       - name: foobar

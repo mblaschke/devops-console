@@ -103,7 +103,7 @@ func (c *Server) setupKubernetes() {
 
 	c.logger.Infof("setup kubernetes object configuration (for namespaces)")
 
-	objectsPath := c.config.App.Kubernetes.ObjectsPath
+	objectsPath := c.config.Kubernetes.ObjectsPath
 	if !filepath.IsAbs(objectsPath) {
 		if currentWorkDir, err := os.Getwd(); err == nil {
 			objectsPath = filepath.Join(currentWorkDir, objectsPath)
@@ -144,18 +144,18 @@ func (c *Server) setupKubernetes() {
 			panic(err)
 		}
 	}
-	c.config.App.Kubernetes.ObjectsList = KubeNamespaceConfig
+	c.config.Kubernetes.ObjectsList = KubeNamespaceConfig
 
 	c.logger.Infof("setup kubernetes NetworkPolicy configuration (for namespaces)")
 
-	for key, netpol := range c.config.App.Kubernetes.Namespace.NetworkPolicy {
+	for key, netpol := range c.config.Kubernetes.Namespace.NetworkPolicy {
 		if netpol.Path != "" {
 			c.logger.Infof("parsing %v", netpol.Path)
 			k8sObject := KubeParseConfig(filepath.Clean(netpol.Path))
 
 			switch k8sObject.GetObjectKind().GroupVersionKind().Kind {
 			case "NetworkPolicy":
-				c.config.App.Kubernetes.Namespace.NetworkPolicy[key].SetKubernetesObject(k8sObject.(*networkingV1.NetworkPolicy))
+				c.config.Kubernetes.Namespace.NetworkPolicy[key].SetKubernetesObject(k8sObject.(*networkingV1.NetworkPolicy))
 			default:
 				panic("not allowed object found: " + k8sObject.GetObjectKind().GroupVersionKind().Kind)
 			}

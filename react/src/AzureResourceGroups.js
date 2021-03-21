@@ -8,31 +8,19 @@ class AzureResourceGroups extends BaseComponent {
         super(props);
 
         this.state = {
+            isStartup: true,
+            config: this.buildAppConfig(),
+
             searchValue: "",
             buttonText: "Create Azure ResourceGroup",
-            requestRunning: false,
 
+            requestRunning: false,
             resourceGroup: {
                 team: "",
                 name: "",
                 location: "westeurope",
                 tag: {}
-            },
-
-            config: {
-                User: {
-                    Username: '',
-                },
-                Teams: [],
-                NamespaceEnvironments: [],
-                Quota: {},
-                Azure: {
-                    ResourceGroup: {
-                        Tags: []
-                    }
-                }
-            },
-            isStartup: true
+            }
         };
 
         setInterval(() => {
@@ -40,32 +28,8 @@ class AzureResourceGroups extends BaseComponent {
         }, 10000);
     }
 
-    loadConfig() {
-        this.ajax({
-            type: "GET",
-            url: '/_webapi/app/config'
-        }).done((jqxhr) => {
-            if (jqxhr) {
-                if (!jqxhr.Teams) {
-                    jqxhr.Teams = [];
-                }
-
-                if (!jqxhr.NamespaceEnvironments) {
-                    jqxhr.NamespaceEnvironments = [];
-                }
-
-                if (this.state.isStartup) {
-                    this.setInputFocus();
-                }
-
-                this.setState({
-                    config: jqxhr,
-                    isStartup: false
-                });
-
-                this.componentWillMount();
-            }
-        });
+    init() {
+        this.componentWillMount();
     }
 
     componentWillMount() {
@@ -74,8 +38,8 @@ class AzureResourceGroups extends BaseComponent {
         // default team for local storage
         try {
             let lastSelectedTeam = "" + localStorage.getItem("team");
-            this.state.config.Teams.map((row, value) => {
-                if (row.Name === lastSelectedTeam) {
+            this.state.config.teams.map((row, value) => {
+                if (row.name === lastSelectedTeam) {
                     state.resourceGroup.team = lastSelectedTeam;
                 }
             });
@@ -83,8 +47,8 @@ class AzureResourceGroups extends BaseComponent {
 
         // select first team if no selection available
         if (this.state.resourceGroup.team === "") {
-            if (this.state.config.Teams.length > 0) {
-                state.resourceGroup.team = this.state.config.Teams[0].Name
+            if (this.state.config.teams.length > 0) {
+                state.resourceGroup.team = this.state.config.teams[0].name
             }
         }
 
@@ -203,8 +167,8 @@ class AzureResourceGroups extends BaseComponent {
     azureResourceGroupTagConfig() {
         let ret = [];
 
-        if (this.state.config.Azure.ResourceGroup.Tags) {
-            ret = this.state.config.Azure.ResourceGroup.Tags
+        if (this.state.config.azure.resourceGroup.tags) {
+            ret = this.state.config.azure.resourceGroup.tags
         }
 
         return ret;
@@ -235,8 +199,8 @@ class AzureResourceGroups extends BaseComponent {
                             <div className="form-group">
                                 <label htmlFor="inputNsAreaTeam">Team</label>
                                 <select name="nsAreaTeam" id="inputNsAreaTeam" className="form-control namespace-area-team" value={this.getResourceGroupItem("team")} onChange={this.handleResourceGroupInputChange.bind(this, "team")}>
-                                    {this.state.config.Teams.map((row, value) =>
-                                        <option key={row.Id} value={row.Name}>{row.Name}</option>
+                                    {this.state.config.teams.map((row, value) =>
+                                        <option key={row.Id} value={row.name}>{row.name}</option>
                                     )}
                                 </select>
                             </div>
@@ -252,9 +216,9 @@ class AzureResourceGroups extends BaseComponent {
 
                             {this.azureResourceGroupTagConfig().map((setting, value) =>
                                 <div className="form-group">
-                                    <label htmlFor="inputNsApp" className="inputRg">{setting.Label}</label>
-                                    <input type="text" name={setting.Name} id={setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getResourceGroupTagItem(setting.Name)} onChange={this.handleResourceGroupTagInputChange.bind(this, setting.Name)} />
-                                    <small className="form-text text-muted">{setting.Description}</small>
+                                    <label htmlFor="inputNsApp" className="inputRg">{setting.label}</label>
+                                    <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.plaeholder} value={this.getResourceGroupTagItem(setting.name)} onChange={this.handleResourceGroupTagInputChange.bind(this, setting.name)} />
+                                    <small className="form-text text-muted">{setting.description}</small>
                                 </div>
                             )}
                             <div className="toolbox">

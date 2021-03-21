@@ -2,17 +2,17 @@ package response
 
 type (
 	GeneralStats struct {
-		Name  string
-		Stats []GeneralStatsLine
+		Name  string `json:"name"`
+		Stats []GeneralStatsLine `json:"stats"`
 	}
 
 	GeneralStatsLine struct {
-		Name  string
-		Value string
+		Name  string `json:"name"`
+		Value string `json:"value"`
 	}
 
 	GeneralMessage struct {
-		Message string
+		Message string `json:"message"`
 	}
 )
 

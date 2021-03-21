@@ -16,6 +16,59 @@ class BaseComponent extends Component {
         this.startHeartbeat();
     }
 
+    buildAppConfig() {
+        return {
+            user: {
+                username: '',
+            },
+            teams: [],
+                alertmanager: {
+                instances: []
+            },
+            quota: {},
+            azure: {
+                resourceGroup: {
+                    tags: []
+                }
+            },
+            kubernetes: {
+                environments: [],
+                namespace: {
+                    settings: [],
+                    networkPolicy: []
+                }
+            }
+        };
+    }
+
+
+    loadConfig() {
+        let jqxhr = this.ajax({
+            type: "GET",
+            url: '/_webapi/app/config'
+        }).done((jqxhr) => {
+            if (jqxhr) {
+                if (this.state.isStartup) {
+                    this.setInputFocus();
+                }
+
+                if (!jqxhr.teams) {
+                    jqxhr.teams = [];
+                }
+
+                this.setState({
+                    isStartup: false,
+                    config: jqxhr
+                });
+
+                // trigger init
+                setTimeout(() => {
+                    this.init();
+                });
+            }
+        });
+    }
+
     sortBy(field, text, callback) {
         let symbol = <i className="fas fa-sort disabled"></i>;
         if (this.state.sort && this.state.sort.field === field) {
@@ -128,10 +181,10 @@ class BaseComponent extends Component {
         jqxhr.fail((jqxhr) => {
             if (jqxhr.status === 401) {
                 window.location.href = "/logout/forced";
-            } else if (jqxhr.responseJSON && jqxhr.responseJSON.Message) {
-                window.App.pushGlobalMessage("danger", jqxhr.responseJSON.Message);
+            } else if (jqxhr.responseJSON && jqxhr.responseJSON.message) {
+                window.App.pushGlobalMessage("danger", jqxhr.responseJSON.message);
                 this.setState({
-                    globalError: jqxhr.responseJSON.Message,
+                    globalError: jqxhr.responseJSON.message,
                     isStartup: false
                 });
             } else if (jqxhr.responseText) {
@@ -146,10 +199,10 @@ class BaseComponent extends Component {
                 return
             }
 
-            if (jqxhr.Message) {
-                window.App.pushGlobalMessage("success", jqxhr.Message);
-            } else if (jqxhr.responseJSON && jqxhr.responseJSON.Message) {
-                window.App.pushGlobalMessage("success", jqxhr.Message);
+            if (jqxhr.message) {
+                window.App.pushGlobalMessage("success", jqxhr.message);
+            } else if (jqxhr.responseJSON && jqxhr.responseJSON.message) {
+                window.App.pushGlobalMessage("success", jqxhr.message);
             }
         });
     }
@@ -257,8 +310,8 @@ class BaseComponent extends Component {
         return (
             <select className="form-control" id={htmlId} value={this.getValue("team")} onChange={this.setTeam.bind(this, "team")}>
                 <option key="*" value="*">All teams</option>
-                {this.state.config.Teams.map((row, value) =>
-                    <option key={row.Id} value={row.Name}>{row.Name}</option>
+                {this.state.config.teams.map((row, value) =>
+                    <option key={row.Id} value={row.name}>{row.name}</option>
                 )}
             </select>
         )

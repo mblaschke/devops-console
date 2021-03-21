@@ -1,7 +1,6 @@
 package models
 
 import (
-	networkingV1 "k8s.io/api/networking/v1"
 	"time"
 )
 
@@ -43,16 +42,6 @@ type (
 			Channels []string
 			Message  string
 		}
-
-		Kubernetes struct {
-			ObjectsPath string `yaml:"objectsPath"`
-
-			ObjectsList map[string]KubernetesObjectList
-
-			Environments []AppConfigKubernetesEnvironment `yaml:"environments"`
-
-			Namespace KubernetesNamespaceConfig
-		} `yaml:"kubernetes"`
 	}
 
 	OAuthConfig struct {
@@ -85,59 +74,4 @@ type (
 		Quota       string
 	}
 
-	KubernetesNamespaceConfig struct {
-		Filter struct {
-			Access string
-			Delete string
-			User   string
-			Team   string
-		}
-
-		Validation struct {
-			App  string
-			Team string
-		}
-
-		Annotations struct {
-			Description   string
-			Immortal      string
-			NetworkPolicy string `yaml:"networkPolicy"`
-		}
-
-		Labels struct {
-			Name        string
-			User        string
-			Team        string
-			Environment string
-		}
-
-		Role struct {
-			Team    string
-			User    string
-			Private bool
-		}
-
-		Quota struct {
-			User int
-			Team int
-		}
-
-		NetworkPolicy []ApplicationKubernetesNetworkPolicy `yaml:"networkPolicy"`
-	}
-
-	ApplicationKubernetesNetworkPolicy struct {
-		Name        string
-		Description string
-		Path        string
-		Default     bool
-		netpol      *networkingV1.NetworkPolicy
-	}
 )
-
-func (netpol *ApplicationKubernetesNetworkPolicy) SetKubernetesObject(obj *networkingV1.NetworkPolicy) {
-	netpol.netpol = obj
-}
-
-func (netpol *ApplicationKubernetesNetworkPolicy) GetKubernetesObject() *networkingV1.NetworkPolicy {
-	return netpol.netpol
-}
