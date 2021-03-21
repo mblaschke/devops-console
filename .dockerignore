@@ -9,3 +9,5 @@
 /public/dist/*
 /react/node_modules
 /devops-console
+.env
+.env*
