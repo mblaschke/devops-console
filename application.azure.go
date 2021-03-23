@@ -48,7 +48,7 @@ func (c *ApplicationAzure) azureAuthorizer() (*autorest.Authorizer, error) {
 	return c.authorizer, nil
 }
 
-func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) (error) {
+func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
 	ctx := context.Background()
 	if c.roleDefinitionMap == nil {
 		c.roleDefinitionMap = map[string]string{}
