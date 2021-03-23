@@ -1,6 +1,7 @@
 package main
 
 import (
+	"devops-console/models/response"
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"strings"
@@ -59,12 +60,9 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 		}
 
 		// XHR error
-		response := struct {
-			Message string `json:"message"`
-		}{
+		c.responseJson(ctx, response.GeneralMessage{
 			Message: message,
-		}
-		c.responseJson(ctx, response)
+		})
 	} else {
 		// Page error
 		ctx.ViewData("ERROR_MESSAGE", message)
