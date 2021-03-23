@@ -31,6 +31,7 @@ type Server struct {
 
 	logger      *zap.SugaredLogger
 	auditLogger *zap.SugaredLogger
+	irisLogger  *zap.SugaredLogger
 }
 
 func NewServer(pathList []string) *Server {
@@ -38,9 +39,10 @@ func NewServer(pathList []string) *Server {
 
 	server.app = iris.New()
 	server.logger = log
-	auditLogger := log.Desugar()
-	auditLogger = auditLogger.WithOptions(zap.AddCallerSkip(1))
-	server.auditLogger = auditLogger.Sugar()
+	logger := log.Desugar()
+	logger = logger.WithOptions(zap.AddCallerSkip(1))
+	server.auditLogger = logger.Sugar().With(zap.String("context", "audit"))
+	server.irisLogger = logger.WithOptions(zap.AddStacktrace(zap.FatalLevel)).Sugar().With(zap.String("context", "iris"))
 	server.app.Use(recover.New())
 
 	server.Init()

@@ -16,7 +16,7 @@ func (c *Server) initLogging() {
 		message := l.Message
 		source := fmt.Sprintf("%s#%d", fn, line)
 
-		contextLogger := log.With(
+		contextLogger := c.irisLogger.With(
 			zap.String("file", source),
 		)
 
@@ -48,7 +48,6 @@ func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 	}
 
 	c.auditLogger.With(
-		zap.String("context", "audit"),
 		zap.String("user", username),
 	).Info(message)
 }
