@@ -60,7 +60,7 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 
 		// XHR error
 		response := struct {
-			Message string
+			Message string `json:"message"`
 		}{
 			Message: message,
 		}
