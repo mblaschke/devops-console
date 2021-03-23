@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/hashicorp/go-uuid"
@@ -16,17 +17,100 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"os"
 	"strings"
-	"sync"
 	"time"
 )
 
-type ApplicationAzure struct {
-	*Server
+type (
+	ApplicationAzure struct {
+		*Server
+
+		authorizer *autorest.Authorizer
+
+		roleDefinitionMap map[string]string
+	}
+
+	azureRoleAssignment struct {
+		PrincipalId        string
+		RoleDefinitionName string
+		RoleDefinitionId   string
+	}
+)
+
+func (c *ApplicationAzure) azureAuthorizer() (*autorest.Authorizer, error) {
+	if c.authorizer == nil {
+		authorizer, err := auth.NewAuthorizerFromEnvironment()
+		if err != nil {
+			return nil, err
+		}
+		c.authorizer = &authorizer
+	}
+
+	return c.authorizer, nil
+}
+
+func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) (error) {
+	ctx := context.Background()
+	if c.roleDefinitionMap == nil {
+		c.roleDefinitionMap = map[string]string{}
+	}
+
+	authorizer, err := c.azureAuthorizer()
+	if err != nil {
+		return err
+	}
+
+	// get RoleDefinition Id
+	roleDefinitionsClient := authorization.NewRoleDefinitionsClient(subscriptionId)
+	roleDefinitionsClient.Authorizer = *authorizer
+	for i, roleAssignment := range list {
+		roleDefintionName := roleAssignment.RoleDefinitionName
+		if val, exists := c.roleDefinitionMap[roleDefintionName]; exists {
+			// use cached value
+			list[i].RoleDefinitionId = val
+		} else {
+			// get role definition via API
+			filter := fmt.Sprintf("roleName eq '%s'", strings.Replace(roleDefintionName, "'", "\\'", -1))
+			result, err := roleDefinitionsClient.List(ctx, fmt.Sprintf("/subscriptions/%s", subscriptionId), filter)
+			if err != nil {
+				return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+			}
+
+			roleDefinitions := result.Values()
+			if len(roleDefinitions) != 1 {
+				return fmt.Errorf("could not find Azure RoleDefinition: %v", roleDefintionName)
+			}
+
+			list[i].RoleDefinitionId = *roleDefinitions[0].ID
+			c.roleDefinitionMap[roleAssignment.RoleDefinitionName] = *roleDefinitions[0].ID
+		}
+	}
+
+	// create RoleAssignments on scope
+	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
+	roleAssignmentsClient.Authorizer = *authorizer
+	for _, roleAssignment := range list {
+		properties := authorization.RoleAssignmentCreateParameters{
+			Properties: &authorization.RoleAssignmentProperties{
+				RoleDefinitionID: &roleAssignment.RoleDefinitionId,
+				PrincipalID:      &roleAssignment.PrincipalId,
+			},
+		}
+
+		// create uuid
+		roleAssignmentId, err := uuid.GenerateUUID()
+		if err != nil {
+			return fmt.Errorf("unable to build UUID: %v", err)
+		}
+		_, err = roleAssignmentsClient.Create(ctx, scopeId, roleAssignmentId, properties)
+		if err != nil {
+			return fmt.Errorf("unable to create Azure RoleAssignment: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models.User) {
-	wg := sync.WaitGroup{}
-
 	azureContext := context.Background()
 	var group resources.Group
 	validationMessages := []string{}
@@ -49,20 +133,20 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		validationMessages = append(validationMessages, fmt.Sprintf("validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Validation.HumanizeString()))
 	}
 
-	roleAssignmentList := []models.TeamAzureRoleAssignments{}
-	roleAssignmentList = append(roleAssignmentList, models.TeamAzureRoleAssignments{
-		Role:        "Owner",
-		PrincipalId: user.Uuid,
-	})
-
 	// membership check
 	if !user.IsMemberOf(formData.Team) {
 		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", err))
 		return
 	}
 
+	roleAssignmentList := []azureRoleAssignment{}
 	if teamObj, err := user.GetTeam(formData.Team); err == nil {
-		roleAssignmentList = append(roleAssignmentList, teamObj.AzureRoleAssignments...)
+		for _, teamRoleAssignemnt := range teamObj.AzureRoleAssignments {
+			roleAssignmentList = append(roleAssignmentList, azureRoleAssignment{
+				RoleDefinitionName: teamRoleAssignemnt.Role,
+				PrincipalId:        teamRoleAssignemnt.PrincipalId,
+			})
+		}
 	}
 
 	// create ResourceGroup tagList
@@ -102,7 +186,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	}
 
 	// azure authorizer
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	authorizer, err := c.azureAuthorizer()
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %v", err))
 		return
@@ -110,13 +194,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	// setup clients
 	groupsClient := resources.NewGroupsClient(subscriptionId)
-	groupsClient.Authorizer = authorizer
-
-	roleDefinitionsClient := authorization.NewRoleDefinitionsClient(subscriptionId)
-	roleDefinitionsClient.Authorizer = authorizer
-
-	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
-	roleAssignmentsClient.Authorizer = authorizer
+	groupsClient.Authorizer = *authorizer
 
 	// check for existing resourcegroup
 	group, _ = groupsClient.Get(azureContext, formData.Name)
@@ -136,35 +214,6 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		return
 	}
 
-	// translate role lookup
-	roleAssignmentChannel := make(chan models.TeamAzureRoleAssignments, len(roleAssignmentList))
-	for _, roleAssignment := range roleAssignmentList {
-		wg.Add(1)
-		go func(roleAssignment models.TeamAzureRoleAssignments) {
-			defer wg.Done()
-
-			// get role definition
-			filter := fmt.Sprintf("roleName eq '%s'", roleAssignment.Role)
-			roleDefinitions, err := roleDefinitionsClient.List(azureContext, "", filter)
-
-			if len(roleDefinitions.Values()) != 1 {
-				c.respondError(ctx, fmt.Errorf("error generating UUID for Azure RoleAssignment: %v", err))
-				return
-			}
-
-			roleAssignment.Role = *roleDefinitions.Values()[0].ID
-
-			roleAssignmentChannel <- roleAssignment
-		}(roleAssignment)
-	}
-	wg.Wait()
-
-	close(roleAssignmentChannel)
-	roleAssignmentList = []models.TeamAzureRoleAssignments{}
-	for roleAssignment := range roleAssignmentChannel {
-		roleAssignmentList = append(roleAssignmentList, roleAssignment)
-	}
-
 	resourceGroup := resources.Group{
 		Location: to.StringPtr(formData.Location),
 		Tags:     tagList,
@@ -176,34 +225,11 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		return
 	}
 
-	// assign role to ResourceGroup
-	for _, roleAssignment := range roleAssignmentList {
-		wg.Add(1)
-		go func(roleAssignment models.TeamAzureRoleAssignments) {
-			defer wg.Done()
-			// assign role to ResourceGroup
-			properties := authorization.RoleAssignmentCreateParameters{
-				Properties: &authorization.RoleAssignmentProperties{
-					RoleDefinitionID: &roleAssignment.Role,
-					PrincipalID:      &roleAssignment.PrincipalId,
-				},
-			}
-
-			// create uuid
-			roleAssignmentId, err := uuid.GenerateUUID()
-			if err != nil {
-				c.respondError(ctx, fmt.Errorf("unable to build UUID: %v", err))
-				return
-			}
-
-			_, err = roleAssignmentsClient.Create(azureContext, to.String(group.ID), roleAssignmentId, properties)
-			if err != nil {
-				c.respondError(ctx, fmt.Errorf("unable to create Azure RoleAssignment: %v", err))
-				return
-			}
-		}(roleAssignment)
+	err = c.createRoleAssignmentOnScope(subscriptionId, *group.ID, roleAssignmentList)
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
+		return
 	}
-	wg.Wait()
 
 	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createResourceGroup"}).Inc()
 
