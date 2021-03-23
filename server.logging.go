@@ -22,8 +22,9 @@ func (c *Server) initLogging() {
 
 		switch l.Level {
 		case golog.DisableLevel:
+			// do not log
 		case golog.DebugLevel:
-			contextLogger.Debug(l.Message)
+			contextLogger.Debug(message)
 		case golog.InfoLevel:
 			contextLogger.Info(message)
 		case golog.WarnLevel:
