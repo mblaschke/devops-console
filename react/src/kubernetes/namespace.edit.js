@@ -26,11 +26,11 @@ class NamespaceEdit extends BaseComponent {
             buttonText: "Saving...",
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'PUT',
             url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.name),
             data: JSON.stringify(this.state.form)
-        }).done((jqxhr) => {
+        }).done(() => {
             this.setState({
                 form: false,
                 reload: true,

@@ -13,7 +13,7 @@ class NamespaceFormelement extends BaseComponent {
         };
     }
 
-    generateHtmlId(setting) {
+    generateHtmlId() {
         return this.state.htmlId;
     }
 

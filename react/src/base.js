@@ -46,7 +46,7 @@ class Base extends Component {
 
 
     loadConfig() {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: "GET",
             url: '/_webapi/app/config'
         }).done((jqxhr) => {
@@ -173,7 +173,7 @@ class Base extends Component {
     }
 
     handleXhr(jqxhr) {
-        jqxhr.always((resp) => {
+        jqxhr.always(() => {
             // update CSRF token if needed
             let csrfToken = jqxhr.getResponseHeader("x-csrf-token");
             if (csrfToken) {
@@ -237,14 +237,14 @@ class Base extends Component {
     }
 
     setValue(field, event) {
-        let value = false;
+        let value;
         if (event.target) {
             value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
         } else {
             value = event;
         }
 
-        var state = this.state;
+        let state = this.state;
         _.set(state, field, value);
         this.setState(state);
     }
@@ -291,7 +291,7 @@ class Base extends Component {
     }
 
     setTeam(field, event) {
-        let value = false;
+        let value;
         if (event.target) {
             value = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
         } else {

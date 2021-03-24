@@ -50,7 +50,7 @@ class Namespace extends BaseComponent {
     }
 
     loadNamespaces() {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: "GET",
             url: '/_webapi/kubernetes/namespace'
         }).done((jqxhr) => {
@@ -125,7 +125,7 @@ class Namespace extends BaseComponent {
         }, 200)
     }
 
-    handleNamespaceClick(row, event) {
+    handleNamespaceClick(row) {
         // close descripton if clicked somewhere else
         if (this.state.namespaceDescriptionEdit !== false && this.state.namespaceDescriptionEdit !== row.name) {
             this.handleDescriptionEditClose();
@@ -137,7 +137,7 @@ class Namespace extends BaseComponent {
     }
 
     resetNamespace(namespace) {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/kubernetes/namespace/" + encodeURI(namespace.name) + "/reset"
         });
@@ -148,16 +148,18 @@ class Namespace extends BaseComponent {
         let teamBadge = "";
         let userBadge = "";
 
-        if (row.name.match(/^user-[^-]+-.*/i)) {
-            personalBadge = <span className="badge badge-light">Personal Namespace</span>
-        }
+        if (!row) {
+            if (row.name && row.name.match(/^user-[^-]+-.*/i)) {
+                personalBadge = <span className="badge badge-light">Personal Namespace</span>
+            }
 
-        if (row.ownerTeam !== "") {
-            teamBadge = <div><span className="badge badge-light">Team: {this.highlight(row.ownerTeam)}</span></div>
-        }
+            if (row.ownerTeam && row.ownerTeam !== "") {
+                teamBadge = <div><span className="badge badge-light">Team: {this.highlight(row.ownerTeam)}</span></div>
+            }
 
-        if (row.ownerUser !== "") {
-            userBadge = <div><span className="badge badge-light">User: {this.highlight(row.ownerUser)}</span></div>
+            if (row.ownerUser && row.ownerUser !== "") {
+                userBadge = <div><span className="badge badge-light">User: {this.highlight(row.ownerUser)}</span></div>
+            }
         }
 
         return <span className="badge-list">{personalBadge}{teamBadge}{userBadge}</span>
@@ -195,7 +197,7 @@ class Namespace extends BaseComponent {
         });
     }
 
-    handleDescriptionEdit(row, event) {
+    handleDescriptionEdit(row) {
         this.setState({
             namespaceDescriptionEdit: row.name,
             namespaceDescriptionEditValue: row.description
@@ -213,13 +215,13 @@ class Namespace extends BaseComponent {
     }
 
     handleDescriptionSubmit(event) {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'PUT',
             url: "/_webapi/kubernetes/namespace/" + encodeURI(this.state.namespaceDescriptionEdit),
             data: JSON.stringify({
                 description: this.state.namespaceDescriptionEditValue
             })
-        }).done((jqxhr) => {
+        }).done(() => {
             this.setState({
                 namespaceDescriptionEdit: false
             });
@@ -259,8 +261,7 @@ class Namespace extends BaseComponent {
         // filter by team
         if (this.state.team !== "*") {
             ret = ret.filter((row) => {
-                if (row.ownerTeam === this.state.team) return true;
-                return false;
+                return row.ownerTeam === this.state.team;
             });
         }
 
@@ -374,7 +375,7 @@ class Namespace extends BaseComponent {
                                 {namespaces.map((row) =>
                                     <tr key={row.name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
                                         <td>
-                                            <div class="button-copy-box">
+                                            <div className="button-copy-box">
                                                 {this.highlight(row.name)}
                                                 <CopyToClipboard text={row.name}>
                                                     <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
@@ -397,7 +398,7 @@ class Namespace extends BaseComponent {
                                         <td>
                                             {this.renderRowOwner(row)}
                                         </td>
-                                        <td class="small">
+                                        <td className="small">
                                             <div>
                                                 <span className="badge badge-warning">NetworkPolicy: {row.networkPolicy || "none"}</span>
                                             </div>

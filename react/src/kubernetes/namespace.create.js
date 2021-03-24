@@ -39,7 +39,7 @@ class NamespaceCreate extends BaseComponent {
             type: 'POST',
             url: "/_webapi/kubernetes/namespace",
             data: JSON.stringify(this.state.form)
-        }).done((jqxhr) => {
+        }).done(() => {
             this.setState({
                 form: false
             });

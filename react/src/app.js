@@ -140,7 +140,7 @@ class App extends Base {
                 username: this.state.username,
                 password: this.state.password
             }
-        }).done((data) => {
+        }).done(() => {
             this.setState({loggedIn: true});
         });
     }

@@ -251,7 +251,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
             }
 
             return (
-                <span class="reltime">({val})</span>
+                <span className="reltime">({val})</span>
             )
         };
 
