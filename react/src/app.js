@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import BaseComponent from './BaseComponent';
-import K8sNamespace from './K8sNamespace';
-import K8sAccess from './K8sAccess';
-import AzureResourceGroups from './AzureResourceGroups';
-import AzureRoleAssignment from './AzureRoleAssignment';
-import MonitoringAlertmanager from "./MonitoringAlertmanager";
-import Settings from './Settings';
-import GeneralStats from './GeneralStats';
+import Base from './base';
+import K8sNamespace from './kubernetes/namespace';
+import K8sAccess from './kubernetes/access';
+import AzureResourceGroups from './azure/resourcegroup';
+import AzureRoleAssignment from './azure/roleassignment';
+import MonitoringAlertmanager from "./monitoring/alertmanager";
+import Settings from './general/settings';
+import GeneralStats from './general/stats';
 import $ from "jquery";
 
-class App extends BaseComponent {
+class App extends Base {
     constructor(props) {
         super(props);
 

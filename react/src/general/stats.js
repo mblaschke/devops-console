@@ -1,8 +1,8 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
-import Spinner from './Spinner';
+import Base from '../base';
+import Spinner from '../spinner';
 
-class GeneralStats extends BaseComponent {
+class Stats extends Base {
     constructor(props) {
         super(props);
 
@@ -82,5 +82,5 @@ class GeneralStats extends BaseComponent {
     }
 }
 
-export default GeneralStats;
+export default Stats;
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../base';
 
-class MonitoringAlertmanagerModalSilenceDelete extends BaseComponent {
+class AlertmanagerSilencedelete extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -85,5 +85,5 @@ class MonitoringAlertmanagerModalSilenceDelete extends BaseComponent {
     }
 }
 
-export default MonitoringAlertmanagerModalSilenceDelete;
+export default AlertmanagerSilencedelete;
 

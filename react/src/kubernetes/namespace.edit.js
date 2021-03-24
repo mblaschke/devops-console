@@ -1,8 +1,8 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
-import K8sNamespaceFormElement from "./K8sNamespaceFormElement";
+import BaseComponent from '../base';
+import NamespaceFormelement from "./namespace.formelement";
 
-class K8sNamespaceModalEdit extends BaseComponent {
+class NamespaceEdit extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -126,7 +126,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <K8sNamespaceFormElement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
+                                        <NamespaceFormelement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
                                     )}
 
                                 <div className="modal-footer">
@@ -143,5 +143,5 @@ class K8sNamespaceModalEdit extends BaseComponent {
     }
 }
 
-export default K8sNamespaceModalEdit;
+export default NamespaceEdit;
 

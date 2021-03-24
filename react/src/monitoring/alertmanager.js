@@ -2,13 +2,14 @@ import React from 'react';
 import $ from 'jquery';
 import moment from 'moment';
 
-import BaseComponent from './BaseComponent';
-import Spinner from './Spinner';
-import Breadcrumb from './Breadcrumb';
-import MonitoringAlertmanagerModalSilenceDelete from "./MonitoringAlertmanagerModalSilenceDelete";
-import MonitoringAlertmanagerModalSilenceEdit from "./MonitoringAlertmanagerModalSilenceEdit";
+import BaseComponent from '../base';
+import Spinner from '../spinner';
+import Breadcrumb from '../breadcrumb';
 
-class MonitoringAlertmanager extends BaseComponent {
+import AlertmanagerSilencedelete from "./alertmanager.silencedelete";
+import AlertmanagerSilenceedit from "./alertmanager.silenceedit";
+
+class Alertmanager extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -606,8 +607,8 @@ class MonitoringAlertmanager extends BaseComponent {
                     <div className="card-footer small text-muted">{this.buildFooter(this.state.silences, silences)}</div>
                 </div>
 
-                <MonitoringAlertmanagerModalSilenceDelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
-                <MonitoringAlertmanagerModalSilenceEdit instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceEdit.bind(this)} />
+                <AlertmanagerSilencedelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
+                <AlertmanagerSilenceedit instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceEdit.bind(this)} />
             </div>
         );
     }
@@ -976,4 +977,4 @@ class MonitoringAlertmanager extends BaseComponent {
     }
 }
 
-export default MonitoringAlertmanager;
+export default Alertmanager;

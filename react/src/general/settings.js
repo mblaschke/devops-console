@@ -1,7 +1,7 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
-import Spinner from "./Spinner";
-import Breadcrumb from "./Breadcrumb";
+import BaseComponent from '../base';
+import Spinner from "../spinner";
+import Breadcrumb from "../breadcrumb";
 
 class Settings extends BaseComponent {
     constructor(props) {

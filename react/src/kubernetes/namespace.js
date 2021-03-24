@@ -3,14 +3,15 @@ import $ from 'jquery';
 import onClickOutside from 'react-onclickoutside'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
-import BaseComponent from './BaseComponent';
-import Spinner from './Spinner';
-import K8sNamespaceModalDelete from './K8sNamespaceModalDelete';
-import K8sNamespaceModalCreate from './K8sNamespaceModalCreate';
-import K8sNamespaceModalEdit from './K8sNamespaceModalEdit';
-import Breadcrumb from './Breadcrumb';
+import BaseComponent from '../base';
+import Spinner from '../spinner';
+import Breadcrumb from '../breadcrumb';
 
-class K8sNamespace extends BaseComponent {
+import NamespaceDelete from './namespace.delete';
+import NamespaceCreate from './namespace.create';
+import NamespaceEdit from './namespace.edit';
+
+class Namespace extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -454,13 +455,13 @@ class K8sNamespace extends BaseComponent {
                     <div className="card-footer small text-muted">{this.buildFooter(namespaces)}</div>
                 </div>
 
-                <K8sNamespaceModalDelete config={this.state.config} namespace={this.state.selectedNamespaceDelete} callback={this.handleNamespaceDeletion.bind(this)} />
-                <K8sNamespaceModalCreate config={this.state.config} callback={this.handleNamespaceCreation.bind(this)} />
-                <K8sNamespaceModalEdit config={this.state.config} show={this.state.namespaceEditModalShow} namespace={this.state.selectedNamespace} callback={this.handleNamespaceEdit.bind(this)} />
+                <NamespaceDelete config={this.state.config} namespace={this.state.selectedNamespaceDelete} callback={this.handleNamespaceDeletion.bind(this)} />
+                <NamespaceCreate config={this.state.config} callback={this.handleNamespaceCreation.bind(this)} />
+                <NamespaceEdit config={this.state.config} show={this.state.namespaceEditModalShow} namespace={this.state.selectedNamespace} callback={this.handleNamespaceEdit.bind(this)} />
             </div>
         );
     }
 }
 
-export default onClickOutside(K8sNamespace);
+export default onClickOutside(Namespace);
 

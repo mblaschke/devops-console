@@ -1,7 +1,7 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../base';
 
-class K8sNamespaceModalDelete extends BaseComponent {
+class NamespaceDelete extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -101,5 +101,5 @@ class K8sNamespaceModalDelete extends BaseComponent {
     }
 }
 
-export default K8sNamespaceModalDelete;
+export default NamespaceDelete;
 

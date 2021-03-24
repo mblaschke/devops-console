@@ -1,9 +1,9 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
-import Spinner from './Spinner';
-import Breadcrumb from "./Breadcrumb";
+import BaseComponent from '../base';
+import Spinner from '../spinner';
+import Breadcrumb from '../breadcrumb';
 
-class K8sAccess extends BaseComponent {
+class Access extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -72,5 +72,5 @@ class K8sAccess extends BaseComponent {
     }
 }
 
-export default K8sAccess;
+export default Access;
 

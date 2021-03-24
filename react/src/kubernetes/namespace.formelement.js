@@ -1,7 +1,7 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
+import BaseComponent from '../base';
 
-class K8sNamespaceFormElement extends BaseComponent {
+class NamespaceFormelement extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -71,5 +71,5 @@ class K8sNamespaceFormElement extends BaseComponent {
     }
 }
 
-export default K8sNamespaceFormElement;
+export default NamespaceFormelement;
 

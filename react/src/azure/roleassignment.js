@@ -1,9 +1,9 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
-import Spinner from './Spinner';
-import Breadcrumb from './Breadcrumb';
+import BaseComponent from '../base';
+import Spinner from '../spinner';
+import Breadcrumb from '../breadcrumb';
 
-class AzureRoleAssignment extends BaseComponent {
+class Roleassignment extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -140,5 +140,5 @@ class AzureRoleAssignment extends BaseComponent {
     }
 }
 
-export default AzureRoleAssignment;
+export default Roleassignment;
 

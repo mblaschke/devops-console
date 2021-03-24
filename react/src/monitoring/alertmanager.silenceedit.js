@@ -1,9 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import BaseComponent from './BaseComponent';
 
-class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
+import BaseComponent from '../base';
+
+class AlertmanagerSilenceedit extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -413,5 +414,5 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
     }
 }
 
-export default MonitoringAlertmanagerModalSilenceEdit;
+export default AlertmanagerSilenceedit;
 

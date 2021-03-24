@@ -1,7 +1,7 @@
 import React from 'react';
-import BaseComponent from './BaseComponent';
+import Base from './base';
 
-class Breadcrumb extends BaseComponent {
+class Breadcrumb extends Base {
     constructor(props) {
         super(props);
 

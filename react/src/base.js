@@ -4,7 +4,7 @@ import $ from 'jquery';
 import * as utils from "./utils";
 import _ from 'lodash';
 
-class BaseComponent extends Component {
+class Base extends Component {
     constructor(props) {
         super(props);
 
@@ -348,4 +348,4 @@ class BaseComponent extends Component {
 
 }
 
-export default BaseComponent;
+export default Base;

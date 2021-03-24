@@ -1,10 +1,10 @@
 import React from 'react';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
-import BaseComponent from './BaseComponent';
-import K8sNamespaceFormElement from './K8sNamespaceFormElement';
+import BaseComponent from '../base';
+import NamespaceFormelement from './namespace.formelement';
 
-class K8sNamespaceModalCreate extends BaseComponent {
+class NamespaceCreate extends BaseComponent {
     constructor(props) {
         super(props);
 
@@ -215,7 +215,7 @@ class K8sNamespaceModalCreate extends BaseComponent {
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <K8sNamespaceFormElement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
+                                        <NamespaceFormelement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
                                     )}
                                 </div>
                                 <div className="modal-footer">
@@ -231,5 +231,5 @@ class K8sNamespaceModalCreate extends BaseComponent {
     }
 }
 
-export default K8sNamespaceModalCreate;
+export default NamespaceCreate;
 
