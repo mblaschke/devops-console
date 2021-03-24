@@ -308,7 +308,7 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 	}
 
 	if owner, exists := group.Tags["owner"]; exists {
-		if owner == nil {
+		if owner == nil || *owner == "" {
 			c.respondError(ctx, fmt.Errorf("found empty owner tag in Azure ResourceGroup"))
 			return
 		}
