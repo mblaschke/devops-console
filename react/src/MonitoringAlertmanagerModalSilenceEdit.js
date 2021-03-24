@@ -13,7 +13,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             buttonState: "",
             reload: true,
             team: "",
-            silence: {}
+            form: {}
         };
     }
 
@@ -68,7 +68,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id),
             data: JSON.stringify({
                 team: this.state.team,
-                silence: this.state.silence
+                silence: this.state.form
             })
         }).done((jqxhr) => {
             this.setState({
@@ -100,7 +100,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence",
             data: JSON.stringify({
                 team: this.state.team,
-                silence: this.state.silence
+                silence: this.state.form
             })
         }).done((jqxhr) => {
             this.setState({
@@ -148,22 +148,22 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
 
 
         // make copy
-        let silence = JSON.parse(JSON.stringify(nextProps.silence));
+        let form = JSON.parse(JSON.stringify(nextProps.silence));
 
         let team = this.state.team;
 
         try {
-            if (silence.matchers) {
+            if (form.matchers) {
                 let matcherTeam = false;
                 let matchersFiltered = [];
-                silence.matchers.map((matcher) => {
+                form.matchers.map((matcher) => {
                     if (matcher.name === "team") {
                         matcherTeam = matcher.value;
                     } else {
                         matchersFiltered.push(matcher);
                     }
                 });
-                silence.matchers = matchersFiltered;
+                form.matchers = matchersFiltered;
 
                 if (matcherTeam) {
                     this.props.config.teams.map((row, value) => {
@@ -178,7 +178,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
 
         // set to state
         this.setState({
-            silence: silence,
+            form: form,
             team: team,
             reload: false
         });
@@ -186,13 +186,13 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
 
     deleteMatcher(num) {
         var state = this.state;
-        state.silence.matchers.splice(num, 1 );
+        state.form.matchers.splice(num, 1 );
         this.setState(state);
     }
 
     addMatcher() {
         var state = this.state;
-        state.silence.matchers.push({
+        state.form.matchers.push({
             name: "",
             value: "",
             regexp: false,
@@ -221,7 +221,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
     }
 
     render() {
-        if (!this.state.silence) {
+        if (!this.state.form) {
             return (
                 <div>
                     <form method="post">
@@ -232,7 +232,7 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
             )
         }
 
-        let matchers = Array.isArray(this.state.silence.matchers) ? this.state.silence.matchers : [];
+        let matchers = Array.isArray(this.state.form.matchers) ? this.state.form.matchers : [];
 
         // filter team
         matchers = matchers.filter((row) => {
@@ -279,15 +279,15 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
 
                                     <div className="form-group">
                                         <label htmlFor="silence-form-comment" className="inputRg">Description</label>
-                                        <textarea id="silence-form-comment" className="form-control" value={this.getValue("silence.comment")} onChange={this.setValue.bind(this, "silence.comment")}  />
+                                        <textarea id="silence-form-comment" className="form-control" value={this.getValue("form.comment")} onChange={this.setValue.bind(this, "form.comment")}  />
                                     </div>
 
                                     <div className="form-group">
                                         <div className="form-row">
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="silence-form-startsAt" className="inputRg">Starts at {reltime(this.getValue("silence.startsAt"))}</label>
+                                                <label htmlFor="silence-form-startsAt" className="inputRg">Starts at {reltime(this.getValue("form.startsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input id="silence-form-startsAt" className="form-control" value={this.getValue("silence.startsAt")} onChange={this.setValue.bind(this, "silence.startsAt")}  />
+                                                    <input id="silence-form-startsAt" className="form-control" value={this.getValue("form.startsAt")} onChange={this.setValue.bind(this, "form.startsAt")}  />
                                                     <div className="btn-group bnt-abs-right" role="group">
                                                         <button id="btnGroupDrop-startsAt" type="button"
                                                                 className="btn btn-secondary dropdown-toggle btn-sm"
@@ -296,26 +296,26 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                                             +
                                                         </button>
                                                         <div className="dropdown-menu" aria-labelledby="btnGroupDrop-startsAt">
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "h")}>1 hour</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "h")}>2 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "h")}>4 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 8, "h")}>8 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "d")}>1 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "d")}>2 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "d")}>4 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 1, "w")}>1 week</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 2, "w")}>2 weeks</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 3, "w")}>3 weeks</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.startsAt", 4, "w")}>4 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "h")}>1 hour</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "h")}>2 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "h")}>4 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 8, "h")}>8 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "d")}>1 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "d")}>2 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "d")}>4 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "w")}>1 week</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "w")}>2 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 3, "w")}>3 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "w")}>4 weeks</a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="silence-form-endsAt" className="inputRg">Ends at {reltime(this.getValue("silence.endsAt"))}</label>
+                                                <label htmlFor="silence-form-endsAt" className="inputRg">Ends at {reltime(this.getValue("form.endsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input id="silence-form-endsAt" className="form-control" value={this.getValue("silence.endsAt")} onChange={this.setValue.bind(this, "silence.endsAt")}  />
+                                                    <input id="silence-form-endsAt" className="form-control" value={this.getValue("form.endsAt")} onChange={this.setValue.bind(this, "form.endsAt")}  />
                                                     <div className="btn-group bnt-abs-right" role="group">
                                                         <button id="btnGroupDrop-endsAt" type="button"
                                                                 className="btn btn-secondary dropdown-toggle btn-sm"
@@ -324,17 +324,17 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                                             +
                                                         </button>
                                                         <div className="dropdown-menu" aria-labelledby="btnGroupDrop-endsAt">
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "h")}>1 hour</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "h")}>2 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "h")}>4 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 8, "h")}>8 hours</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "d")}>1 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "d")}>2 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "d")}>4 day</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 1, "w")}>1 week</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 2, "w")}>2 weeks</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 3, "w")}>3 weeks</a>
-                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "silence.endsAt", 4, "w")}>4 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "h")}>1 hour</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "h")}>2 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "h")}>4 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 8, "h")}>8 hours</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "d")}>1 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "d")}>2 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "d")}>4 day</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "w")}>1 week</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "w")}>2 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 3, "w")}>3 weeks</a>
+                                                            <a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "w")}>4 weeks</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -369,19 +369,19 @@ class MonitoringAlertmanagerModalSilenceEdit extends BaseComponent {
                                         {matchers.map((item,key) =>
                                             <tr>
                                                 <td>
-                                                    <input className="form-control" value={this.getValue("silence.matchers[" + key + "].name")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].name")}  />
+                                                    <input className="form-control" value={this.getValue("form.matchers[" + key + "].name")} onChange={this.setValue.bind(this, "form.matchers[" + key + "].name")}  />
                                                 </td>
 
                                                 <td>
-                                                    <input className="form-control" value={this.getValue("silence.matchers[" + key + "].value")} onChange={this.setValue.bind(this, "silence.matchers[" + key + "].value")}  />
+                                                    <input className="form-control" value={this.getValue("form.matchers[" + key + "].value")} onChange={this.setValue.bind(this, "form.matchers[" + key + "].value")}  />
                                                 </td>
 
                                                 <td>
                                                     <div className="form-check">
                                                         <input type="checkbox" id={this.htmlIdMatcher(key)}
                                                                className="form-check-input"
-                                                               checked={this.getValueCheckbox("silence.matchers[" + key + "].isRegex")}
-                                                               onChange={this.setValueCheckbox.bind(this, "silence.matchers[" + key + "].isRegex")}/>
+                                                               checked={this.getValueCheckbox("form.matchers[" + key + "].isRegex")}
+                                                               onChange={this.setValueCheckbox.bind(this, "form.matchers[" + key + "].isRegex")}/>
                                                         <label className="form-check-label"
                                                                htmlFor={this.htmlIdMatcher(key)}>
                                                             Regexp

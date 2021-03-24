@@ -15,17 +15,13 @@ class AzureResourceGroups extends BaseComponent {
             buttonText: "Create Azure ResourceGroup",
 
             requestRunning: false,
-            resourceGroup: {
+            form: {
                 team: "",
                 name: "",
                 location: "westeurope",
                 tag: {}
             }
         };
-
-        setInterval(() => {
-            this.refresh()
-        }, 10000);
     }
 
     init() {
@@ -40,22 +36,22 @@ class AzureResourceGroups extends BaseComponent {
             let lastSelectedTeam = "" + localStorage.getItem("team");
             this.state.config.teams.map((row, value) => {
                 if (row.name === lastSelectedTeam) {
-                    state.resourceGroup.team = lastSelectedTeam;
+                    state.form.team = lastSelectedTeam;
                 }
             });
         } catch {}
 
         // select first team if no selection available
-        if (this.state.resourceGroup.team === "") {
+        if (this.state.form.team === "") {
             if (this.state.config.teams.length > 0) {
-                state.resourceGroup.team = this.state.config.teams[0].name
+                state.form.team = this.state.config.teams[0].name
             }
         }
 
-        state.resourceGroup.tag = {};
+        state.form.tag = {};
         this.azureResourceGroupTagConfig().map((setting) => {
             if (setting.Default) {
-                state.resourceGroup.tag[setting.Name] = setting.Default;
+                state.form.tag[setting.Name] = setting.Default;
             }
         });
 
@@ -65,9 +61,6 @@ class AzureResourceGroups extends BaseComponent {
     componentDidMount() {
         this.loadConfig();
         this.setInputFocus();
-    }
-
-    refresh() {
     }
 
     createResourceGroup(e) {
@@ -83,10 +76,10 @@ class AzureResourceGroups extends BaseComponent {
         let jqxhr = this.ajax({
             type: 'POST',
             url: "/_webapi/azure/resourcegroup",
-            data: JSON.stringify(this.state.resourceGroup)
+            data: JSON.stringify(this.state.form)
         }).done((jqxhr) => {
             let state = this.state;
-            state.resourceGroup.name = "";
+            state.form.name = "";
             this.setState(state);
         }).always(() => {
             this.setState({
@@ -102,63 +95,13 @@ class AzureResourceGroups extends BaseComponent {
         if (this.state.requestRunning) {
             state = "disabled";
         } else {
-            if (this.state.azResourceGroup === "" || this.state.azTeam === "" || this.state.azResourceGroupLocation === "") {
+            if (this.state.form.name === "" || this.state.form.team === "" || this.state.form.location === "") {
                 state = "disabled"
             }
         }
 
         return state
     }
-
-    handleResourceGroupInputChange(name, event) {
-        let state = this.state;
-        state.resourceGroup[name] = event.target.value;
-        this.setState(state);
-
-        if (name === "team") {
-            try {
-                localStorage.setItem("team", event.target.value);
-            } catch {}
-        }
-    }
-
-
-    handleResourceGroupTagInputChange(name, event) {
-        let state = this.state;
-        state.resourceGroup["tag"][name] = event.target.value;
-        this.setState(state);
-    }
-
-    getResourceGroupItem(name) {
-        let ret = "";
-
-        if (this.state.resourceGroup && this.state.resourceGroup[name]) {
-            ret = this.state.resourceGroup[name];
-        }
-
-        return ret;
-    }
-
-    handleResourceGroupCheckboxChange(name, event) {
-        let state = this.state;
-        state.resourceGroup[name] = event.target.checked;
-        this.setState(state);
-    }
-
-    getResourceGroupItemBool(name) {
-        return (this.state.resourceGroup && this.state.resourceGroup[name])
-    }
-
-    getResourceGroupTagItem(name) {
-        var ret = "";
-
-        if (this.state.resourceGroup.tag && this.state.resourceGroup.tag[name]) {
-            ret = this.state.resourceGroup.tag[name];
-        }
-
-        return ret;
-    }
-
 
     handleClickOutside() {
         this.setInputFocus();
@@ -198,7 +141,7 @@ class AzureResourceGroups extends BaseComponent {
                         <form method="post">
                             <div className="form-group">
                                 <label htmlFor="inputNsAreaTeam">Team</label>
-                                <select name="nsAreaTeam" id="inputNsAreaTeam" className="form-control namespace-area-team" value={this.getResourceGroupItem("team")} onChange={this.handleResourceGroupInputChange.bind(this, "team")}>
+                                <select name="nsAreaTeam" id="inputNsAreaTeam" className="form-control namespace-area-team" value={this.getValue("form.team")} onChange={this.setValue.bind(this, "form.team")}>
                                     {this.state.config.teams.map((row, value) =>
                                         <option key={row.Id} value={row.name}>{row.name}</option>
                                     )}
@@ -207,17 +150,17 @@ class AzureResourceGroups extends BaseComponent {
 
                             <div className="form-group">
                                 <label htmlFor="inputNsApp" className="inputRg">Azure ResourceGroup</label>
-                                <input type="text" name="nsApp" id="inputRg" className="form-control" placeholder="ResourceGroup name" required value={this.getResourceGroupItem("name")} onChange={this.handleResourceGroupInputChange.bind(this, "name")} />
+                                <input type="text" name="nsApp" id="inputRg" className="form-control" placeholder="ResourceGroup name" required value={this.getValue("form.name")} onChange={this.setValue.bind(this, "form.name")} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="inputNsApp" className="inputRgLocation">Azure Location</label>
-                                <input type="text" name="nsApp" id="inputRgLocation" className="form-control" placeholder="ResourceGroup location" required value={this.getResourceGroupItem("location")} onChange={this.handleResourceGroupInputChange.bind(this, "location")} />
+                                <input type="text" name="nsApp" id="inputRgLocation" className="form-control" placeholder="ResourceGroup location" required value={this.getValue("form.location")} onChange={this.setValue.bind(this, "form.location")} />
                             </div>
 
                             {this.azureResourceGroupTagConfig().map((setting, value) =>
                                 <div className="form-group">
                                     <label htmlFor="inputNsApp" className="inputRg">{setting.label}</label>
-                                    <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.plaeholder} value={this.getResourceGroupTagItem(setting.name)} onChange={this.handleResourceGroupTagInputChange.bind(this, setting.name)} />
+                                    <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.plaeholder} value={this.getValue("form.tag." + setting.name)} onChange={this.setValue.bind(this, "form.tag." + setting.name)} />
                                     <small className="form-text text-muted">{setting.description}</small>
                                 </div>
                             )}

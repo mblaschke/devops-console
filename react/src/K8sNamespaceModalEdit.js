@@ -12,7 +12,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
             buttonState: "",
             reload: true,
 
-            namespace: {}
+            form: {}
         };
     }
 
@@ -29,10 +29,10 @@ class K8sNamespaceModalEdit extends BaseComponent {
         let jqxhr = this.ajax({
             type: 'PUT',
             url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.name),
-            data: JSON.stringify(this.state.namespace)
+            data: JSON.stringify(this.state.form)
         }).done((jqxhr) => {
             this.setState({
-                namespace: false,
+                form: false,
                 reload: true,
             });
 
@@ -49,52 +49,9 @@ class K8sNamespaceModalEdit extends BaseComponent {
 
     cancelEdit() {
         this.setState({
-            namespace: false,
+            form: false,
             reload: true,
         });
-    }
-
-    handleNamespaceInputChange(name, event) {
-        var state = this.state;
-        state.namespace[name] = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
-        this.setState(state);
-    }
-
-    handleNamespaceSettingInputChange(name, event) {
-        var state = this.state;
-
-        if (!state.namespace.settings) {
-            state.namespace.settings = {}
-        }
-
-        state.namespace.settings[name] = event.target.type === 'checkbox' ? String(event.target.checked) : String(event.target.value);
-        this.setState(state);
-    }
-
-    getNamespaceItem(name) {
-        var ret = "";
-
-        if (this.state.namespace && this.state.namespace[name]) {
-            ret = this.state.namespace[name];
-        }
-
-        return ret;
-    }
-
-    getNamespaceSettingItem(name) {
-        var ret = "";
-
-        if (this.state.namespace.settings && this.state.namespace.settings[name]) {
-            ret = this.state.namespace.settings[name];
-        }
-
-        return ret;
-    }
-
-    handleNsDescriptionChange(event) {
-        let state = this.state;
-        state.namespace.description = event.target.value;
-        this.setState(state);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -115,11 +72,11 @@ class K8sNamespaceModalEdit extends BaseComponent {
         // show modal
         if (this.state.reload) {
             // make copy
-            let namespace = JSON.parse(JSON.stringify(nextProps.namespace));
+            let form = JSON.parse(JSON.stringify(nextProps.namespace));
 
             // set to state
             this.setState({
-                namespace: namespace,
+                form: form,
                 reload: false
             });
         }
@@ -151,17 +108,17 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                 <div className="modal-body">
                                     <div className="form-group">
                                         <label htmlFor="inputNsApp" className="inputRg">Namespace</label>
-                                        <input className="form-control" type="text" value={this.state.namespace.name} readOnly />
+                                        <input className="form-control" type="text" value={this.state.form.name} readOnly />
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsDescription" className="inputRg">Description</label>
-                                        <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getNamespaceItem("description")} onChange={this.handleNamespaceInputChange.bind(this, "description")} />
+                                        <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getValue("form.description")} onChange={this.setValue.bind(this, "form.description")} />
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
-                                        <select id="inputNsNetpol" className="form-control" value={this.getNamespaceItem("networkPolicy")} onChange={this.handleNamespaceInputChange.bind(this, "networkPolicy")}>
+                                        <select id="inputNsNetpol" className="form-control" value={this.getValue("form.networkPolicy")} onChange={this.setValue.bind(this, "form.networkPolicy")}>
                                             {this.props.config.kubernetes.namespace.networkPolicy.map((row) =>
                                                 <option key={row.name} value={row.name}>{row.description}</option>
                                             )}
@@ -169,7 +126,7 @@ class K8sNamespaceModalEdit extends BaseComponent {
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <K8sNamespaceFormElement setting={setting} value={this.getNamespaceSettingItem(setting.name)} onchange={this.handleNamespaceSettingInputChange.bind(this, setting.name)} />
+                                        <K8sNamespaceFormElement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
                                     )}
 
                                 <div className="modal-footer">

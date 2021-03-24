@@ -53,12 +53,6 @@ class K8sNamespaceModalDelete extends BaseComponent {
         }
     }
 
-    handleConfirmNamespace(event) {
-        this.setState({
-            confirmNamespace: event.target.value
-        });
-    }
-
     renderButtonState() {
         if (this.state.buttonState !== "") {
             return this.state.buttonState;
@@ -90,7 +84,7 @@ class K8sNamespaceModalDelete extends BaseComponent {
                                     </div>
                                     <div className="row">
                                         <div className="col">
-                                            <input type="text" id="inputNsDeleteConfirm" className="form-control" placeholder="Enter namespace for confirmation" required value={this.state.confirmNamespace} onChange={this.handleConfirmNamespace.bind(this)} />
+                                            <input type="text" id="inputNsDeleteConfirm" className="form-control" placeholder="Enter namespace for confirmation" required value={this.getValue("confirmNamespace")} onChange={this.setValue.bind(this, "confirmNamespace")} />
                                         </div>
                                     </div>
                                 </div>
