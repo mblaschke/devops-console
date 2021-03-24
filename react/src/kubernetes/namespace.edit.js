@@ -9,7 +9,7 @@ class NamespaceEdit extends BaseComponent {
         this.state = {
             namespacePreview: "",
             buttonText: "Save namespace",
-            buttonState: "",
+            requestRunning: false,
             reload: true,
 
             form: {}
@@ -22,7 +22,7 @@ class NamespaceEdit extends BaseComponent {
 
         let oldButtonText = this.state.buttonText;
         this.setState({
-            buttonState: "disabled",
+            requestRunning: true,
             buttonText: "Saving...",
         });
 
@@ -41,7 +41,7 @@ class NamespaceEdit extends BaseComponent {
             }
         }).always(() => {
             this.setState({
-                buttonState: "",
+                requestRunning: false,
                 buttonText: oldButtonText
             });
         });
@@ -92,6 +92,16 @@ class NamespaceEdit extends BaseComponent {
         return ret;
     }
 
+    stateButton() {
+        let state = "";
+
+        if (this.state.requestRunning) {
+            state = "disabled";
+        }
+
+        return state
+    }
+
     render() {
         return (
             <div>
@@ -131,7 +141,7 @@ class NamespaceEdit extends BaseComponent {
 
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-dismiss="modal">Cancel</button>
-                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.state.buttonState} onClick={this.saveNamespace.bind(this)}>{this.state.buttonText}</button>
+                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateButton()} onClick={this.saveNamespace.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>
                         </div>

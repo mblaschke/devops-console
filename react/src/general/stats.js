@@ -22,7 +22,7 @@ class Stats extends Base {
     }
 
     refresh() {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: "GET",
             url: '/_webapi/general/stats'
         }).done((jqxhr) => {

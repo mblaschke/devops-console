@@ -10,7 +10,6 @@ class Settings extends BaseComponent {
         this.state = {
             isStartupConfig: true,
             isStartupSettings: true,
-            buttonState: "",
 
             config: this.buildAppConfig(),
 
@@ -39,7 +38,7 @@ class Settings extends BaseComponent {
     }
 
     loadSettings() {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'GET',
             url: '/_webapi/general/settings'
         }).done((jqxhr) => {
@@ -99,7 +98,7 @@ class Settings extends BaseComponent {
             requestRunning: true,
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/general/settings/user",
             data: JSON.stringify(this.state.user)
@@ -119,7 +118,7 @@ class Settings extends BaseComponent {
             requestRunning: true
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/general/settings/team/" + encodeURI(team),
             data: JSON.stringify(this.getTeamConfig(team))

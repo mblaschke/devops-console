@@ -6,7 +6,7 @@ class NamespaceDelete extends BaseComponent {
         super(props);
 
         this.state = {
-            buttonState: "",
+            requestRunning: false,
             buttonText: "Delete namespace",
             confirmNamespace: ""
         };
@@ -22,11 +22,11 @@ class NamespaceDelete extends BaseComponent {
 
         let oldButtonText = this.state.buttonText;
         this.setState({
-            buttonState: "disabled",
+            requestRunning: true,
             buttonText: "Deleting...",
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'DELETE',
             url: "/_webapi/kubernetes/namespace/" + encodeURI(this.props.namespace.name)
         }).done(() => {
@@ -39,7 +39,7 @@ class NamespaceDelete extends BaseComponent {
             }
         }).always(() => {
             this.setState({
-                buttonState: "",
+                requestRunning: false,
                 buttonText: oldButtonText
             });
         });
@@ -54,13 +54,15 @@ class NamespaceDelete extends BaseComponent {
     }
 
     renderButtonState() {
-        if (this.state.buttonState !== "") {
-            return this.state.buttonState;
+        let state = "";
+
+        if (this.state.requestRunning) {
+            state = "disabled";
+        } else if (this.state.confirmNamespace !== this.props.namespace.name) {
+            state = "disabled"
         }
 
-        if (this.state.confirmNamespace !== this.props.namespace.name) {
-            return "disabled";
-        }
+        return state
     }
 
     render() {

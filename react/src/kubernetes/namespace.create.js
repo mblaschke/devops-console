@@ -11,10 +11,10 @@ class NamespaceCreate extends BaseComponent {
         this.state = {
             namespacePreview: "",
             buttonText: "Create namespace",
-            buttonState: "",
 
             environment: {},
 
+            requestRunning: false,
             form: {
                 environment: "",
                 app: "",
@@ -31,11 +31,11 @@ class NamespaceCreate extends BaseComponent {
 
         let oldButtonText = this.state.buttonText;
         this.setState({
-            buttonState: "disabled",
+            requestRunning: true,
             buttonText: "Saving...",
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/kubernetes/namespace",
             data: JSON.stringify(this.state.form)
@@ -50,18 +50,22 @@ class NamespaceCreate extends BaseComponent {
             }
         }).always(() => {
             this.setState({
-                buttonState: "",
+                requestRunning: false,
                 buttonText: oldButtonText
             });
         });
     }
 
-    getButtonState(event) {
-        if (this.state.buttonState === "" && this.state.form.environment !== "" && this.state.form.app !== "" && this.state.form.team !== "") {
-            return ""
-        } else {
-            return "disabled"
+    getButtonState() {
+        let state = "";
+
+        if (this.state.requestRunning) {
+            state = "disabled";
+        } else if (this.state.form.environment !== "" || this.state.form.app !== "" || this.state.form.team !== "") {
+            state = "disabled"
         }
+
+        return state
     }
 
     previewNamespace() {

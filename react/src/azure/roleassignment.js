@@ -45,11 +45,11 @@ class Roleassignment extends BaseComponent {
             buttonText: "Creating..."
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/azure/roleassignment",
             data: JSON.stringify(this.state.form)
-        }).done((jqxhr) => {
+        }).done(() => {
             let state = this.state;
             state.form = {
                 resourceId: "",
@@ -70,10 +70,8 @@ class Roleassignment extends BaseComponent {
 
         if (this.state.requestRunning) {
             state = "disabled";
-        } else {
-            if (this.state.form.resourceId === "" || this.state.form.roleDefinition === "" || this.state.form.reason === "") {
-                state = "disabled"
-            }
+        } else if (this.state.form.resourceId === "" || this.state.form.roleDefinition === "" || this.state.form.reason === "") {
+            state = "disabled"
         }
 
         return state

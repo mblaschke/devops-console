@@ -14,7 +14,7 @@ class Access extends BaseComponent {
     }
 
     loadKubeconfig() {
-        let jqxhr = this.ajax({
+        this.ajax({
             type: "GET",
             url: '/_webapi/kubernetes/kubeconfig'
         }).done((jqxhr) => {

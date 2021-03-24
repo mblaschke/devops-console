@@ -73,11 +73,11 @@ class Resourcegroup extends BaseComponent {
             buttonText: "Saving..."
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             url: "/_webapi/azure/resourcegroup",
             data: JSON.stringify(this.state.form)
-        }).done((jqxhr) => {
+        }).done(() => {
             let state = this.state;
             state.form.name = "";
             this.setState(state);
@@ -94,10 +94,8 @@ class Resourcegroup extends BaseComponent {
 
         if (this.state.requestRunning) {
             state = "disabled";
-        } else {
-            if (this.state.form.name === "" || this.state.form.team === "" || this.state.form.location === "") {
-                state = "disabled"
-            }
+        } else if (this.state.form.name === "" || this.state.form.team === "" || this.state.form.location === "") {
+            state = "disabled"
         }
 
         return state

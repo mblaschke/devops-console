@@ -27,6 +27,9 @@ class Base extends Component {
             },
             quota: {},
             azure: {
+                roleAssignment: {
+                    roleDefinitions: []
+                },
                 resourceGroup: {
                     tags: []
                 }
