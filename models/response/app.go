@@ -21,7 +21,7 @@ type (
 	}
 
 	ResponseConfigAzure struct {
-		ResourceGroup ResponseConfigAzureResourceGroup `json:"resourceGroup"`
+		ResourceGroup  ResponseConfigAzureResourceGroup  `json:"resourceGroup"`
 		RoleAssignment ResponseConfigAzureRoleAssignment `json:"roleAssignment"`
 	}
 
