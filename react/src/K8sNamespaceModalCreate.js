@@ -84,7 +84,6 @@ class K8sNamespaceModalCreate extends BaseComponent {
             namespace = namespace.replace("{app}", this.state.form.app);
         }
 
-        console.log(namespace)
         return namespace.toLowerCase().replace(/_/g, "");
     }
 

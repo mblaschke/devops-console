@@ -10,6 +10,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/hashicorp/go-uuid"
@@ -238,6 +239,94 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	resp.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name)
 	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name))
 	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name), 1)
+
+	c.responseJson(ctx, resp)
+}
+
+func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *models.User) {
+	azureContext := context.Background()
+	var group resources.Group
+
+	formData := formdata.AzureRoleAssignment{}
+	err := ctx.ReadJSON(&formData)
+	if err != nil {
+		c.respondErrorWithPenalty(ctx, err)
+		return
+	}
+
+	// azure authorizer
+	authorizer, err := c.azureAuthorizer()
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %v", err))
+		return
+	}
+
+	resourceIdInfo, err := azure.ParseResourceID(formData.ResourceId)
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %v", err))
+		return
+	}
+
+	if resourceIdInfo.SubscriptionID == "" {
+		c.respondError(ctx, fmt.Errorf("unable to parse subscription id, please check your resource id"))
+		return
+	}
+
+	if resourceIdInfo.ResourceGroup == "" {
+		c.respondError(ctx, fmt.Errorf("unable to parse subscription id, please check your resource id"))
+		return
+	}
+
+	subscriptionId := resourceIdInfo.SubscriptionID
+	resourceGroupName := resourceIdInfo.ResourceGroup
+
+	// setup clients
+	groupsClient := resources.NewGroupsClient(subscriptionId)
+	groupsClient.Authorizer = *authorizer
+
+	// check for existing resourcegroup
+	group, err = groupsClient.Get(azureContext, resourceGroupName)
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %v", err))
+		return
+	}
+
+	if owner, exists := group.Tags["owner"]; exists {
+		if owner == nil {
+			c.respondError(ctx, fmt.Errorf("found empty owner tag in Azure ResourceGroup"))
+			return
+		}
+
+		// membership check
+		if !user.IsMemberOf(*owner) {
+			c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", err))
+			return
+		}
+	} else {
+		c.respondError(ctx, fmt.Errorf("no owner tag found in Azure ResourceGroup"))
+		return
+	}
+
+	roleAssignmentList := []azureRoleAssignment{
+		{
+			PrincipalId:        user.Uuid,
+			RoleDefinitionName: formData.RoleDefinition,
+		},
+	}
+
+	err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
+		return
+	}
+
+	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createRoleAssignment"}).Inc()
+
+	resp := response.GeneralMessage{}
+
+	resp.Message = fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason)
+	c.notificationMessage(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason))
+	c.auditLog(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason), 1)
 
 	c.responseJson(ctx, resp)
 }

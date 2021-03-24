@@ -52,6 +52,12 @@ settings:
   team: []
 
 azure:
+  roleassignment:
+    roledefinitions:
+      - Owner
+      - Contributor
+      - Reader
+
   resourcegroup:
     validation:
       regexp: "^(.+)-rg$"

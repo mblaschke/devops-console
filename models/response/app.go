@@ -22,10 +22,15 @@ type (
 
 	ResponseConfigAzure struct {
 		ResourceGroup ResponseConfigAzureResourceGroup `json:"resourceGroup"`
+		RoleAssignment ResponseConfigAzureRoleAssignment `json:"roleAssignment"`
 	}
 
 	ResponseConfigAzureResourceGroup struct {
 		Tags []ResponseConfigAzureResourceGroupTag `json:"tags"`
+	}
+
+	ResponseConfigAzureRoleAssignment struct {
+		RoleDefinitions []string `json:"roleDefinitions"`
 	}
 
 	ResponseConfigAzureResourceGroupTag struct {

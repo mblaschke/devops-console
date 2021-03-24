@@ -2,6 +2,10 @@ package models
 
 type (
 	AppConfigAzure struct {
+		RoleAssignment struct {
+			RoleDefinitions []string
+		}
+
 		ResourceGroup struct {
 			Validation AppInputValidation
 			Tags       []AppConfigAzureResourceGroupTag

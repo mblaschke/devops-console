@@ -61,6 +61,7 @@ func (c *Server) initRoutes() {
 	applicationAzure := ApplicationAzure{Server: c}
 	applicationSettings := ApplicationSettings{Server: c}
 	applicationGeneral := ApplicationGeneral{Server: c}
+	applicationConfig := ApplicationConfig{Server: c}
 	applicationAuth := ApplicationAuth{Server: c}
 	applicationSystem := ApplicationSystem{Server: c}
 	applicationIndex := ApplicationIndex{Server: c}
@@ -83,6 +84,7 @@ func (c *Server) initRoutes() {
 		pageParty.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
 		pageParty.Get("/kubernetes/access", func(ctx iris.Context) { c.react(ctx, "Kubernetes Kubeconfig") })
 		pageParty.Get("/azure/resourcegroup", func(ctx iris.Context) { c.react(ctx, "Azure ResourceGroup") })
+		pageParty.Get("/azure/roleassignment", func(ctx iris.Context) { c.react(ctx, "Azure RoleAssignment") })
 		pageParty.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
 	}
 
@@ -91,7 +93,7 @@ func (c *Server) initRoutes() {
 		apiParty.Get("/heartbeat", applicationIndex.heartbeat)
 
 		apiParty.Get("/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
-		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppConfig) })
+		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationConfig.handleApiAppConfig) })
 
 		apiParty.Get("/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
 		apiParty.Post("/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
@@ -107,6 +109,7 @@ func (c *Server) initRoutes() {
 		apiParty.Get("/kubernetes/kubeconfig/{name:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.KubeconfigDownload) })
 
 		apiParty.Post("/azure/resourcegroup", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiResourceGroupCreate) })
+		apiParty.Post("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentCreate) })
 
 		apiParty.Get("/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
 		apiParty.Get("/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })

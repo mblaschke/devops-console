@@ -8,6 +8,7 @@
 
             <div class="sb-sidenav-menu-heading">Azure</div>
             {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
+            {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}
 
             <div class="sb-sidenav-menu-heading">Monitoring</div>
             {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
