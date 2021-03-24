@@ -254,6 +254,22 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 		return
 	}
 
+	if formData.ResourceId == "" {
+		c.respondError(ctx, fmt.Errorf("no ResourceID specified"))
+		return
+	}
+
+	if formData.RoleDefinition == "" {
+		c.respondError(ctx, fmt.Errorf("no RoleDefinition specified"))
+		return
+	}
+
+	formData.Reason = strings.TrimSpace(formData.Reason)
+	if formData.Reason == "" {
+		c.respondError(ctx, fmt.Errorf("no Reason specified"))
+		return
+	}
+
 	// azure authorizer
 	authorizer, err := c.azureAuthorizer()
 	if err != nil {
