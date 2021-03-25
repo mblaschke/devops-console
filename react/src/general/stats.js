@@ -61,7 +61,7 @@ class Stats extends Base {
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th colspan="2">{category.name}</th>
+                                        <th colSpan="2">{category.name}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
