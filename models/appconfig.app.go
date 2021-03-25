@@ -1,11 +1,14 @@
 package models
 
 import (
+	"fmt"
 	"time"
 )
 
 type (
 	Application struct {
+		Features map[string]bool
+
 		Session struct {
 			Type         string
 			Expiry       time.Duration
@@ -73,4 +76,26 @@ type (
 		Template    string
 		Quota       string
 	}
+
+	ApplicationFeatures map[string]bool
 )
+
+func (a *Application) MainFeatureIsEnabled(main string) bool {
+	if v, exists := a.Features[main]; exists && v {
+		return true
+	}
+	return false
+}
+
+func (a *Application) FeatureIsEnabled(main, branch string) bool {
+	if v, exists := a.Features[main]; !exists || !v {
+		return false
+	}
+
+	name := fmt.Sprintf("%v-%v", main, branch)
+	if v, exists := a.Features[name]; exists && v {
+		return true
+	}
+
+	return false
+}

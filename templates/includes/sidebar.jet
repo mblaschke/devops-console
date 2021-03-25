@@ -2,10 +2,15 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
     <div class="sb-sidenav-menu">
         <div class="nav">
-            <div class="sb-sidenav-menu-heading">Kubernetes</div>
-            {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
-            {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
-
+            {{ if MainFeatureIsEnabled("kubernetes") }}
+                <div class="sb-sidenav-menu-heading">Kubernetes</div>
+                {{ if FeatureIsEnabled("kubernetes", "namespaces") }}
+                    {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
+                {{ end }}
+                {{ if FeatureIsEnabled("kubernetes", "access") }}
+                    {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
+                {{ end }}
+            {{ end }}
             <div class="sb-sidenav-menu-heading">Azure</div>
             {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
             {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}

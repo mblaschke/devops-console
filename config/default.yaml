@@ -1,4 +1,21 @@
 application:
+  features:
+    kubernetes: true
+    kubernetes-namespaces: true
+    kubernetes-access: true
+
+    azure: true
+    azure-resourcegroups: true
+    azure-roleassignments: true
+
+    monitoring: true
+    monitoring-alertmanager: true
+
+    general: true
+    general-settings: true
+    general-stats: true
+
+
   session:
     type: {{env "SESSION_TYPE" | default "internal" | toJson }}
     expiry: {{env "SESSION_EXPIRY" | default "168h" | toJson }}
