@@ -4,12 +4,12 @@ type (
 	AppConfigSettings struct {
 		Vault struct {
 			Url string
-		}
+		} `json:"-"`
 
-		Kubeconfig map[string]AppConfigKubeconfig
+		Kubeconfig map[string]AppConfigKubeconfig `json:"-"`
 
-		User []AppConfigSettingItem
-		Team []AppConfigSettingItem
+		User []AppConfigSettingItem `json:"user"`
+		Team []AppConfigSettingItem `json:"team"`
 	}
 
 	AppConfigKubeconfig struct {

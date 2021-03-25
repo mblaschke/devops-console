@@ -15,14 +15,13 @@ class Settings extends BaseComponent {
 
             requestRunning: false,
 
-            settingConfig: {
-                User: [],
-                Team: []
+            settings: {
+                user: [],
+                team: []
             },
 
-            user: {},
-
-            team: {}
+            formUser: {},
+            formTeam: {}
         };
     }
 
@@ -46,38 +45,21 @@ class Settings extends BaseComponent {
                 var state = this.state;
                 state.isStartupSettings = false;
 
-                if (jqxhr.Configuration) {
-                    state.settingConfig = jqxhr.Configuration;
+                if (jqxhr.configuration) {
+                    state.settings = jqxhr.configuration;
                 }
 
-                if (jqxhr.User) {
-                    state.user = jqxhr.User;
+                if (jqxhr.user) {
+                    state.formUser = jqxhr.user;
                 }
 
-                if (jqxhr.Team) {
-                    state.team = jqxhr.Team;
+                if (jqxhr.team) {
+                    state.formTeam = jqxhr.team;
                 }
 
                 this.setState(state);
             }
         });
-    }
-
-    handlePersonalInputChange(name, event) {
-        var state = this.state.user;
-        state[name] = event.target.value;
-        this.setState(state);
-    }
-
-    handleTeamInputChange(team, name, event) {
-        var state = this.state.team;
-
-        if (!state[team]) {
-            state[team] = {};
-        }
-
-        state[team][name] = event.target.value;
-        this.setState(state);
     }
 
     stateUpdateButton() {
@@ -101,7 +83,7 @@ class Settings extends BaseComponent {
         this.ajax({
             type: 'POST',
             url: "/_webapi/general/settings/user",
-            data: JSON.stringify(this.state.user)
+            data: JSON.stringify(this.state.formUser)
         }).always(() => {
             this.setState({
                 requestRunning: false,
@@ -129,30 +111,11 @@ class Settings extends BaseComponent {
         });
     }
 
-    getUserConfigItem(name) {
-        var ret = "";
-
-        if (this.state.user && this.state.user[name]) {
-            ret = this.state.user[name];
-        }
-
-        return ret;
-    }
-
     getTeamConfig(team) {
         var ret = {};
 
-        if (this.state.team && this.state.team[team]) {
-            ret = this.state.team[team];
-        }
-
-        return ret;
-    }
-    getTeamConfigItem(team, name) {
-        var ret = "";
-
-        if (this.state.team && this.state.team[team] && this.state.team[team][name]) {
-            ret = this.state.team[team][name];
+        if (this.state.formTeam && this.state.formTeam[team]) {
+            ret = this.state.formTeam[team];
         }
 
         return ret;
@@ -184,10 +147,10 @@ class Settings extends BaseComponent {
                     </div>
                     <div className="card-body">
                         <form method="post">
-                            {this.state.settingConfig.User.map((setting, value) =>
+                            {this.state.settings.user.map((setting, value) =>
                                 <div className="form-group">
-                                    <label htmlFor={"personal-" + setting.Name} className="inputRg">{setting.Label}</label>
-                                    <input type="text" name={setting.Name} id={"personal-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getUserConfigItem(setting.Name)} onChange={this.handlePersonalInputChange.bind(this, setting.Name)} />
+                                    <label htmlFor={"personal-" + setting.name} className="inputRg">{setting.label}</label>
+                                    <input type="text" name={setting.name} id={"personal-" + setting.name} className="form-control" placeholder={setting.Plaeholder} value={this.getValue(["formUser", setting.name])} onChange={this.setValue.bind(this, ["formUser", setting.name])} />
                                 </div>
                             )}
                             <div className="toolbox">
@@ -205,10 +168,10 @@ class Settings extends BaseComponent {
                         </div>
                         <div className="card-body">
                             <form method="post">
-                                {this.state.settingConfig.Team.map((setting, value) =>
+                                {this.state.settings.team.map((setting, value) =>
                                     <div className="form-group">
-                                        <label htmlFor={"team-" + team.name + "-" + setting.Name} className="inputRg">{setting.Label}</label>
-                                        <input type="text" name={setting.Name} id={"team-" + team.name + "-" + setting.Name} className="form-control" placeholder={setting.Plaeholder} value={this.getTeamConfigItem(team.name, setting.Name)} onChange={this.handleTeamInputChange.bind(this, team.name, setting.Name)} />
+                                        <label htmlFor={"team-" + team.name + "-" + setting.name} className="inputRg">{setting.label}</label>
+                                        <input type="text" name={setting.name} id={"team-" + team.name + "-" + setting.name} className="form-control" placeholder={setting.placeholder} value={this.getValue(["formTeam", team.name, setting.name])} onChange={this.setValue.bind(this, ["formTeam", team.name, setting.name])} />
                                     </div>
                                 )}
                                 <div className="toolbox">
