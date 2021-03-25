@@ -7,8 +7,8 @@ import (
 	"devops-console/models/response"
 	"errors"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/preview/authorization/mgmt/2020-04-01-preview/authorization"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -34,6 +34,7 @@ type (
 		PrincipalId        string
 		RoleDefinitionName string
 		RoleDefinitionId   string
+		Description        string
 	}
 )
 
@@ -91,9 +92,10 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 	roleAssignmentsClient.Authorizer = *authorizer
 	for _, roleAssignment := range list {
 		properties := authorization.RoleAssignmentCreateParameters{
-			Properties: &authorization.RoleAssignmentProperties{
+			&authorization.RoleAssignmentProperties{
 				RoleDefinitionID: &roleAssignment.RoleDefinitionId,
 				PrincipalID:      &roleAssignment.PrincipalId,
+				Description:      to.StringPtr(roleAssignment.Description),
 			},
 		}
 
@@ -327,6 +329,7 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 		{
 			PrincipalId:        user.Uuid,
 			RoleDefinitionName: formData.RoleDefinition,
+			Description:        formData.Reason,
 		},
 	}
 
