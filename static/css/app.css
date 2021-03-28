@@ -246,6 +246,10 @@ padding-top: 1rem;
 text-align: right;
 }
 
+div.toolbox .btn {
+    margin-left: 1rem;
+}
+
 thead td.toolbox,
 thead th.toolbox,
 tfoot td.toolbox,

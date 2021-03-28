@@ -12,19 +12,32 @@ class Roleassignment extends BaseComponent {
             config: this.buildAppConfig(),
 
             searchValue: "",
-            buttonText: "Create Azure RoleAssignment",
 
             requestRunning: false,
-            form: {
-                resourceId: "",
-                roleDefinition: "",
-                reason: ""
-            }
+            form: {}
         };
+    }
+
+    resetForm() {
+        let state = this.state;
+
+        state.form = {
+            resourceId: "",
+            roleDefinition: "",
+            ttl: "1h",
+            reason: ""
+        };
+        let ttlList = this.ttlList();
+        if (ttlList && ttlList.length >= 1) {
+            state.form.ttl = ttlList[0]
+        }
+
+        this.setState(state);
     }
 
     init() {
         this.componentWillMount();
+        this.resetForm();
     }
 
     componentWillMount() {
@@ -39,10 +52,8 @@ class Roleassignment extends BaseComponent {
         e.preventDefault();
         e.stopPropagation();
 
-        let oldButtonText = this.state.buttonText;
         this.setState({
-            requestRunning: true,
-            buttonText: "Creating..."
+            requestRunning: true
         });
 
         this.ajax({
@@ -50,27 +61,42 @@ class Roleassignment extends BaseComponent {
             url: "/_webapi/azure/roleassignment",
             data: JSON.stringify(this.state.form)
         }).done(() => {
-            let state = this.state;
-            state.form = {
-                resourceId: "",
-                roleDefinition: "",
-                reason: ""
-            };
-            this.setState(state);
+            this.resetForm();
         }).always(() => {
             this.setState({
-                requestRunning: false,
-                buttonText: oldButtonText
+                requestRunning: false
             });
         });
     }
 
-    stateCreateButton() {
+
+    remove(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.setState({
+            requestRunning: true
+        });
+
+        this.ajax({
+            type: 'DELETE',
+            url: "/_webapi/azure/roleassignment",
+            data: JSON.stringify(this.state.form)
+        }).done(() => {
+            this.resetForm();
+        }).always(() => {
+            this.setState({
+                requestRunning: false,
+            });
+        });
+    }
+
+    stateButton() {
         let state = "";
 
         if (this.state.requestRunning) {
             state = "disabled";
-        } else if (this.state.form.resourceId === "" || this.state.form.roleDefinition === "" || this.state.form.reason === "") {
+        } else if (this.state.form.resourceId === "" || this.state.form.roleDefinition === "" || this.state.form.ttl === "" || this.state.form.reason === "") {
             state = "disabled"
         }
 
@@ -83,6 +109,10 @@ class Roleassignment extends BaseComponent {
 
     roleDefinitionList() {
         return Array.isArray(this.state.config.azure.roleAssignment.roleDefinitions) ? this.state.config.azure.roleAssignment.roleDefinitions : [];
+    }
+
+    ttlList() {
+        return Array.isArray(this.state.config.azure.roleAssignment.ttl) ? this.state.config.azure.roleAssignment.ttl : [];
     }
 
     render() {
@@ -123,12 +153,22 @@ class Roleassignment extends BaseComponent {
                             </div>
 
                             <div className="form-group">
+                                <label htmlFor="selectTtl">Time (ttl)</label>
+                                <select name="ttl" id="selectTtl" className="form-control" value={this.getValue("form.ttl")} onChange={this.setValue.bind(this, "form.ttl")}>
+                                    {this.ttlList().map((row, value) =>
+                                        <option key={row} value={row}>{row}</option>
+                                    )}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
                                 <label htmlFor="inputReason" className="inputReason">Reason</label>
                                 <textarea className="form-control" id="inputReason" rows="3" required value={this.getValue("form.reason")} onChange={this.setValue.bind(this, "form.reason")}></textarea>
                             </div>
 
                             <div className="toolbox">
-                                <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateCreateButton()} onClick={this.create.bind(this)}>{this.state.buttonText}</button>
+                                <button type="button" className="btn btn-primary" disabled={this.stateButton()} onClick={this.remove.bind(this)}>Remove RoleAssignment</button>
+                                <button type="button" className="btn btn-primary" disabled={this.stateButton()} onClick={this.create.bind(this)}>Create RoleAssignment</button>
                             </div>
                         </form>
                     </div>

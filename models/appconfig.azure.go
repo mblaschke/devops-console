@@ -4,6 +4,7 @@ type (
 	AppConfigAzure struct {
 		RoleAssignment struct {
 			RoleDefinitions []string
+			Ttl []string
 		}
 
 		ResourceGroup struct {

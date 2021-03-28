@@ -50,41 +50,101 @@ func (c *ApplicationAzure) azureAuthorizer() (*autorest.Authorizer, error) {
 	return c.authorizer, nil
 }
 
-func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
-	ctx := context.Background()
+func (c *ApplicationAzure) translateRoleDefinitionNameToId(ctx context.Context, subscriptionId, name string) (*string, error) {
 	if c.roleDefinitionMap == nil {
 		c.roleDefinitionMap = map[string]string{}
 	}
 
 	authorizer, err := c.azureAuthorizer()
 	if err != nil {
+		return nil, err
+	}
+
+	roleDefinitionsClient := authorization.NewRoleDefinitionsClient(subscriptionId)
+	roleDefinitionsClient.Authorizer = *authorizer
+
+	cacheKey := fmt.Sprintf("%v:%v", subscriptionId, name)
+	if _, exists := c.roleDefinitionMap[cacheKey]; !exists {
+		// get role definition via API
+		filter := fmt.Sprintf("roleName eq '%s'", strings.Replace(name, "'", "\\'", -1))
+		result, err := roleDefinitionsClient.List(ctx, fmt.Sprintf("/subscriptions/%s", subscriptionId), filter)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+		}
+
+		roleDefinitions := result.Values()
+		if len(roleDefinitions) != 1 {
+			return nil, fmt.Errorf("could not find Azure RoleDefinition: %v", name)
+		}
+
+		c.roleDefinitionMap[cacheKey] = *roleDefinitions[0].ID
+	}
+
+	roleDefinitionId := c.roleDefinitionMap[cacheKey]
+	return &roleDefinitionId, nil
+}
+
+func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
+	ctx := context.Background()
+
+	authorizer, err := c.azureAuthorizer()
+	if err != nil {
 		return err
 	}
 
-	// get RoleDefinition Id
-	roleDefinitionsClient := authorization.NewRoleDefinitionsClient(subscriptionId)
-	roleDefinitionsClient.Authorizer = *authorizer
+	// translate RoleDefinition Id
 	for i, roleAssignment := range list {
-		roleDefintionName := roleAssignment.RoleDefinitionName
-		if val, exists := c.roleDefinitionMap[roleDefintionName]; exists {
-			// use cached value
-			list[i].RoleDefinitionId = val
-		} else {
-			// get role definition via API
-			filter := fmt.Sprintf("roleName eq '%s'", strings.Replace(roleDefintionName, "'", "\\'", -1))
-			result, err := roleDefinitionsClient.List(ctx, fmt.Sprintf("/subscriptions/%s", subscriptionId), filter)
-			if err != nil {
-				return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
-			}
-
-			roleDefinitions := result.Values()
-			if len(roleDefinitions) != 1 {
-				return fmt.Errorf("could not find Azure RoleDefinition: %v", roleDefintionName)
-			}
-
-			list[i].RoleDefinitionId = *roleDefinitions[0].ID
-			c.roleDefinitionMap[roleAssignment.RoleDefinitionName] = *roleDefinitions[0].ID
+		roleDefinitionId, err := c.translateRoleDefinitionNameToId(
+			ctx,
+			subscriptionId,
+			roleAssignment.RoleDefinitionName,
+		)
+		if err != nil {
+			return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
 		}
+		list[i].RoleDefinitionId = *roleDefinitionId
+	}
+
+	// delete RoleAssignments on scope
+	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
+	roleAssignmentsClient.Authorizer = *authorizer
+	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "")
+	if err != nil {
+		return fmt.Errorf("error fetching Azure RoleAssignments: %v", err)
+	}
+
+	for _, scopeRoleAssignment := range *result.Response().Value {
+		for _, roleAssignment := range list {
+			if *scopeRoleAssignment.PrincipalID == roleAssignment.PrincipalId && *scopeRoleAssignment.RoleDefinitionID == roleAssignment.RoleDefinitionId {
+				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID); err != nil {
+					return fmt.Errorf("unable to delete Azure RoleAssignment: %v", err)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
+	ctx := context.Background()
+
+	authorizer, err := c.azureAuthorizer()
+	if err != nil {
+		return err
+	}
+
+	// translate RoleDefinition Id
+	for i, roleAssignment := range list {
+		roleDefinitionId, err := c.translateRoleDefinitionNameToId(
+			ctx,
+			subscriptionId,
+			roleAssignment.RoleDefinitionName,
+		)
+		if err != nil {
+			return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+		}
+		list[i].RoleDefinitionId = *roleDefinitionId
 	}
 
 	// create RoleAssignments on scope
@@ -246,6 +306,14 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 }
 
 func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *models.User) {
+	c.handleRoleAssignmentAction(ctx, user, "create")
+}
+
+func (c *ApplicationAzure) ApiRoleAssignmentDelete(ctx iris.Context, user *models.User) {
+	c.handleRoleAssignmentAction(ctx, user, "delete")
+}
+
+func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *models.User, task string) {
 	azureContext := context.Background()
 	var group resources.Group
 
@@ -256,16 +324,33 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 		return
 	}
 
+	// resourceid
 	if formData.ResourceId == "" {
 		c.respondError(ctx, fmt.Errorf("no ResourceID specified"))
 		return
 	}
 
+	// roledefinition
 	if formData.RoleDefinition == "" {
 		c.respondError(ctx, fmt.Errorf("no RoleDefinition specified"))
 		return
 	}
+	if !stringInSlice(formData.RoleDefinition, c.config.Azure.RoleAssignment.RoleDefinitions) {
+		c.respondError(ctx, fmt.Errorf("invalid RoleDefinition specified"))
+		return
+	}
 
+	// ttl
+	if formData.Ttl == "" {
+		c.respondError(ctx, fmt.Errorf("no TTL specified"))
+		return
+	}
+	if !stringInSlice(formData.Ttl, c.config.Azure.RoleAssignment.Ttl) {
+		c.respondError(ctx, fmt.Errorf("invalid TTL specified"))
+		return
+	}
+
+	// reason
 	formData.Reason = strings.TrimSpace(formData.Reason)
 	if formData.Reason == "" {
 		c.respondError(ctx, fmt.Errorf("no Reason specified"))
@@ -279,6 +364,7 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 		return
 	}
 
+	// parse and validate resourceid
 	resourceIdInfo, err := azure.ParseResourceID(formData.ResourceId)
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %v", err))
@@ -325,27 +411,43 @@ func (c *ApplicationAzure) ApiRoleAssignmentCreate(ctx iris.Context, user *model
 		return
 	}
 
+	reason := fmt.Sprintf("[ttl:%v] %v", formData.Ttl, formData.Reason)
 	roleAssignmentList := []azureRoleAssignment{
 		{
 			PrincipalId:        user.Uuid,
 			RoleDefinitionName: formData.RoleDefinition,
-			Description:        formData.Reason,
+			Description:        reason,
 		},
 	}
 
-	err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
-	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
-		return
-	}
-
-	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createRoleAssignment"}).Inc()
-
 	resp := response.GeneralMessage{}
 
-	resp.Message = fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason)
-	c.notificationMessage(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason))
-	c.auditLog(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason), 1)
+	switch task {
+	case "create":
+		err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		if err != nil {
+			c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
+			return
+		}
+		PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createRoleAssignment"}).Inc()
+
+		resp.Message = fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason)
+		c.notificationMessage(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason))
+		c.auditLog(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason), 1)
+	case "delete":
+		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		if err != nil {
+			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %v", err))
+			return
+		}
+		PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "deleteRoleAssignment"}).Inc()
+
+		resp.Message = fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" removed: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason)
+		c.notificationMessage(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" removed: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason))
+		c.auditLog(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" removed: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason), 1)
+	default:
+		c.respondError(ctx, fmt.Errorf("unable to handle RoleAssignment change: not defined"))
+	}
 
 	c.responseJson(ctx, resp)
 }

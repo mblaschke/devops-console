@@ -43,6 +43,7 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 	}
 
 	ret.Azure.RoleAssignment.RoleDefinitions = c.config.Azure.RoleAssignment.RoleDefinitions
+	ret.Azure.RoleAssignment.Ttl = c.config.Azure.RoleAssignment.Ttl
 
 	// kubernetes
 	ret.Kubernetes = response.ResponseConfigKubernetes{}

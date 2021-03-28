@@ -11,6 +11,7 @@ type (
 	AzureRoleAssignment struct {
 		ResourceId     string `json:"resourceId"`
 		RoleDefinition string `json:"roleDefinition"`
+		Ttl            string `json:"ttl"`
 		Reason         string `json:"reason"`
 	}
 )

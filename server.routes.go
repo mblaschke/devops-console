@@ -141,6 +141,7 @@ func (c *Server) initRoutes() {
 
 		if c.config.App.FeatureIsEnabled("azure", "roleassignments") {
 			apiParty.Post("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentCreate) })
+			apiParty.Delete("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentDelete) })
 		}
 
 		if c.config.App.FeatureIsEnabled("monitoring", "alertmanager") {
