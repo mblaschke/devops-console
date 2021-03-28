@@ -152,7 +152,7 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 	roleAssignmentsClient.Authorizer = *authorizer
 	for _, roleAssignment := range list {
 		properties := authorization.RoleAssignmentCreateParameters{
-			&authorization.RoleAssignmentProperties{
+			RoleAssignmentProperties: &authorization.RoleAssignmentProperties{
 				RoleDefinitionID: &roleAssignment.RoleDefinitionId,
 				PrincipalID:      &roleAssignment.PrincipalId,
 				Description:      to.StringPtr(roleAssignment.Description),

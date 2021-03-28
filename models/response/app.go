@@ -31,7 +31,7 @@ type (
 
 	ResponseConfigAzureRoleAssignment struct {
 		RoleDefinitions []string `json:"roleDefinitions"`
-		Ttl []string `json:"ttl"`
+		Ttl             []string `json:"ttl"`
 	}
 
 	ResponseConfigAzureResourceGroupTag struct {
