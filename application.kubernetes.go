@@ -61,8 +61,9 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 
 	ret := []response.KubernetesNamespace{}
 
-	for _, namespaceNative := range nsList {
-		namespace := models.KubernetesNamespace{Namespace: &namespaceNative}
+	for _, row := range nsList {
+		nativeNamespace := row
+		namespace := models.KubernetesNamespace{Namespace: &nativeNamespace}
 
 		if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
 			continue

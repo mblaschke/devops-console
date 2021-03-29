@@ -1,16 +1,15 @@
 package main
 
 import (
+	"crypto/rand"
 	"devops-console/models"
 	"fmt"
 	"io/ioutil"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
-	"math/rand"
+	"math/big"
 	"os"
 	"path/filepath"
-	"strings"
-	"time"
 )
 
 func createKubernetesObjectList() models.KubernetesObjectList {
@@ -100,18 +99,16 @@ func KubeParseConfig(path string) runtime.Object {
 }
 
 func randomString(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"abcdefghijklmnopqrstuvwxyz" +
-		"0123456789" +
-		"-_+=*")
-	var b strings.Builder
+	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+	ret := make([]byte, length)
 	for i := 0; i < length; i++ {
-		if _, err := b.WriteRune(chars[rand.Intn(len(chars))]); err != nil {
-			fmt.Printf("ERROR: %s\n", err)
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			panic(err)
 		}
+		ret[i] = letters[num.Int64()]
 	}
-	return b.String()
+	return string(ret)
 }
 
 func stringInSlice(a string, list []string) bool {
