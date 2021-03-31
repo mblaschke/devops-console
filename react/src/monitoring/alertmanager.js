@@ -116,7 +116,7 @@ class Alertmanager extends BaseComponent {
     }
 
     init() {
-        this.initTeam();
+        this.initTeamSelection('team');
 
         let state = this.state;
 

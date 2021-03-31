@@ -41,6 +41,7 @@ azure:
         label: Barfoo
         placeholder: Description here
         type: input
+        default: foobar
 
 kubernetes:
   environments:

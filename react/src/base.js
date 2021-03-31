@@ -268,27 +268,32 @@ class Base extends Component {
         });
     }
 
-    initTeam() {
-        let state = this.state;
+    initTeamSelection(field) {
+        let selectedTeam = this.getValue(field)
+        if (selectedTeam) {
+            // team already selected
+            console.log(275)
+            return
+        }
 
         // default team for local storage
         try {
             let lastSelectedTeam = "" + localStorage.getItem("team");
-            this.state.config.Teams.map((row, value) => {
-                if (row.Name === lastSelectedTeam) {
-                    state.team = lastSelectedTeam;
+            this.state.config.teams.map((row, value) => {
+                if (row.name === lastSelectedTeam) {
+                    this.setValue(field, lastSelectedTeam);
+                    selectedTeam = lastSelectedTeam
                 }
             });
+            if (selectedTeam) {
+                return
+            }
         } catch {}
 
         // select first team if no selection available
-        if (state.team === "") {
-            if (this.state.config.Teams.length > 0) {
-                state.team = this.state.config.Teams[0].Name
-            }
+        if (this.state.config.teams.length > 0) {
+            this.setValue(field, this.state.config.teams[0].name)
         }
-
-        this.setState(state);
     }
 
     setTeam(field, event) {

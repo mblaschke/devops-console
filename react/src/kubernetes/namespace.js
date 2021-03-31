@@ -62,7 +62,7 @@ class Namespace extends BaseComponent {
     }
 
     init() {
-        this.initTeam();
+        this.initTeamSelection('team');
         this.refresh();
     }
 

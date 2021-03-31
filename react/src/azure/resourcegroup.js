@@ -19,7 +19,7 @@ class Resourcegroup extends BaseComponent {
                 team: "",
                 name: "",
                 location: "westeurope",
-                tag: {}
+                tags: {}
             }
         };
     }
@@ -29,33 +29,16 @@ class Resourcegroup extends BaseComponent {
     }
 
     componentWillMount() {
-        let state = this.state;
+        this.initTeamSelection('form.team');
 
-        // default team for local storage
-        try {
-            let lastSelectedTeam = "" + localStorage.getItem("team");
-            this.state.config.teams.map((row, value) => {
-                if (row.name === lastSelectedTeam) {
-                    state.form.team = lastSelectedTeam;
-                }
-            });
-        } catch {}
-
-        // select first team if no selection available
-        if (this.state.form.team === "") {
-            if (this.state.config.teams.length > 0) {
-                state.form.team = this.state.config.teams[0].name
-            }
-        }
-
-        state.form.tag = {};
+        let tags = {};
         this.azureResourceGroupTagConfig().map((setting) => {
-            if (setting.Default) {
-                state.form.tag[setting.Name] = setting.Default;
+            if (setting.default) {
+                tags[setting.name] = setting.default;
             }
         });
 
-        this.setState(state);
+        this.setValue('form.tags', tags)
     }
 
     componentDidMount() {
@@ -155,10 +138,10 @@ class Resourcegroup extends BaseComponent {
                                 <input type="text" name="nsApp" id="inputRgLocation" className="form-control" placeholder="ResourceGroup location" required value={this.getValue("form.location")} onChange={this.setValue.bind(this, "form.location")} />
                             </div>
 
-                            {this.azureResourceGroupTagConfig().map((setting, value) =>
+                            {this.azureResourceGroupTagConfig().map((setting) =>
                                 <div className="form-group">
                                     <label htmlFor="inputNsApp" className="inputRg">{setting.label}</label>
-                                    <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.plaeholder} value={this.getValue("form.tag." + setting.name)} onChange={this.setValue.bind(this, "form.tag." + setting.name)} />
+                                    <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.placeholder} value={this.getValue("form.tags." + setting.name)} onChange={this.setValue.bind(this, "form.tags." + setting.name)} />
                                     <small className="form-text text-muted">{setting.description}</small>
                                 </div>
                             )}

@@ -218,7 +218,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	// add tags from user
 	for _, tagConfig := range c.config.Azure.ResourceGroup.Tags {
 		tagValue := ""
-		if val, ok := formData.Tag[tagConfig.Name]; ok {
+		if val, ok := formData.Tags[tagConfig.Name]; ok {
 			tagValue = val
 		}
 
