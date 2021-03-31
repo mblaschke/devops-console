@@ -424,6 +424,12 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 
 	switch task {
 	case "create":
+		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		if err != nil {
+			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %v", err))
+			return
+		}
+
 		err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
 		if err != nil {
 			c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
