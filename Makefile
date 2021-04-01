@@ -5,6 +5,7 @@ LDFLAGS             := -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMM
 
 FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
+GOSEC_BIN			:= $(FIRST_GOPATH)/bin/gosec
 
 .PHONY: all
 all: vendor build-frontend build-backend
@@ -62,8 +63,15 @@ build-frontend:
 lint: $(GOLANGCI_LINT_BIN)
 	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=10m
 
+.PHONY: gosec
+gosec: $(GOSEC_BIN)
+	$(GOSEC_BIN) ./...
+
 .PHONY: dependencies
-dependencies: $(GOLANGCI_LINT_BIN)
+dependencies: $(GOLANGCI_LINT_BIN) $(GOSEC_BIN)
 
 $(GOLANGCI_LINT_BIN):
 	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.32.2
+
+$(GOSEC_BIN):
+	curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(FIRST_GOPATH)/bin v2.7.0
