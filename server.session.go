@@ -93,7 +93,7 @@ func (c *Server) initSessionRedis() {
 			break
 		}
 
-		contextLogger.Error("redis connection failed, retrying in %v", retryTime.String())
+		contextLogger.Errorf("redis connection failed, retrying in %v", retryTime.String())
 		time.Sleep(retryTime)
 	}
 
