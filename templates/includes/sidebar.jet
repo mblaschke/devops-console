@@ -11,17 +11,34 @@
                     {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
                 {{ end }}
             {{ end }}
-            <div class="sb-sidenav-menu-heading">Azure</div>
-            {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
-            {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}
 
-            <div class="sb-sidenav-menu-heading">Monitoring</div>
-            {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
+            {{ if MainFeatureIsEnabled("azure") }}
+                <div class="sb-sidenav-menu-heading">Azure</div>
+                {{ if FeatureIsEnabled("azure", "resourcegroup") }}
+                    {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
+                {{ end }}
 
+                {{ if FeatureIsEnabled("azure", "roleassignment") }}
+                    {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}
+                {{ end }}
+            {{ end }}
 
-            <div class="sb-sidenav-menu-heading">General</div>
-            {{yield navigationItem(title="Settings", href="/general/settings")}}
-            {{yield navigationItem(title="About", href="/general/about")}}
+            {{ if MainFeatureIsEnabled("monitoring") }}
+                <div class="sb-sidenav-menu-heading">Monitoring</div>
+                {{ if FeatureIsEnabled("monitoring", "alertmanager") }}
+                    {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
+                {{ end }}
+            {{ end }}
+
+            {{ if MainFeatureIsEnabled("general") }}
+                <div class="sb-sidenav-menu-heading">General</div>
+                {{ if FeatureIsEnabled("general", "settings") }}
+                {{yield navigationItem(title="Settings", href="/general/settings")}}
+                {{ end }}
+                {{ if FeatureIsEnabled("general", "about") }}
+                {{yield navigationItem(title="About", href="/general/about")}}
+                {{ end }}
+            {{ end }}
 
         </div>
     </div>
