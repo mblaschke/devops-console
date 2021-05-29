@@ -35,7 +35,6 @@ COPY --from=frontend /app/templates /go/src/devops-console/templates
 COPY --from=frontend /app/static /go/src/devops-console/static
 RUN git status
 RUN make lint
-RUN make gosec
 RUN make build-backend
 RUN ./devops-console --help
 
