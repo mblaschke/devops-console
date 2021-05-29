@@ -61,7 +61,7 @@ build-frontend:
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
-	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=10m
+	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=25m
 
 .PHONY: gosec
 gosec: $(GOSEC_BIN)
