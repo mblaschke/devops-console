@@ -104,12 +104,10 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 		list[i].RoleDefinitionId = *roleDefinitionId
 	}
 
-	tenantId := opts.Azure.TenantId
-
 	// delete RoleAssignments on scope
 	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
 	roleAssignmentsClient.Authorizer = *authorizer
-	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "", tenantId)
+	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "", "")
 	if err != nil {
 		return fmt.Errorf("error fetching Azure RoleAssignments: %v", err)
 	}
@@ -117,7 +115,7 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 	for _, scopeRoleAssignment := range *result.Response().Value {
 		for _, roleAssignment := range list {
 			if *scopeRoleAssignment.PrincipalID == roleAssignment.PrincipalId && *scopeRoleAssignment.RoleDefinitionID == roleAssignment.RoleDefinitionId {
-				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID, tenantId); err != nil {
+				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID, ""); err != nil {
 					return fmt.Errorf("unable to delete Azure RoleAssignment: %v", err)
 				}
 			}
@@ -297,8 +295,8 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createResourceGroup"}).Inc()
 
-	resp := struct{
-		Message string `json:"message"`
+	resp := struct {
+		Message    string `json:"message"`
 		ResoruceId string `json:"resourceId"`
 	}{
 		Message:    fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name),
