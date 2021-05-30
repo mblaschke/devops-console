@@ -29,6 +29,7 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 
 	// azure
 	ret.Azure = response.ResponseConfigAzure{}
+	ret.Azure.TenantId = opts.Azure.TenantId
 	for _, row := range c.config.Azure.ResourceGroup.Tags {
 		tmp := response.ResponseConfigAzureResourceGroupTag{
 			Name:        row.Name,

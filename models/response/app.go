@@ -21,6 +21,7 @@ type (
 	}
 
 	ResponseConfigAzure struct {
+		TenantId       string                            `json:"tenantId"`
 		ResourceGroup  ResponseConfigAzureResourceGroup  `json:"resourceGroup"`
 		RoleAssignment ResponseConfigAzureRoleAssignment `json:"roleAssignment"`
 	}

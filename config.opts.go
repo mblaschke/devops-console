@@ -16,6 +16,11 @@ type (
 			EnableNamespacePodCount bool `long:"enable-namespace-pod-count" env:"ENABLE_NAMESPACE_POD_COUNT" description:"Enable namespace pod count"`
 		}
 
+		Azure struct {
+			SubscriptionId string `long:"azure.subscriptionid"   env:"AZURE_SUBSCRIPTION_ID"   description:"Azure subscription id"     required:"true"`
+			TenantId       string `long:"azure.tenantid"         env:"AZURE_TENANT_ID"         description:"Azure tenant id"           required:"true"`
+		}
+
 		// config
 		Config struct {
 			Path []string `long:"config" env:"CONFIG" description:"Path to config file" default:"./config/default.yaml" env-delim:":"`

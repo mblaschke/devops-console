@@ -14,6 +14,8 @@ class Resourcegroup extends BaseComponent {
             searchValue: "",
             buttonText: "Create Azure ResourceGroup",
 
+            resourceId: false,
+
             requestRunning: false,
             form: {
                 team: "",
@@ -60,9 +62,15 @@ class Resourcegroup extends BaseComponent {
             type: 'POST',
             url: "/_webapi/azure/resourcegroup",
             data: JSON.stringify(this.state.form)
-        }).done(() => {
+        }).done((jqxhr) => {
             let state = this.state;
+
+            if (jqxhr && jqxhr.resourceId) {
+                state.resourceId = "" + jqxhr.resourceId;
+            }
+
             state.form.name = "";
+            console.log(state)
             this.setState(state);
         }).always(() => {
             this.setState({
@@ -72,6 +80,17 @@ class Resourcegroup extends BaseComponent {
         });
     }
 
+
+    openResourceGroup(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.state.resourceId) {
+            let tenantId = encodeURI(this.state.config.azure.tenantId)
+            let resourceId = encodeURI(this.state.resourceId)
+            window.open(`https://portal.azure.com/#@${tenantId}/resource/${resourceId}`, '_blank');
+        }
+    }
+
     stateCreateButton() {
         let state = "";
 
@@ -79,6 +98,16 @@ class Resourcegroup extends BaseComponent {
             state = "disabled";
         } else if (this.state.form.name === "" || this.state.form.team === "" || this.state.form.location === "") {
             state = "disabled"
+        }
+
+        return state
+    }
+
+    stateOpenButton() {
+        let state = "disabled";
+
+        if (!this.state.requestRunning && this.state.resourceId) {
+            state = "";
         }
 
         return state
@@ -146,7 +175,8 @@ class Resourcegroup extends BaseComponent {
                                 </div>
                             )}
                             <div className="toolbox">
-                                <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateCreateButton()} onClick={this.createResourceGroup.bind(this)}>{this.state.buttonText}</button>
+                                <button type="submit" className="btn btn-primary bnt-azure-resourcegroup-create" disabled={this.stateCreateButton()} onClick={this.createResourceGroup.bind(this)}>{this.state.buttonText}</button>
+                                <button type="button" className="btn btn-secondary bnt-azure-resourcegroup-open" disabled={this.stateOpenButton()} onClick={this.openResourceGroup.bind(this)}>Goto ResourceGroup</button>
                             </div>
                         </form>
                     </div>
