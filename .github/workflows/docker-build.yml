@@ -14,10 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Run Gosec Security Scanner
       uses: securego/gosec@master
       with:
         args: ./...
+
     - name: Docker meta
       id: docker_meta
       uses: crazy-max/ghaction-docker-meta@v1
