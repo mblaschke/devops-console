@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	"os"
 	"strings"
 	"time"
 )
@@ -105,10 +104,12 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 		list[i].RoleDefinitionId = *roleDefinitionId
 	}
 
+	tenantId := opts.Azure.TenantId
+
 	// delete RoleAssignments on scope
 	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
 	roleAssignmentsClient.Authorizer = *authorizer
-	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "")
+	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "", tenantId)
 	if err != nil {
 		return fmt.Errorf("error fetching Azure RoleAssignments: %v", err)
 	}
@@ -116,7 +117,7 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 	for _, scopeRoleAssignment := range *result.Response().Value {
 		for _, roleAssignment := range list {
 			if *scopeRoleAssignment.PrincipalID == roleAssignment.PrincipalId && *scopeRoleAssignment.RoleDefinitionID == roleAssignment.RoleDefinitionId {
-				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID); err != nil {
+				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID, tenantId); err != nil {
 					return fmt.Errorf("unable to delete Azure RoleAssignment: %v", err)
 				}
 			}
@@ -185,7 +186,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		return
 	}
 
-	subscriptionId := os.Getenv("AZURE_SUBSCRIPTION_ID")
+	subscriptionId := opts.Azure.SubscriptionId
 
 	if formData.Name == "" {
 		validationMessages = append(validationMessages, "validation of ResourceGroup name failed (empty)")
@@ -296,9 +297,14 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createResourceGroup"}).Inc()
 
-	resp := response.GeneralMessage{}
+	resp := struct{
+		Message string `json:"message"`
+		ResoruceId string `json:"resourceId"`
+	}{
+		Message:    fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name),
+		ResoruceId: *group.ID,
+	}
 
-	resp.Message = fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name)
 	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name))
 	c.auditLog(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name), 1)
 
