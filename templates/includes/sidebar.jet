@@ -14,18 +14,18 @@
 
             {{ if MainFeatureIsEnabled("azure") }}
                 <div class="sb-sidenav-menu-heading">Azure</div>
-                {{ if FeatureIsEnabled("azure", "resourcegroup") }}
+                {{ if FeatureIsEnabled("azure", "resourcegroups") }}
                     {{yield navigationItem(title="ResourceGroup", href="/azure/resourcegroup")}}
                 {{ end }}
 
-                {{ if FeatureIsEnabled("azure", "roleassignment") }}
+                {{ if FeatureIsEnabled("azure", "roleassignments") }}
                     {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}
                 {{ end }}
             {{ end }}
 
             {{ if MainFeatureIsEnabled("monitoring") }}
                 <div class="sb-sidenav-menu-heading">Monitoring</div>
-                {{ if FeatureIsEnabled("monitoring", "alertmanager") }}
+                {{ if FeatureIsEnabled("monitoring", "alertmanagers") }}
                     {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
                 {{ end }}
             {{ end }}

@@ -83,8 +83,9 @@ func (c *Server) initRoutes() {
 			pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
 		}
 
-		pageParty.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
-
+		if c.config.App.FeatureIsEnabled("general", "about") {
+			pageParty.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
+		}
 		if c.config.App.FeatureIsEnabled("kubernetes", "namespaces") {
 			pageParty.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
 		}
@@ -101,7 +102,7 @@ func (c *Server) initRoutes() {
 			pageParty.Get("/azure/roleassignment", func(ctx iris.Context) { c.react(ctx, "Azure RoleAssignment") })
 		}
 
-		if c.config.App.FeatureIsEnabled("monitoring", "alertmanager") {
+		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {
 			pageParty.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
 		}
 	}
@@ -110,7 +111,7 @@ func (c *Server) initRoutes() {
 	{
 		apiParty.Get("/heartbeat", applicationIndex.heartbeat)
 
-		if c.config.App.FeatureIsEnabled("general", "stats") {
+		if c.config.App.FeatureIsEnabled("general", "about") {
 			apiParty.Get("/general/stats", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationGeneral.handleApiAppStats) })
 		}
 
@@ -144,7 +145,7 @@ func (c *Server) initRoutes() {
 			apiParty.Delete("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentDelete) })
 		}
 
-		if c.config.App.FeatureIsEnabled("monitoring", "alertmanager") {
+		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {
 			apiParty.Get("/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
 			apiParty.Get("/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
 			apiParty.Delete("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })

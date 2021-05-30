@@ -9,11 +9,11 @@ application:
     azure-roleassignments: true
 
     monitoring: true
-    monitoring-alertmanager: true
+    monitoring-alertmanagers: true
 
     general: true
     general-settings: true
-    general-stats: true
+    general-about: true
 
 
   session:
