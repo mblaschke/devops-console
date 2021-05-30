@@ -51,7 +51,7 @@ build-frontend:
 	mkdir -p static/js
 	cp react/build/static/js/* static/js
 	cp -a react/node_modules/bootstrap/dist/ static/dist/bootstrap
-	cp -a react/node_modules/popper.js/dist/umd/ static/dist/popper.js
+	cp -a react/node_modules/@popperjs/core/dist/umd/ static/dist/popper.js
 	mkdir -p static/dist/sb-admin static/dist/webfonts
 	cp -a react/node_modules/startbootstrap-sb-admin/dist/css/styles.css static/dist/sb-admin/sb-admin.css
 	cp -a react/node_modules/startbootstrap-sb-admin/dist/js/scripts.js static/dist/sb-admin/sb-admin.js

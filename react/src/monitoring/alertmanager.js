@@ -510,12 +510,12 @@ class Alertmanager extends BaseComponent {
                                 <div className="col-sm-4">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
-                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                id="dropdownMenuButtonFilter" data-bs-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
                                             Filter
                                         </button>
 
-                                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButtonFilter">
                                             <form className="px-4 py-3">
                                                 <label>Status</label>
                                                 <div className="form-check">
@@ -563,7 +563,7 @@ class Alertmanager extends BaseComponent {
                                 <div className="col-sm-4">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
-                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
                                             Filter
                                         </button>
@@ -908,23 +908,23 @@ class Alertmanager extends BaseComponent {
                             </td>
                             <td className="toolbox">
                                 <div className="btn-group" role="group">
-                                    <button id={"btnGroupDrop-" + silences.id} type="button"
+                                    <button id={"btnGroupDrop-" + row.id} type="button"
                                             className="btn btn-secondary dropdown-toggle"
-                                            data-toggle="dropdown" aria-haspopup="true"
+                                            data-bs-toggle="dropdown" aria-haspopup="true"
                                             aria-expanded="false">
                                         Action
                                     </button>
                                     {(() => {
                                         switch (row.status.state) {
                                             case "expired":
-                                                return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
-                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                </div>
+                                                return <ul className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + row.id}>
+                                                    <li><a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
+                                                </ul>
                                             default:
-                                                return <div className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + silences.id}>
-                                                    <a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a>
-                                                    <a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a>
-                                                </div>
+                                                return <ul className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + row.id}>
+                                                    <li><a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
+                                                    <li><a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a></li>
+                                                </ul>
                                         }
                                     })()}
                                 </div>

@@ -8,6 +8,9 @@ import AzureRoleAssignment from './azure/roleassignment';
 import MonitoringAlertmanager from "./monitoring/alertmanager";
 import Settings from './general/settings';
 import GeneralStats from './general/stats';
+
+import '@popperjs/core';
+import { usePopper } from 'react-popper';
 import $ from "jquery";
 
 class App extends Base {

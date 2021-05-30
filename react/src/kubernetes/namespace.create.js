@@ -162,7 +162,7 @@ class NamespaceCreate extends BaseComponent {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title" id="exampleModalLabel">Create namespace</h5>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
@@ -223,7 +223,7 @@ class NamespaceCreate extends BaseComponent {
                                     )}
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-dismiss="modal">Cancel</button>
+                                    <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
                                     <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.getButtonState()} onClick={this.createNamespace.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>

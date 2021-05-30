@@ -433,15 +433,15 @@ class Namespace extends BaseComponent {
                                                         <div className="btn-group" role="group">
                                                             <button id={'btnGroupDrop-' + row.name } type="button"
                                                                     className="btn btn-secondary dropdown-toggle"
-                                                                    data-toggle="dropdown" aria-haspopup="true"
+                                                                    data-bs-toggle="dropdown" aria-haspopup="true"
                                                                     aria-expanded="false">
                                                                 Action
                                                             </button>
-                                                            <div className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.name }>
-                                                                <a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a>
-                                                                <a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a>
-                                                                <a className={row.deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
-                                                            </div>
+                                                            <ul className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.name }>
+                                                                <li><a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a></li>
+                                                                <li><a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a></li>
+                                                                <li><a className={row.deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a></li>
+                                                            </ul>
                                                         </div>
                                                     );
                                                 }
