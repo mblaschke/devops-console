@@ -61,7 +61,7 @@ class NamespaceCreate extends BaseComponent {
 
         if (this.state.requestRunning) {
             state = "disabled";
-        } else if (this.state.form.environment !== "" || this.state.form.app !== "" || this.state.form.team !== "") {
+        } else if (this.state.form.environment === "" || this.state.form.app === "" || this.state.form.team === "") {
             state = "disabled"
         }
 
