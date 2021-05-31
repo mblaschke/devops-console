@@ -42,8 +42,8 @@ application:
   oauth:
     provider: {{env "OAUTH_PROVIDER" | toJson }}
     usernamePrefix: {{env "OAUTH_USERNAME_PREFIX" | toJson }}
-    groupPrefix: {{env "OAUTH_GROUPS_PREFIX" | default "oidc:"  | toJson }}
-    redirectUrl: {{env "OAUTH_REDIRECT_URL" | default "oidc:" | toJson }}
+    groupPrefix: {{env "OAUTH_GROUPS_PREFIX" | default ""  | toJson }}
+    redirectUrl: {{env "OAUTH_REDIRECT_URL" | default "" | toJson }}
 
     azuread:
       tenant: {{env "OAUTH_AZUREAD_TENANT" | toJson }}
