@@ -23,7 +23,7 @@ type ApplicationKubernetes struct {
 
 func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernetes) {
 	service = &services.Kubernetes{
-		Config:  c.config,
+		Config: c.config,
 	}
 
 	if c.config.Kubernetes.Namespace.Filter.Access != "" {

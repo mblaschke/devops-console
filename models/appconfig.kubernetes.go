@@ -17,7 +17,7 @@ type (
 
 	AppConfigKubernetesRoleBindingMetaData struct {
 		Annotations map[string]string `yaml:"annotations"`
-		Labels map[string]string `yaml:"labels"`
+		Labels      map[string]string `yaml:"labels"`
 	}
 
 	AppConfigNamespaceSettings struct {
