@@ -44,6 +44,12 @@ azure:
         default: foobar
 
 kubernetes:
+  roleBinding:
+    annotations:
+      foo: annotation
+    labels:
+      bar: label
+
   environments:
     - name: dev
       description: Development

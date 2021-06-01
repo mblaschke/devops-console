@@ -27,6 +27,8 @@ type Kubernetes struct {
 	dynClient       dynamic.Interface
 	discoveryClient *discovery.DiscoveryClient
 
+	Config models.AppConfig
+
 	Filter struct {
 		Namespace *regexp.Regexp
 	}
@@ -256,8 +258,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 		}
 	}
 
-	annotations := map[string]string{}
+	annotations := k.Config.Kubernetes.RoleBinding.Annotations
 	annotations["user"] = strings.ToLower(username)
+
+	labels := k.Config.Kubernetes.RoleBinding.Labels
 
 	subject := rbacV1.Subject{}
 	subject.Name = userid
@@ -269,6 +273,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 
 	roleBinding = &rbacV1.RoleBinding{}
 	roleBinding.SetAnnotations(annotations)
+	roleBinding.SetLabels(labels)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
@@ -289,8 +294,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 		}
 	}
 
-	annotations := map[string]string{}
+	annotations := k.Config.Kubernetes.RoleBinding.Annotations
 	annotations["team"] = strings.ToLower(teamName)
+
+	labels := k.Config.Kubernetes.RoleBinding.Labels
 
 	subjectList := []rbacV1.Subject{}
 	for _, group := range permission.Groups {
@@ -316,6 +323,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 
 	roleBinding = &rbacV1.RoleBinding{}
 	roleBinding.SetAnnotations(annotations)
+	roleBinding.SetLabels(labels)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
@@ -336,8 +344,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName 
 		}
 	}
 
-	annotations := map[string]string{}
+	annotations := k.Config.Kubernetes.RoleBinding.Annotations
 	annotations["group"] = strings.ToLower(group)
+
+	labels := k.Config.Kubernetes.RoleBinding.Labels
 
 	subject := rbacV1.Subject{}
 	subject.Name = group
@@ -349,6 +359,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceGroup(namespace, group, roleName 
 
 	roleBinding = &rbacV1.RoleBinding{}
 	roleBinding.SetAnnotations(annotations)
+	roleBinding.SetLabels(labels)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role
@@ -369,8 +380,10 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 		}
 	}
 
-	annotations := map[string]string{}
+	annotations := k.Config.Kubernetes.RoleBinding.Annotations
 	annotations["serviceaccount"] = strings.ToLower(serviceaccount)
+
+	labels := k.Config.Kubernetes.RoleBinding.Labels
 
 	subject := rbacV1.Subject{}
 	subject.Name = serviceaccount
@@ -382,6 +395,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 
 	roleBinding = &rbacV1.RoleBinding{}
 	roleBinding.SetAnnotations(annotations)
+	roleBinding.SetLabels(labels)
 	roleBinding.SetName(roleBindName)
 	roleBinding.SetNamespace(namespace)
 	roleBinding.RoleRef = role

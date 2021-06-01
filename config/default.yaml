@@ -90,6 +90,10 @@ azure:
 kubernetes:
   objectsPath: ./config/kubernetes
 
+  roleBinding:
+    annotations: {}
+    labels: {}
+
   environments: []
 
   namespace:

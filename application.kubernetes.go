@@ -22,7 +22,9 @@ type ApplicationKubernetes struct {
 }
 
 func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernetes) {
-	service = &services.Kubernetes{}
+	service = &services.Kubernetes{
+		Config:  c.config,
+	}
 
 	if c.config.Kubernetes.Namespace.Filter.Access != "" {
 		service.Filter.Namespace = regexp.MustCompile(c.config.Kubernetes.Namespace.Filter.Access)

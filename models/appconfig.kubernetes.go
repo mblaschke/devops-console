@@ -8,9 +8,16 @@ type (
 
 		ObjectsList map[string]KubernetesObjectList
 
+		RoleBinding AppConfigKubernetesRoleBindingMetaData `yaml:"roleBinding"`
+
 		Environments []AppConfigKubernetesEnvironment `yaml:"environments"`
 
 		Namespace AppConfigKubernetesNamespace
+	}
+
+	AppConfigKubernetesRoleBindingMetaData struct {
+		Annotations map[string]string `yaml:"annotations"`
+		Labels map[string]string `yaml:"labels"`
 	}
 
 	AppConfigNamespaceSettings struct {
