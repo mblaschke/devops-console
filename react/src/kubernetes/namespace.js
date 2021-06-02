@@ -148,7 +148,7 @@ class Namespace extends BaseComponent {
         let teamBadge = "";
         let userBadge = "";
 
-        if (!row) {
+        if (row) {
             if (row.name && row.name.match(/^user-[^-]+-.*/i)) {
                 personalBadge = <span className="badge badge-light">Personal Namespace</span>
             }
