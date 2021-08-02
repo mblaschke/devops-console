@@ -20,7 +20,7 @@ build-run: build-frontend build-backend run
 recreate-go-mod:
 	rm -f go.mod go.sum
 	GO111MODULE=on go mod init devops-console
-	GO111MODULE=on go get k8s.io/client-go@v0.19.0
+	GO111MODULE=on go get k8s.io/client-go@v0.21.0
 	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
 	GO111MODULE=on go get
 	GO111MODULE=on go mod vendor
