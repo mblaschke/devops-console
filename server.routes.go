@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	httpHeaderCsrfToken = "X-CSRF-Token"
+	httpHeaderCsrfToken = "X-CSRF-Token" // #nosec
 )
 
 func (c *Server) initRoutes() {
