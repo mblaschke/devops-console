@@ -1,5 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
+import {React, Component} from 'react';
 import $ from 'jquery';
 import * as utils from "./utils";
 import _ from 'lodash';

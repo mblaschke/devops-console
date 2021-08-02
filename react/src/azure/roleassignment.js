@@ -40,9 +40,6 @@ class Roleassignment extends BaseComponent {
         this.resetForm();
     }
 
-    componentWillMount() {
-    }
-
     componentDidMount() {
         this.loadConfig();
         this.setInputFocus();

@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	httpHeaderCsrfToken = "X-CSRF-Token"
+)
+
 func (c *Server) initRoutes() {
 	contextLogger := c.logger.With(zap.String("setup", "routes"))
 
@@ -188,7 +192,6 @@ func (c *Server) defaultHeaders(ctx iris.Context) {
 }
 
 func (c *Server) csrfProtectionReferer(ctx iris.Context) {
-	// TODO
 	ctx.Next()
 }
 
@@ -220,7 +223,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 
 	// check token if not GET or HEAD (safe methods)
 	if method != "GET" && method != "HEAD" {
-		clientToken := ctx.GetHeader("X-CSRF-Token")
+		clientToken := ctx.GetHeader(httpHeaderCsrfToken)
 
 		if sessionToken == "" || clientToken != sessionToken {
 			c.respondErrorWithPenalty(ctx, errors.New("Invalid CSRF token"))
@@ -229,7 +232,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 	}
 
 	// inject token
-	ctx.Header("X-CSRF-Token", sessionToken)
+	ctx.Header(httpHeaderCsrfToken, sessionToken)
 
 	tokenJson, _ := json.Marshal(sessionToken)
 	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
@@ -247,7 +250,7 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 	// set new token
 	token := randomString(64)
 	s.Set("CSRF", token)
-	ctx.Header("X-CSRF-Token", token)
+	ctx.Header(httpHeaderCsrfToken, token)
 
 	tokenJson, _ := json.Marshal(token)
 	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)

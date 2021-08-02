@@ -204,15 +204,12 @@ z-index: 999999;
 
 .globalmessages .alert {
 margin-bottom: 0.5rem;
+padding-right: 2rem;
 }
 
 .globalmessages .alert,
 .globalmessages .alert button.close {
 padding: 0.5rem .75rem;
-}
-
-.globalmessages .alert {
-padding-right: 2rem;
 }
 
 .hidden {
