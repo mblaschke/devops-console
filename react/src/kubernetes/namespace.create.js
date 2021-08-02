@@ -115,7 +115,7 @@ class NamespaceCreate extends BaseComponent {
                     state.form.team = lastSelectedTeam;
                 }
             });
-        } catch {}
+        } catch(e) {}
 
         // select first team if no selection available
         if (!state.form.team || state.form.team === "") {

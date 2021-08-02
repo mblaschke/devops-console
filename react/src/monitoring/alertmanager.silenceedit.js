@@ -33,7 +33,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
                     state.team = lastSelectedTeam;
                 }
             });
-        } catch {}
+        } catch(e) {}
 
         // select first team if no selection available
         if (!state.team || state.team === "") {
@@ -175,7 +175,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
                 }
             }
 
-        } catch {}
+        } catch(e) {}
 
         // set to state
         this.setState({

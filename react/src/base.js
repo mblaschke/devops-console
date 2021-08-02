@@ -272,7 +272,6 @@ class Base extends Component {
         let selectedTeam = this.getValue(field)
         if (selectedTeam) {
             // team already selected
-            console.log(275)
             return
         }
 
@@ -288,7 +287,7 @@ class Base extends Component {
             if (selectedTeam) {
                 return
             }
-        } catch {}
+        } catch(e) {}
 
         // select first team if no selection available
         if (this.state.config.teams.length > 0) {
@@ -306,7 +305,7 @@ class Base extends Component {
 
         try {
             localStorage.setItem("team", value);
-        } catch {}
+        } catch(e) {}
 
         this.setValue(field, event);
     }

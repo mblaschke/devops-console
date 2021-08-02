@@ -34,7 +34,7 @@ class Resourcegroup extends BaseComponent {
         this.initTeamSelection('form.team');
 
         let tags = {};
-        this.azureResourceGroupTagConfig().map((setting) => {
+        this.azureResourceGroupTagConfig().forEach((setting) => {
             if (setting.default) {
                 tags[setting.name] = setting.default;
             }
@@ -70,7 +70,6 @@ class Resourcegroup extends BaseComponent {
             }
 
             state.form.name = "";
-            console.log(state)
             this.setState(state);
         }).always(() => {
             this.setState({

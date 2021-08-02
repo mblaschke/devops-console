@@ -123,12 +123,12 @@ class Alertmanager extends BaseComponent {
         // default team for local storage
         try {
             let lastAlertmangerInstance = "" + localStorage.getItem("alertmanager");
-            this.state.config.alertmanager.instances.map((row, value) => {
+            this.state.config.alertmanager.instances.forEach((row, value) => {
                 if (row === lastAlertmangerInstance) {
                     state.instance = lastAlertmangerInstance;
                 }
             });
-        } catch {}
+        } catch(e) {}
 
         // select first team if no selection available
         if (!state.instance || state.instance === "") {
@@ -239,7 +239,7 @@ class Alertmanager extends BaseComponent {
     silenceNewFromAlert(alert) {
         let matchers = [];
 
-        Object.entries(alert.labels).map((item) => {
+        Object.entries(alert.labels).forEach((item) => {
             matchers.push({
                 name: item[0],
                 value: item[1],
@@ -393,7 +393,7 @@ class Alertmanager extends BaseComponent {
 
         if (totalRows && Array.isArray(totalRows)) {
             // collect
-            totalRows.map((row) => {
+            totalRows.forEach((row) => {
                 if (!statsList[row.status.state]) {
                     statsList[row.status.state] = {
                         "total": 0,
@@ -406,7 +406,7 @@ class Alertmanager extends BaseComponent {
 
         if (visibleRows && Array.isArray(visibleRows)) {
             // collect
-            visibleRows.map((row) => {
+            visibleRows.forEach((row) => {
                 if (!statsList[row.status.state]) {
                     statsList[row.status.state] = {
                         "total": 0,
@@ -438,7 +438,7 @@ class Alertmanager extends BaseComponent {
 
         if (rows && Array.isArray(rows)) {
             // collect
-            rows.map((row) => {
+            rows.forEach((row) => {
                 if (!statsList[row.status.state]) {
                     statsList[row.status.state] = {
                         "total": 0
@@ -651,7 +651,7 @@ class Alertmanager extends BaseComponent {
 
         let ungrouped = "Ungrouped alerts";
 
-        alerts.map((row) => {
+        alerts.forEach((row) => {
             if (row.labels && row.labels.alertname) {
                 if (!ret.list[row.labels.alertname]) {
                     ret.list[row.labels.alertname] = [];
@@ -683,7 +683,7 @@ class Alertmanager extends BaseComponent {
 
         let htmlTableRows = [];
 
-        Object.keys(groupedAlertList).map((alertName, alertIndex) => {
+        Object.keys(groupedAlertList).forEach((alertName, alertIndex) => {
             let isVisible = false;
             let alertGroupIconClassName = "far fa-caret-square-up";
 
@@ -708,7 +708,7 @@ class Alertmanager extends BaseComponent {
             if (isVisible) {
                 alertList = this.sortDataset(alertList);
 
-                alertList.map((row) => {
+                alertList.forEach((row) => {
                     htmlTableRows.push(
                         <tr className="alertmanager-alertname-item">
                             <td className="detail">
@@ -801,7 +801,7 @@ class Alertmanager extends BaseComponent {
             ungroupedName = "- Ungrouped -";
         }
 
-        list.map((row) => {
+        list.forEach((row) => {
             let groupName = groupCallback(row);
 
             if (groupName) {
@@ -842,7 +842,7 @@ class Alertmanager extends BaseComponent {
     renderSilences(silences) {
         let groupedSilences = this.buildGroupedList(silences, (row) => {
             let alertname = false;
-            row.matchers.map((item) => {
+            row.matchers.forEach((item) => {
                 if (item.name === "alertname") {
                     alertname = item.value;
                 }
@@ -855,7 +855,7 @@ class Alertmanager extends BaseComponent {
 
         let htmlTableRows = [];
 
-        Object.keys(groupedSilenceList).map((alertName, silenceIndex) => {
+        Object.keys(groupedSilenceList).forEach((alertName, silenceIndex) => {
             let isVisible = false;
             let alertGroupIconClassName = "far fa-caret-square-up";
 
@@ -878,7 +878,7 @@ class Alertmanager extends BaseComponent {
             );
 
             if (isVisible) {
-                silenceList.map((row) => {
+                silenceList.forEach((row) => {
                     htmlTableRows.push(
                         <tr>
                             <td>

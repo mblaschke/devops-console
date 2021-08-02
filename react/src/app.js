@@ -40,7 +40,7 @@ class App extends Base {
                 if (this.searchCallback) {
                     try {
                         this.searchCallback(event);
-                    } catch {}
+                    } catch(e) {}
                 }
             },
 
@@ -109,7 +109,7 @@ class App extends Base {
             if (this.janitorTimeout) {
                 try {
                     this.janitorTimeout.cancel();
-                } catch {}
+                } catch(e) {}
             }
             this.janitorTimeout = setTimeout(janitorFunc, timeout);
         };
@@ -186,7 +186,7 @@ class App extends Base {
                     messageList: messageList
                 });
             }
-        } catch {}
+        } catch(e) {}
 
         this.handlePreventEvent(event);
     }

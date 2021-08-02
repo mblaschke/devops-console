@@ -304,7 +304,7 @@ class Namespace extends BaseComponent {
            let ret = [];
            try {
                if (this.state.config && this.state.config.kubernetes.namespace.settings) {
-                   this.state.config.kubernetes.namespace.settings.map((setting) => {
+                   this.state.config.kubernetes.namespace.settings.forEach((setting) => {
                        if (row.settings && row.settings[setting.name]) {
                            ret.push({
                               label: setting.label,

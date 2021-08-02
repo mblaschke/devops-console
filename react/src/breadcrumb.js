@@ -17,7 +17,7 @@ class Breadcrumb extends Base {
         let pathPartsRaw = window.location.pathname.split("/", -1);
         state.breadcrumbs = [];
 
-        pathPartsRaw.map((row) => {
+        pathPartsRaw.forEach((row) => {
             if (row !== "") {
                 state.breadcrumbs.push({
                     title: row,
