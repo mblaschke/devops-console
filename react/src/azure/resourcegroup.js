@@ -158,17 +158,17 @@ class Resourcegroup extends BaseComponent {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="inputNsApp" className="inputRg">Azure ResourceGroup</label>
+                                <label htmlFor="inputRg" className="inputRg">Azure ResourceGroup</label>
                                 <input type="text" name="nsApp" id="inputRg" className="form-control" placeholder="ResourceGroup name" required value={this.getValue("form.name")} onChange={this.setValue.bind(this, "form.name")} />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="inputNsApp" className="inputRgLocation">Azure Location</label>
+                                <label htmlFor="inputRgLocation" className="inputRgLocation">Azure Location</label>
                                 <input type="text" name="nsApp" id="inputRgLocation" className="form-control" placeholder="ResourceGroup location" required value={this.getValue("form.location")} onChange={this.setValue.bind(this, "form.location")} />
                             </div>
 
                             {this.azureResourceGroupTagConfig().map((setting) =>
                                 <div className="form-group">
-                                    <label htmlFor="inputNsApp" className="inputRg">{setting.label}</label>
+                                    <label className="inputRg">{setting.label}</label>
                                     <input type="text" name={setting.name} id={setting.name} className="form-control" placeholder={setting.placeholder} value={this.getValue("form.tags." + setting.name)} onChange={this.setValue.bind(this, "form.tags." + setting.name)} />
                                     <small className="form-text text-muted">{setting.description}</small>
                                 </div>

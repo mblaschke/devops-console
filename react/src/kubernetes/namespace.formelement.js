@@ -4,24 +4,16 @@ import BaseComponent from '../base';
 class NamespaceFormelement extends BaseComponent {
     constructor(props) {
         super(props);
-
-        let htmlId = this.props.setting.name + Math.random().toString(36).substr(2, 9);
-        htmlId = htmlId.replace(/[^a-zA-Z0-9]/g, '');
-
         this.state = {
-            htmlId: htmlId,
+            _htmlid:  "" + this.generateHtmlId(props.setting.name),
         };
-    }
-
-    generateHtmlId() {
-        return this.state.htmlId;
     }
 
     renderInput() {
         return (
             <div className="form-group">
-                <label htmlFor={this.generateHtmlId()} className="inputRg">{this.props.setting.label}</label>
-                <input type="text" name={this.props.setting.name} id={this.generateHtmlId()} className="form-control" placeholder={this.props.setting.placeholder} required={this.props.setting.required} value={this.props.value} onChange={this.props.onchange} />
+                <label htmlFor={this.state._htmlid} className="inputRg">{this.props.setting.label}</label>
+                <input type="text" name={this.props.setting.name} id={this.state._htmlid} className="form-control" placeholder={this.props.setting.placeholder} required={this.props.setting.required} value={this.props.value} onChange={this.props.onchange} />
                 <small className="form-text text-muted">{this.props.setting.description}</small>
                 <small className="form-text text-muted">{this.props.setting.k8sType}: {this.props.setting.k8sName}</small>
             </div>
@@ -47,8 +39,8 @@ class NamespaceFormelement extends BaseComponent {
 
         return (
             <div className="form-group form-check">
-                <input type="checkbox" name={this.props.setting.name} id={this.generateHtmlId()} className="form-check-input" placeholder={this.props.setting.plaeholder} required={this.props.setting.required} checked={checkboxState} onChange={this.props.onchange} />
-                <label htmlFor={this.generateHtmlId()} className="form-check-label">{this.props.setting.label}</label>
+                <input type="checkbox" name={this.props.setting.name} id={this.state._htmlid} className="form-check-input" placeholder={this.props.setting.plaeholder} required={this.props.setting.required} checked={checkboxState} onChange={this.props.onchange} />
+                <label htmlFor={this.state._htmlid} className="form-check-label">{this.props.setting.label}</label>
                 <small className="form-text text-muted">{this.props.setting.description}</small>
                 <small className="form-text text-muted">{this.props.setting.k8sType}: {this.props.setting.k8sName}</small>
             </div>

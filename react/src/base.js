@@ -312,7 +312,7 @@ class Base extends Component {
 
     renderTeamSelector(htmlId) {
         if (!htmlId) {
-            htmlId = "formTeamSelector" + Math.random() * 10000;
+            htmlId = this.generateHtmlId("formTeamSelector");
         }
 
         return (
@@ -326,7 +326,7 @@ class Base extends Component {
     }
 
     renderTeamSelectorWithlabel() {
-        let htmlId = "formTeamSelector" + Math.random() * 10000;
+        let htmlId = this.generateHtmlId("formTeamSelector");
 
         return (
             <div className="form-group">
@@ -352,6 +352,15 @@ class Base extends Component {
         let jqxhr = $.ajax(opts);
         this.handleXhr(jqxhr);
         return jqxhr;
+    }
+
+    generateHtmlId(prefix) {
+        if (!prefix) {
+            prefix = "uid"
+        }
+        let ret = _.uniqueId(prefix);
+        ret = ret.replace(/[^a-zA-Z0-9]/g, '');
+        return ret;
     }
 
 }
