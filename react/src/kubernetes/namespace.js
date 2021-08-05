@@ -320,11 +320,11 @@ class Namespace extends BaseComponent {
         let self = this;
         let namespaces = this.getNamespaces();
         return (
-            <div onClick={this.handleDescriptionEditClose.bind(this)}>
+            <div className="flexcontainer" onClick={this.handleDescriptionEditClose.bind(this)}>
 
                 <Breadcrumb/>
 
-                <div className="card mb-3">
+                <div className="card mb-3 autoheight">
                     <div className="card-header">
                         <i className="fas fa-object-group"></i>
                         Kubernetes namespaces

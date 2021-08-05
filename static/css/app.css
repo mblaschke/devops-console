@@ -25,11 +25,38 @@ main,
 #layoutSidenav,
 #layoutSidenav_content,
 #wrapper #content-wrapper > .container-fluid,
-#root {
+#root,
+#root >div  {
     min-height: 100%;
     height: 100%
 }
 
+#root {
+    height: calc(100%-10rem);
+}
+
+div.flexcontainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+div.autoheight {
+    flex-grow: 1;
+}
+
+.card.autoheight .card-body {
+    position: relative;
+}
+
+.card.autoheight .card-body .table-responsive {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+}
 #wrapper #content-wrapper {
     padding-bottom: 0;
     padding-top: 1rem;
