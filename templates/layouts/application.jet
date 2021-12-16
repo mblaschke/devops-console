@@ -38,6 +38,7 @@ window.CSRF_TOKEN = {{ CSRF_TOKEN_JSON | raw }};
 {{else}}
 window.CSRF_TOKEN = false;
 {{end}}
+window.APP_VERSION = "{{ appVersion | raw }}";
 </script>
   {{include "includes/react.jet"}}
   {{include "includes/html-footer.jet"}}

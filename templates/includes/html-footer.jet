@@ -1,4 +1,1 @@
-  <script src="/static/dist/jquery/jquery.min.js?ver={{appVersion}}"></script>
-  <script src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}"></script>
-  <script src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}"></script>
-  <script src="/static/dist/sb-admin/sb-admin.js?ver={{appVersion}}"></script>
+<!-- html-footer -->
