@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import {
+    BrowserRouter,
+    Routes,
+    Route
+} from "react-router-dom";
 import Base from './base';
 import K8sNamespace from './kubernetes/namespace';
 import K8sAccess from './kubernetes/access';
@@ -224,21 +228,23 @@ class App extends Base {
 
     render() {
         return (
-            <Router>
+            <BrowserRouter>
                 <div>
                     <div className="globalmessages">{this.renderGlobalMessages()}</div>
-                    <Route path="/kubernetes/namespaces" component={K8sNamespace} />
-                    <Route path="/kubernetes/access" component={K8sAccess} />
+                    <Routes>
+                        <Route path="/kubernetes/namespaces" element={<K8sNamespace />} />
+                        <Route path="/kubernetes/access" element={<K8sAccess />} />
 
-                    <Route path="/azure/resourcegroup" component={AzureResourceGroups} />
-                    <Route path="/azure/roleassignment" component={AzureRoleAssignment} />
+                        <Route path="/azure/resourcegroup" element={<AzureResourceGroups />} />
+                        <Route path="/azure/roleassignment" element={<AzureRoleAssignment />} />
 
-                    <Route path="/monitoring/alertmanager" component={MonitoringAlertmanager} />
+                        <Route path="/monitoring/alertmanager" element={<MonitoringAlertmanager />} />
 
-                    <Route path="/general/settings" component={Settings} />
-                    <Route path="/general/about" component={GeneralStats} />
+                        <Route path="/general/settings" element={<Settings />} />
+                        <Route path="/general/about" element={<GeneralStats />} />
+                    </Routes>
                 </div>
-            </Router>
+            </BrowserRouter>
         )
     }
 }

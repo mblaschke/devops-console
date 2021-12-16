@@ -20,7 +20,7 @@ build-run: build-frontend build-backend run
 recreate-go-mod:
 	rm -f go.mod go.sum
 	GO111MODULE=on go mod init devops-console
-	GO111MODULE=on go get k8s.io/client-go@v0.21.0
+	GO111MODULE=on go get k8s.io/client-go@v0.22.0
 	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
 	GO111MODULE=on go get
 	GO111MODULE=on go mod vendor
@@ -52,7 +52,8 @@ build-frontend:
 	cp react/build/static/js/* static/js
 	cp -a react/node_modules/bootstrap/dist/ static/dist/bootstrap
 	cp -a react/node_modules/@popperjs/core/dist/umd/ static/dist/popper.js
-	mkdir -p static/dist/sb-admin static/dist/webfonts
+	mkdir -p static/dist/sb-admin static/dist/webfonts static/dist/jquery/
+	cp -a react/node_modules/jquery/dist/jquery.min.js static/dist/jquery/jquery.min.js
 	cp -a react/node_modules/startbootstrap-sb-admin/dist/css/styles.css static/dist/sb-admin/sb-admin.css
 	cp -a react/node_modules/startbootstrap-sb-admin/dist/js/scripts.js static/dist/sb-admin/sb-admin.js
 	cp -a react/node_modules/@fortawesome/fontawesome-free/css/all.min.css static/dist/sb-admin/fontawesome.css

@@ -77,8 +77,11 @@ func (c *Server) initRoutes() {
 		publicParty.Get("/oauth", applicationAuth.LoginViaOauth)
 		publicParty.Get("/logout", applicationAuth.Logout)
 		publicParty.Get("/logout/forced", applicationAuth.LogoutForced)
+	}
 
-		publicParty.Get("/_healthz", applicationSystem.Healthz)
+	healthParty := c.app.Party("/", c.defaultHeaders)
+	{
+		healthParty.Get("/_healthz", applicationSystem.Healthz)
 	}
 
 	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
