@@ -3,11 +3,6 @@ name: docker-build
 on:
   schedule:
     - cron: '0 10 * * *'
-  push:
-    branches:
-      - '**'
-    tags:
-      - '*.*.*'
 
 jobs:
   build:
