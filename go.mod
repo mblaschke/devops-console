@@ -3,9 +3,9 @@ module devops-console
 go 1.17
 
 require (
-	github.com/Azure/azure-sdk-for-go v60.1.0+incompatible
+	github.com/Azure/azure-sdk-for-go v60.2.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.23
-	github.com/Azure/go-autorest/autorest/azure/auth v0.5.9
+	github.com/Azure/go-autorest/autorest/azure/auth v0.5.10
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/containrrr/shoutrrr v0.5.2
@@ -32,7 +32,7 @@ require (
 require (
 	cloud.google.com/go v0.65.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.17 // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.9.18 // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.4 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
@@ -118,7 +118,7 @@ require (
 	go.mongodb.org/mongo-driver v1.7.5 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b // indirect
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
