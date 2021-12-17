@@ -1,4 +1,4 @@
-name: docker-build
+name: "scheduled docker"
 
 on:
   schedule:
