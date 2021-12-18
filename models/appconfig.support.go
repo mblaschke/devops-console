@@ -6,7 +6,7 @@ type (
 	}
 
 	AppConfigSupportPagerduty struct {
-		AuthToken string `yaml:"authToken"`
+		AuthToken      string `yaml:"authToken"`
 		IntegrationKey string `yaml:"integrationKey"`
 	}
 )

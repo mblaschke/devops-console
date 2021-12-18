@@ -24,10 +24,6 @@ type ApplicationSupport struct {
 	*Server
 }
 
-func (c *ApplicationSupport) pagerdutyClient() *pagerduty.Client {
-	return pagerduty.NewClient(c.config.Support.Pagerduty.AuthToken)
-}
-
 func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *models.User) {
 	var err error
 
@@ -48,12 +44,12 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 	event := pagerduty.V2Event{
 		RoutingKey: c.config.Support.Pagerduty.IntegrationKey,
 		Action:     "trigger",
-		Payload:    &pagerduty.V2Payload{
-			Summary:   fmt.Sprintf("emergency support request from %v", formData.Team),
-			Source:    "DevOps console",
-			Severity:  "critical",
-			Details:   pagerduty.V2Payload{
-				Group:     formData.ResourceType,
+		Payload: &pagerduty.V2Payload{
+			Summary:  fmt.Sprintf("emergency support request from %v", formData.Team),
+			Source:   "DevOps console",
+			Severity: "critical",
+			Details: pagerduty.V2Payload{
+				Group: formData.ResourceType,
 				Component: fmt.Sprintf(
 					SupportPagerdutyEventComponent,
 					formData.ResourceType,
@@ -61,7 +57,7 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 					formData.ResourceGroup,
 					formData.Resource,
 				),
-				Summary:   fmt.Sprintf(
+				Summary: fmt.Sprintf(
 					SupportPagerdutyEventSummary,
 					formData.Message,
 				),

@@ -6,12 +6,12 @@ import (
 
 type (
 	SupportPagerduty struct {
-		Team string `yaml:"team"`
-		ResourceType string `yaml:"resourceType"`
-		Location string `yaml:"location"`
+		Team          string `yaml:"team"`
+		ResourceType  string `yaml:"resourceType"`
+		Location      string `yaml:"location"`
 		ResourceGroup string `yaml:"resourceGroup"`
-		Resource string `yaml:"resource"`
-		Message string `yaml:"message"`
+		Resource      string `yaml:"resource"`
+		Message       string `yaml:"message"`
 	}
 )
 
