@@ -69,6 +69,7 @@ func (c *Server) initRoutes() {
 	applicationAuth := ApplicationAuth{Server: c}
 	applicationSystem := ApplicationSystem{Server: c}
 	applicationIndex := ApplicationIndex{Server: c}
+	applicationSupport := ApplicationSupport{Server: c}
 
 	publicParty := c.app.Party("/", requestLogger, c.defaultHeaders)
 	{
@@ -107,6 +108,10 @@ func (c *Server) initRoutes() {
 
 		if c.config.App.FeatureIsEnabled("azure", "roleassignments") {
 			pageParty.Get("/azure/roleassignment", func(ctx iris.Context) { c.react(ctx, "Azure RoleAssignment") })
+		}
+
+		if c.config.App.FeatureIsEnabled("support", "pagerduty") {
+			pageParty.Get("/support/pagerduty", func(ctx iris.Context) { c.react(ctx, "PagerDuty support") })
 		}
 
 		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {
@@ -150,6 +155,10 @@ func (c *Server) initRoutes() {
 		if c.config.App.FeatureIsEnabled("azure", "roleassignments") {
 			apiParty.Post("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentCreate) })
 			apiParty.Delete("/azure/roleassignment", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAzure.ApiRoleAssignmentDelete) })
+		}
+
+		if c.config.App.FeatureIsEnabled("support", "pagerduty") {
+			apiParty.Post("/support/pagerduty", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSupport.ApiPagerDutyTicketCreate) })
 		}
 
 		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {

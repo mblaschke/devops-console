@@ -23,6 +23,13 @@
                 {{ end }}
             {{ end }}
 
+            {{ if MainFeatureIsEnabled("support") }}
+                <div class="sb-sidenav-menu-heading">Support</div>
+                {{ if FeatureIsEnabled("support", "pagerduty") }}
+                    {{yield navigationItem(title="PagerDuty", href="/support/pagerduty")}}
+                {{ end }}
+            {{ end }}
+
             {{ if MainFeatureIsEnabled("monitoring") }}
                 <div class="sb-sidenav-menu-heading">Monitoring</div>
                 {{ if FeatureIsEnabled("monitoring", "alertmanagers") }}

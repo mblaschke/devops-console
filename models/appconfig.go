@@ -16,6 +16,7 @@ type (
 		Azure        AppConfigAzure        `yaml:"azure"`
 		Kubernetes   AppConfigKubernetes   `yaml:"kubernetes"`
 		Permissions  AppConfigPermissions  `yaml:"permissions"`
+		Support      AppConfigSupport      `yaml:"support"`
 		Alertmanager AppConfigAlertmanager `yaml:"alertmanager"`
 	}
 

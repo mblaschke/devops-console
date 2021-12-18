@@ -9,6 +9,7 @@ import K8sNamespace from './kubernetes/namespace';
 import K8sAccess from './kubernetes/access';
 import AzureResourceGroups from './azure/resourcegroup';
 import AzureRoleAssignment from './azure/roleassignment';
+import SupportPagerduty from "./support/pagerduty";
 import MonitoringAlertmanager from "./monitoring/alertmanager";
 import Settings from './general/settings';
 import GeneralStats from './general/stats';
@@ -247,6 +248,8 @@ class App extends Base {
 
                         <Route path="/azure/resourcegroup" element={<AzureResourceGroups />} />
                         <Route path="/azure/roleassignment" element={<AzureRoleAssignment />} />
+
+                        <Route path="/support/pagerduty" element={<SupportPagerduty />} />
 
                         <Route path="/monitoring/alertmanager" element={<MonitoringAlertmanager />} />
 

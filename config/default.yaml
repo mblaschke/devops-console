@@ -8,8 +8,11 @@ application:
     azure-resourcegroups: true
     azure-roleassignments: true
 
-    monitoring: true
-    monitoring-alertmanagers: true
+    support: false
+    support-pagerduty: false
+
+    monitoring: false
+    monitoring-alertmanagers: false
 
     general: true
     general-settings: true
@@ -145,6 +148,11 @@ kubernetes:
         description: Deny all traffic
         path: ./config/networkpolicy/deny-all.yaml
         default: true
+
+support:
+  pagerduty:
+    authToken: {{env "PAGERDUTY_AUTH_TOKEN"  | toJson }}
+    integrationKey: {{env "PAGERDUTY_INTEGRATION_KEY"  | toJson }}
 
 permissions:
   default:
