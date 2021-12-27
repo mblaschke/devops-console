@@ -12,6 +12,7 @@ type (
 		ResourceGroup string `yaml:"resourceGroup"`
 		Resource      string `yaml:"resource"`
 		Message       string `yaml:"message"`
+		Contact       string `yaml:"contact"`
 	}
 )
 
@@ -41,6 +42,10 @@ func (a *SupportPagerduty) Validate() (ret *SupportPagerduty, err error) {
 
 	if ret.Message == "" {
 		return nil, errors.New("invalid or empty Message")
+	}
+
+	if ret.Contact == "" {
+		return nil, errors.New("invalid or empty Contact")
 	}
 
 	return a, nil

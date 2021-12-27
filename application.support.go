@@ -17,7 +17,16 @@ Group/Namespace: %v
 Resource: %v
 `
 
-	SupportPagerdutyEventSummary = `%v`
+	SupportPagerdutyEventSummary = `
+Requested by:
+%v for %v
+
+Message:
+%v
+
+Contact:
+%v
+`
 )
 
 type ApplicationSupport struct {
@@ -45,7 +54,7 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 		RoutingKey: c.config.Support.Pagerduty.IntegrationKey,
 		Action:     "trigger",
 		Payload: &pagerduty.V2Payload{
-			Summary:  fmt.Sprintf("emergency support request from %v", formData.Team),
+			Summary:  fmt.Sprintf("emergency support request from %v (request by %v)", formData.Team, user.Email),
 			Source:   "DevOps console",
 			Severity: "critical",
 			Details: pagerduty.V2Payload{
@@ -59,7 +68,10 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 				),
 				Summary: fmt.Sprintf(
 					SupportPagerdutyEventSummary,
+					fmt.Sprintf("%s (%s)", user.Username, user.Email),
+					formData.Team,
 					formData.Message,
+					formData.Contact,
 				),
 			},
 		},

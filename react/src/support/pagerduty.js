@@ -68,10 +68,12 @@ class SupportPagerduty extends BaseComponent {
         }).done((jqxhr) => {
             let state = this.state;
             state.form = {
-                resourceType: "",
                 location: "",
+                resourceType: "",
+                resourceGroup: "",
                 resource: "",
                 message: "",
+                contact: ""
             };
             this.setState(state);
         }).always(() => {
@@ -103,6 +105,10 @@ class SupportPagerduty extends BaseComponent {
                         Create PagerDuty emergency ticket
                     </div>
                     <div className="card-body">
+                        <div className="alert alert-warning" role="alert">
+                            You are about to create an emergency support ticket!
+                        </div>
+
                         <form method="post">
                             <div className="form-group">
                                 <label htmlFor="inputNsAreaTeam">Team</label>
@@ -145,6 +151,11 @@ class SupportPagerduty extends BaseComponent {
                             <div className="form-group">
                                 <label htmlFor="inputMessage" className="inputMessage">Message</label>
                                 <textarea className="form-control" id="inputMessage" rows="3" required value={this.getValue("form.message")} onChange={this.setValue.bind(this, "form.message")}></textarea>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="inputContact" className="inputContact">Contact</label>
+                                <textarea className="form-control" id="inputContact" rows="3" required value={this.getValue("form.contact")} onChange={this.setValue.bind(this, "form.contact")}></textarea>
                             </div>
 
                             <div className="toolbox">

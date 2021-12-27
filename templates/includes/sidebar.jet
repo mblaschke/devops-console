@@ -24,7 +24,7 @@
             {{ end }}
 
             {{ if MainFeatureIsEnabled("support") }}
-                <div class="sb-sidenav-menu-heading">Support</div>
+                <div class="sb-sidenav-menu-heading">Emergency</div>
                 {{ if FeatureIsEnabled("support", "pagerduty") }}
                     {{yield navigationItem(title="PagerDuty", href="/support/pagerduty")}}
                 {{ end }}
