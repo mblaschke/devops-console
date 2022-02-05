@@ -15,6 +15,12 @@ jobs:
       with:
         args: ./...
 
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: latest
+        args: -E exportloopref,gofmt --timeout=30m
+
     - name: Docker meta
       id: docker_meta
       uses: docker/metadata-action@v3
