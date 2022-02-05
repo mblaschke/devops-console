@@ -17,9 +17,11 @@ jobs:
 
     - name: Docker meta
       id: docker_meta
-      uses: crazy-max/ghaction-docker-meta@v1
+      uses: docker/metadata-action@v3
       with:
         images: mblaschke/devops-console,quay.io/mblaschke/devops-console
+        labels: |
+          io.artifacthub.package.readme-url: https://raw.githubusercontent.com/mblaschke/devops-console/main/README.md
         #tag-sha: true
 
     - name: Set up QEMU
