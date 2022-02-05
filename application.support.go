@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"devops-console/models"
 	"devops-console/models/formdata"
 	"devops-console/models/response"
@@ -77,7 +78,7 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 		},
 	}
 
-	if pagerdutyResponse, err := pagerduty.ManageEvent(event); err == nil {
+	if pagerdutyResponse, err := pagerduty.ManageEventWithContext(context.Background(), event); err == nil {
 		resp := response.GeneralMessage{
 			Message: fmt.Sprintf("%v", pagerdutyResponse.Message),
 		}
