@@ -19,11 +19,12 @@ build-run: build-frontend build-backend run
 .PHONY: recreate-go-mod
 recreate-go-mod:
 	rm -f go.mod go.sum
-	GO111MODULE=on go mod init devops-console
-	GO111MODULE=on go get k8s.io/client-go@v0.22.0
-	GO111MODULE=on go get -u github.com/Azure/azure-sdk-for-go/...
-	GO111MODULE=on go get
-	GO111MODULE=on go mod vendor
+	go mod init devops-console
+	go get k8s.io/client-go@v0.22.0
+	go get -u github.com/Azure/azure-sdk-for-go/...
+	go get -u github.com/microcosm-cc/bluemonday
+	go get
+	go mod vendor
 
 .PHONY: image
 image: build
