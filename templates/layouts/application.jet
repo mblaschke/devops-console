@@ -3,8 +3,6 @@
 <html lang="en" app:csrf="{{ CSRF_TOKEN_JSON }}" app:version="{{ appVersion }}">
 <head>
     {{include "includes/html-header.jet"}}
-    <script defer="defer" src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}"></script>
-    <script defer="defer" src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}"></script>
 </head>
 <body class="hide-search">
 
@@ -34,6 +32,8 @@
         </main>
     </div>
   </div>
+  <script src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}"></script>
+  <script src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}"></script>
   {{include "includes/react.jet"}}
   {{include "includes/html-footer.jet"}}
 </body>
