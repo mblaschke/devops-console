@@ -98,7 +98,7 @@ class Namespace extends BaseComponent {
         });
 
         setTimeout(() => {
-            $("#deleteQuestion").modal('show');
+            this.modalShow("#deleteQuestion")
             setTimeout(() => {
                 $("#deleteQuestion").find(":input:text:visible:enabled").first().focus();
             },500);
@@ -107,7 +107,7 @@ class Namespace extends BaseComponent {
 
     createNamespace() {
         setTimeout(() => {
-            $("#createQuestion").modal('show');
+            this.modalShow("#createQuestion")
             setTimeout(() => {
                 $("#createQuestion").find(":input:text:visible:enabled").first().focus();
             },500);
@@ -121,7 +121,7 @@ class Namespace extends BaseComponent {
         });
 
         setTimeout(() => {
-            $("#editQuestion").modal('show');
+            this.modalShow("#editQuestion")
         }, 200)
     }
 
@@ -166,27 +166,28 @@ class Namespace extends BaseComponent {
     }
 
     handleNamespaceDeletion() {
-        $("#deleteQuestion").modal('hide');
+        this.modalHide("#deleteQuestion")
         this.setState({
             selectedNamespace: [],
         });
     }
 
     handleNamespaceCreation() {
-        $("#createQuestion").modal('hide');
+        this.modalHide("#createQuestion")
         this.setState({
             selectedNamespace: [],
         });
     }
 
     handleNamespaceEdit() {
+        console.log("edit save");
         this.setState({
             selectedNamespace: [],
             namespaceEditModalShow: false
         });
 
         setTimeout(() => {
-            $("#editQuestion").modal('hide');
+            this.modalHide("#editQuestion")
         }, 200);
     }
 

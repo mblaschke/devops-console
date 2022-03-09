@@ -362,6 +362,22 @@ class Base extends Component {
         return ret;
     }
 
+    modalHide(selector) {
+        let modal = bootstrap.Modal.getOrCreateInstance(document.querySelector(selector))
+        if (modal) {
+            console.log("calling hide")
+            modal.hide()
+        }
+    }
+
+    modalShow(selector) {
+        let modal = bootstrap.Modal.getOrCreateInstance(document.querySelector(selector))
+        if (modal) {
+            console.log("calling show")
+            modal.show()
+        }
+    }
+
 }
 
 export default Base;
