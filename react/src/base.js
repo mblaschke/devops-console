@@ -365,7 +365,6 @@ class Base extends Component {
     modalHide(selector) {
         let modal = bootstrap.Modal.getOrCreateInstance(document.querySelector(selector))
         if (modal) {
-            console.log("calling hide")
             modal.hide()
         }
     }
@@ -373,7 +372,6 @@ class Base extends Component {
     modalShow(selector) {
         let modal = bootstrap.Modal.getOrCreateInstance(document.querySelector(selector))
         if (modal) {
-            console.log("calling show")
             modal.show()
         }
     }

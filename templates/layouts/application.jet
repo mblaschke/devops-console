@@ -5,7 +5,6 @@
     {{include "includes/html-header.jet"}}
     <script defer="defer" src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}"></script>
     <script defer="defer" src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}"></script>
-    <script defer="defer" src="/static/dist/sb-admin/sb-admin.js?ver={{appVersion}}"></script>
 </head>
 <body class="hide-search">
 

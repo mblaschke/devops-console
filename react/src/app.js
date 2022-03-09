@@ -234,6 +234,8 @@ class App extends Base {
     }
 
     render() {
+        this.loadJavascript("/static/dist/sb-admin/sb-admin.js?ver=" + window.APP_VERSION)
+
         return (
             <BrowserRouter>
                 <div>

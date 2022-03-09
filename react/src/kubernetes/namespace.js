@@ -180,7 +180,6 @@ class Namespace extends BaseComponent {
     }
 
     handleNamespaceEdit() {
-        console.log("edit save");
         this.setState({
             selectedNamespace: [],
             namespaceEditModalShow: false
