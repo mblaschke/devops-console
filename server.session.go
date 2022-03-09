@@ -28,6 +28,8 @@ func (c *Server) initSession() {
 		c.initSessionSecureCookie()
 	case "redis":
 		c.initSessionRedis()
+	case "redis+securecookie":
+		c.initSessionRedisSecureCookie()
 	default:
 		panic("invalid session type defined")
 	}
@@ -67,12 +69,13 @@ func (c *Server) initSessionSecureCookie() {
 	})
 }
 
-func (c *Server) initSessionRedis() {
+func (c *Server) createRedisConnection() {
 	contextLogger := c.logger.With(
 		zap.String("setup", "session"),
 		zap.String("session", "redis"),
 	)
 
+	// try connect to redis server (with retry)
 	for i := 0; i < 25; i++ {
 		durationTime := math.Min(15, float64(i*2))
 		retryTime := time.Duration(time.Duration(durationTime) * time.Second)
@@ -109,6 +112,10 @@ func (c *Server) initSessionRedis() {
 			contextLogger.Error(err)
 		}
 	})
+}
+
+func (c *Server) initSessionRedis() {
+	c.createRedisConnection()
 
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
@@ -116,6 +123,24 @@ func (c *Server) initSessionRedis() {
 		DisableSubdomainPersistence: true,
 		AllowReclaim:                true,
 	})
+	c.session.UseDatabase(c.redisConnection)
+}
 
+func (c *Server) initSessionRedisSecureCookie() {
+	c.createRedisConnection()
+
+	secureCookie := securecookie.New(
+		[]byte(c.config.App.Session.SecureCookie.HashKey),
+		[]byte(c.config.App.Session.SecureCookie.BlockKey),
+	)
+
+	c.session = sessions.New(sessions.Config{
+		Cookie:                      c.config.App.Session.CookieName,
+		Encode:                      secureCookie.Encode,
+		Decode:                      secureCookie.Decode,
+		AllowReclaim:                true,
+		Expires:                     c.config.App.Session.Expiry,
+		DisableSubdomainPersistence: true,
+	})
 	c.session.UseDatabase(c.redisConnection)
 }
