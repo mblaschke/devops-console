@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
@@ -85,7 +84,7 @@ func (c *Server) initRoutes() {
 		healthParty.Get("/_healthz", applicationSystem.Healthz)
 	}
 
-	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken, c.csrfProtectionRegenrateToken)
+	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionRegenrateToken)
 	{
 		if c.config.App.FeatureIsEnabled("general", "settings") {
 			pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
@@ -199,7 +198,7 @@ func (c *Server) defaultHeaders(ctx iris.Context) {
 	ctx.Header("X-Frame-Options", "DENY")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
-	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'")
+	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'")
 	ctx.Next()
 }
 
@@ -214,7 +213,7 @@ func (c *Server) csrfProtectionRegenrateToken(ctx iris.Context) {
 
 func (c *Server) csrfProtectionToken(ctx iris.Context) {
 	if opts.DisableCsrfProtection {
-		ctx.ViewData("CSRF_TOKEN_JSON", "false")
+		ctx.ViewData("CSRF_TOKEN_JSON", "")
 		ctx.Next()
 		return
 	}
@@ -233,12 +232,12 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 
 	method := ctx.Method()
 
-	// check token if not GET or HEAD (safe methods)
-	if method != "GET" && method != "HEAD" {
+	// check token if not HEAD (safe methods)
+	if method != "HEAD" {
 		clientToken := ctx.GetHeader(httpHeaderCsrfToken)
 
 		if sessionToken == "" || clientToken != sessionToken {
-			c.respondErrorWithPenalty(ctx, errors.New("Invalid CSRF token"))
+			c.respondErrorWithPenalty(ctx, errors.New("invalid CSRF token"))
 			return
 		}
 	}
@@ -246,8 +245,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 	// inject token
 	ctx.Header(httpHeaderCsrfToken, sessionToken)
 
-	tokenJson, _ := json.Marshal(sessionToken)
-	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
+	ctx.ViewData("CSRF_TOKEN_JSON", sessionToken)
 
 	ctx.Next()
 }
@@ -264,8 +262,7 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 	s.Set("CSRF", token)
 	ctx.Header(httpHeaderCsrfToken, token)
 
-	tokenJson, _ := json.Marshal(token)
-	ctx.ViewData("CSRF_TOKEN_JSON", tokenJson)
+	ctx.ViewData("CSRF_TOKEN_JSON", token)
 
 	return token
 }

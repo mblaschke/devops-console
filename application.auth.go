@@ -22,7 +22,7 @@ func (c *Server) Login(ctx iris.Context) {
 	b := make([]byte, 16)
 	if _, err := randReader.Read(b); err != nil {
 		c.logger.Error(err)
-		c.respondError(ctx, errors.New("Unable to start oauth"))
+		c.respondError(ctx, errors.New("unable to start oauth"))
 		return
 	}
 

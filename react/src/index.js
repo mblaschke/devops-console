@@ -26,6 +26,9 @@ window.$ = window.jQuery = require("jquery");
         });
     }
 
+    // init global settings
+    window.APP_VERSION = window.$("html").attr("app:version");
+    window.CSRF_TOKEN = window.$("html").attr("app:csrf");
 
     let rootEl = document.getElementById("root");
     if (rootEl) {

@@ -1,6 +1,6 @@
 {{import "includes/blocks.jet"}}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" app:csrf="{{ CSRF_TOKEN_JSON }}" app:version="{{ appVersion }}">
 <head>
     {{include "includes/html-header.jet"}}
 </head>
@@ -32,14 +32,6 @@
         </main>
     </div>
   </div>
-<script>
-{{if isset(CSRF_TOKEN_JSON) && CSRF_TOKEN_JSON}}
-window.CSRF_TOKEN = {{ CSRF_TOKEN_JSON | raw }};
-{{else}}
-window.CSRF_TOKEN = false;
-{{end}}
-window.APP_VERSION = "{{ appVersion | raw }}";
-</script>
   {{include "includes/react.jet"}}
   {{include "includes/html-footer.jet"}}
 </body>
