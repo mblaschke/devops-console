@@ -22,10 +22,12 @@ func (c *Server) initTemplateEngine() {
 	c.tmpl.AddVar("irisVersion", iris.Version)
 	c.tmpl.AddVar("azureSdkVersion", azureSdkVersion.Number)
 	c.tmpl.AddVar("appConfig", c.config.App)
+
 	c.tmpl.AddFunc("MainFeatureIsEnabled", func(args view.JetArguments) reflect.Value {
 		main := args.Get(0).String()
 		return reflect.ValueOf(c.config.App.MainFeatureIsEnabled(main))
 	})
+
 	c.tmpl.AddFunc("FeatureIsEnabled", func(args view.JetArguments) reflect.Value {
 		main := args.Get(0).String()
 		branch := args.Get(1).String()

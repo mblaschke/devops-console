@@ -43,11 +43,7 @@ func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
 	c.auditLog(ctx, message, 1)
 
 	if logout {
-		s := c.startSession(ctx)
-		if !s.IsNew() {
-			s.Clear()
-			s.Destroy()
-		}
+		c.destroySession(ctx)
 	}
 
 	ctx.StatusCode(iris.StatusBadRequest)

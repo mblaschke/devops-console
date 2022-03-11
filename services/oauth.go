@@ -74,7 +74,8 @@ func (o *OAuth) FetchUserInfo(token *oauth2.Token) (user models.User, error erro
 			error = err
 			return
 		}
-		// WORKAROUND: azuread groups (json array as string?!)
+
+		// azuread groups extracting (json array with uuids)
 		var groupList []string
 		for _, val := range aadUserInfo.Groups {
 			var tmp []interface{}
@@ -129,7 +130,7 @@ func (o *OAuth) buildConfig() (config *oauth2.Config) {
 
 		o.oidcProvider = provider
 		endpoint = provider.Endpoint()
-		scopes = append(scopes, oidc.ScopeOpenID, "profile", "email")
+		scopes = append(scopes, oidc.ScopeOpenID, "profile", "email", "user_principal_name")
 	default:
 		o.error(fmt.Sprintf("oauth.provider \"%s\" is not valid", OAuthProvider))
 	}

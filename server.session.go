@@ -11,8 +11,50 @@ import (
 	"time"
 )
 
+const (
+	SessionVarNameAppVersion = "__APPVERSION__"
+	SessionVarNameUserAgent  = "__USERAGENT__"
+)
+
 func (c *Server) startSession(ctx iris.Context) *sessions.Session {
-	return c.session.Start(ctx)
+	s := c.session.Start(ctx)
+	invalidSession := false
+
+	// invalidate sessions for different app versions
+	if !s.IsNew() {
+		if val := s.GetString(SessionVarNameAppVersion); val != "" && val != gitTag {
+			// session is invalid
+			invalidSession = true
+		}
+	}
+
+	// enforce same useragent
+	userAgent := ctx.Request().UserAgent()
+	if !s.IsNew() {
+		if val := s.GetString(SessionVarNameUserAgent); val != "" && val != userAgent {
+			// session is invalid
+			invalidSession = true
+		}
+	}
+
+	if invalidSession {
+		c.session.Destroy(ctx)
+		s = c.session.Start(ctx)
+	}
+
+	s.Set(SessionVarNameAppVersion, gitTag)
+	s.Set(SessionVarNameUserAgent, userAgent)
+
+	return s
+}
+
+func (c *Server) recreateSession(ctx iris.Context) *sessions.Session {
+	c.session.Destroy(ctx)
+	return c.startSession(ctx)
+}
+
+func (c *Server) destroySession(ctx iris.Context) {
+	c.session.Destroy(ctx)
 }
 
 func (c *Server) initSession() {

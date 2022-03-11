@@ -32,6 +32,10 @@ func main() {
 	startupTime = time.Now()
 	initArgparser()
 
+	if gitTag == "<unknown>" {
+		gitTag = fmt.Sprintf("unknown-%v", time.Now().Unix())
+	}
+
 	logger, err := logConfig.Build()
 	if err != nil {
 		panic(err)

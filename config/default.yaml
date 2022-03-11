@@ -30,8 +30,10 @@ application:
     internal: {}
 
     secureCookie:
-      hashKey: {{env "SESSION_SECURECOOKIE_HASHKEY" | default "F11JJT1PWFfcPbcnltjMeiFSEZOt3F3I" | toJson }}
-      blockKey: {{env "SESSION_SECURECOOKIE_BLOCKKEY" | default "XDC0RgG55pPRQLb!" | toJson }}
+      # 32 chars
+      hashKey: {{env "SESSION_SECURECOOKIE_HASHKEY" | toJson }}
+      # 16 chars
+      blockKey: {{env "SESSION_SECURECOOKIE_BLOCKKEY" | toJson }}
 
     redis:
       addr: {{env "SESSION_REDIS_ADDR" | toJson }}

@@ -129,6 +129,10 @@ permissions:
         - devteam3
 
   group:
+    01fab9bf-e71e-42e0-b936-0f90c5616e7c:
+      teams:
+        - devops
+
     "bargroup":
       teams:
         - devteam5
@@ -143,6 +147,23 @@ permissions:
         - devteam7
 
   team:
+    devops:
+      rolebinding:
+        - name: "general"
+          groups:
+            - "01fab9bf-e71e-42e0-b936-0f90c5616e7c"
+          serviceaccounts:
+            - name: tiller
+              namespace: foobar
+            - name: tiller
+              namespace: foobar2
+          clusterrole: admin
+      azureroleassignment:
+        - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
+          role: contributor
+      serviceconnection:
+        - {token: "923eh2ihrwpihfg9s0gh0923423ih42po"}
+
     devteam0:
       rolebinding:
         - name: "general"

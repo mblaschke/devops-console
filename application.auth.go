@@ -16,7 +16,7 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
-	s := c.startSession(ctx)
+	s := c.recreateSession(ctx)
 
 	randReader := rand.Reader
 	b := make([]byte, 16)
@@ -38,18 +38,14 @@ func (c *Server) Login(ctx iris.Context) {
 }
 
 func (c *Server) Logout(ctx iris.Context) {
-	s := c.startSession(ctx)
-	s.Clear()
-	s.Destroy()
+	c.destroySession(ctx)
 
 	ctx.ViewData("messageSuccess", "Logged out")
 	c.templateLogin(ctx)
 }
 
 func (c *Server) LogoutForced(ctx iris.Context) {
-	s := c.startSession(ctx)
-	s.Clear()
-	s.Destroy()
+	c.destroySession(ctx)
 
 	ctx.ViewData("ERROR_MESSAGE", "Session was terminated, please login again.")
 	c.templateLogin(ctx)
@@ -139,13 +135,12 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	if userSession, err := user.ToJson(); err == nil {
 		// regenerate session
-		s.Clear()
-		s.Destroy()
-		s := c.startSession(ctx)
+		s := c.recreateSession(ctx)
 
 		s.Set("user", userSession)
 		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
+		c.destroySession(ctx)
 		ctx.ViewData("messageError", "unable to set session")
 		c.templateLogin(ctx)
 		return
