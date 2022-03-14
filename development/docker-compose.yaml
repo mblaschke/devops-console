@@ -43,5 +43,5 @@ services:
     environment:
       REDIS_PASS: "t!#%est-_+|123"
     ports:
-    - "6379:6379"
+      - "6379:6379"
 

@@ -1,9 +1,10 @@
 package main
 
 import (
+	iris "github.com/kataras/iris/v12"
+
 	"devops-console/models"
 	"devops-console/models/response"
-	iris "github.com/kataras/iris/v12"
 )
 
 type ApplicationConfig struct {

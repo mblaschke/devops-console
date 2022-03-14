@@ -1,17 +1,19 @@
 package main
 
 import (
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
 	"errors"
 	"fmt"
+
 	"github.com/go-openapi/strfmt"
 	iris "github.com/kataras/iris/v12"
 	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 	alertmanagerAlert "github.com/prometheus/alertmanager/api/v2/client/alert"
 	alertmanagerSilence "github.com/prometheus/alertmanager/api/v2/client/silence"
 	alertmanagerModels "github.com/prometheus/alertmanager/api/v2/models"
+
+	"devops-console/models"
+	"devops-console/models/formdata"
+	"devops-console/models/response"
 )
 
 type ApplicationAlertmanager struct {

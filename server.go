@@ -2,8 +2,12 @@ package main
 
 import (
 	"bytes"
-	"devops-console/models"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"text/template"
+
 	"github.com/Masterminds/sprig"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/recover"
@@ -12,11 +16,9 @@ import (
 	"github.com/kataras/iris/v12/view"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	networkingV1 "k8s.io/api/networking/v1"
-	"os"
-	"path/filepath"
-	"text/template"
+
+	"devops-console/models"
 )
 
 type Server struct {

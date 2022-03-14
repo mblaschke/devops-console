@@ -2,12 +2,14 @@ package services
 
 import (
 	"context"
-	"devops-console/models"
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
-	"strings"
+
+	"devops-console/models"
 )
 
 var (

@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	httptransport "github.com/go-openapi/runtime/client"
-	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 	"net"
 	"net/url"
 	"strings"
 	"time"
+
+	httptransport "github.com/go-openapi/runtime/client"
+	alertmanager "github.com/prometheus/alertmanager/api/v2/client"
 )
 
 type (

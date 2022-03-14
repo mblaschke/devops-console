@@ -4,9 +4,9 @@ kind: NetworkPolicy
 metadata:
   name: default
 spec:
-  podSelector: {}
+  podSelector: { }
   policyTypes:
     - Ingress
     - Egress
-  ingress: []
-  egress: []
+  ingress: [ ]
+  egress: [ ]

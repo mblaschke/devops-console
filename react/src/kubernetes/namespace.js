@@ -75,9 +75,10 @@ class Namespace extends BaseComponent {
 
         try {
             clearTimeout(this.refreshHandler);
-        } catch(e) {}
+        } catch (e) {
+        }
 
-        this.refreshHandler = setTimeout(() =>{
+        this.refreshHandler = setTimeout(() => {
             this.refresh();
         }, 10000);
     }
@@ -85,7 +86,8 @@ class Namespace extends BaseComponent {
     disableRefresh() {
         try {
             clearTimeout(this.refreshHandler);
-        } catch(e) {}
+        } catch (e) {
+        }
     }
 
     handleClickOutside() {
@@ -101,7 +103,7 @@ class Namespace extends BaseComponent {
             this.modalShow("#deleteQuestion")
             setTimeout(() => {
                 $("#deleteQuestion").find(":input:text:visible:enabled").first().focus();
-            },500);
+            }, 500);
         }, 200);
     }
 
@@ -110,7 +112,7 @@ class Namespace extends BaseComponent {
             this.modalShow("#createQuestion")
             setTimeout(() => {
                 $("#createQuestion").find(":input:text:visible:enabled").first().focus();
-            },500);
+            }, 500);
         }, 200);
     }
 
@@ -204,8 +206,8 @@ class Namespace extends BaseComponent {
         });
 
         setTimeout(() => {
-           $(".description-edit:input").focus();
-        },250);
+            $(".description-edit:input").focus();
+        }, 250);
     }
 
     handleDescriptionChange(event) {
@@ -249,7 +251,7 @@ class Namespace extends BaseComponent {
                 if (row.status.search(re) !== -1) return true;
 
                 if (row.settings) {
-                    for(var i in row.settings) {
+                    for (var i in row.settings) {
                         if (row.settings[i].search(re) !== -1) return true;
                     }
                 }
@@ -265,9 +267,9 @@ class Namespace extends BaseComponent {
             });
         }
 
-        ret = ret.sort(function(a,b) {
-            if(a.name < b.name) return -1;
-            if(a.name > b.name) return 1;
+        ret = ret.sort(function (a, b) {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
             return 0;
         });
         ret = this.sortDataset(ret);
@@ -301,20 +303,21 @@ class Namespace extends BaseComponent {
         }
 
         let namespaceSettings = (row) => {
-           let ret = [];
-           try {
-               if (this.state.config && this.state.config.kubernetes.namespace.settings) {
-                   this.state.config.kubernetes.namespace.settings.forEach((setting) => {
-                       if (row.settings && row.settings[setting.name]) {
-                           ret.push({
-                              label: setting.label,
-                              value: row.settings[setting.name]
-                           });
-                       }
-                   });
-               }
-           } catch (e) {}
-           return ret;
+            let ret = [];
+            try {
+                if (this.state.config && this.state.config.kubernetes.namespace.settings) {
+                    this.state.config.kubernetes.namespace.settings.forEach((setting) => {
+                        if (row.settings && row.settings[setting.name]) {
+                            ret.push({
+                                label: setting.label,
+                                value: row.settings[setting.name]
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+            }
+            return ret;
         };
 
         let self = this;
@@ -329,7 +332,7 @@ class Namespace extends BaseComponent {
                         <i className="fas fa-object-group"></i>
                         Kubernetes namespaces
                         <div className="toolbox">
-                                <div className="form-group row">
+                            <div className="form-group row">
                                 <div className="col-sm-8"></div>
                                 <div className="col-sm-4">
                                     {this.renderTeamSelector()}
@@ -343,13 +346,13 @@ class Namespace extends BaseComponent {
                         <div className="table-responsive">
                             <table className="table table-hover table-sm">
                                 <colgroup>
-                                    <col width="*" />
-                                    <col width="50rem" />
-                                    <col width="200rem" />
-                                    <col width="200rem" />
-                                    <col width="200rem" />
-                                    <col width="100rem" />
-                                    <col width="80rem" />
+                                    <col width="*"/>
+                                    <col width="50rem"/>
+                                    <col width="200rem"/>
+                                    <col width="200rem"/>
+                                    <col width="200rem"/>
+                                    <col width="100rem"/>
+                                    <col width="80rem"/>
                                 </colgroup>
                                 <thead>
                                 <tr>
@@ -360,7 +363,8 @@ class Namespace extends BaseComponent {
                                     <th>{this.sortBy("created", "Created")}</th>
                                     <th>{this.sortBy("status", "Status")}</th>
                                     <th className="toolbox">
-                                        <button type="button" className="btn btn-secondary" onClick={this.createNamespace.bind(this)}>
+                                        <button type="button" className="btn btn-secondary"
+                                                onClick={this.createNamespace.bind(this)}>
                                             <i className="fas fa-plus"></i>
                                         </button>
                                     </th>
@@ -368,56 +372,71 @@ class Namespace extends BaseComponent {
                                 </thead>
                                 <tbody>
                                 {namespaces.length === 0 &&
-                                <tr>
-                                    <td colspan="7" className="not-found">No namespaces found.</td>
-                                </tr>
+                                    <tr>
+                                        <td colspan="7" className="not-found">No namespaces found.</td>
+                                    </tr>
                                 }
                                 {namespaces.map((row) =>
-                                    <tr key={row.name} className="k8s-namespace" onClick={this.handleNamespaceClick.bind(this, row)}>
+                                    <tr key={row.name} className="k8s-namespace"
+                                        onClick={this.handleNamespaceClick.bind(this, row)}>
                                         <td>
                                             <div className="button-copy-box">
                                                 {this.highlight(row.name)}
                                                 <CopyToClipboard text={row.name}>
-                                                    <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
+                                                    <button className="button-copy"
+                                                            onClick={this.handlePreventEvent.bind(this)}><i
+                                                        className="far fa-copy"></i></button>
                                                 </CopyToClipboard>
                                             </div>
                                             <br/>
                                             {(() => {
-                                               if (this.state.namespaceDescriptionEdit === row.name) {
-                                                   return <form onSubmit={this.handleDescriptionSubmit.bind(this)}>
-                                                       <input type="text" className="form-control description-edit" placeholder="Description" value={this.state.namespaceDescriptionEditValue} onChange={this.handleDescriptionChange.bind(this)}/>
-                                                   </form>
-                                               } else {
-                                                   return <small className="form-text text-muted editable description" onClick={this.handleDescriptionEdit.bind(this, row)}>{row.description ? this.highlight(row.description) : <i>no description set</i>}</small>
-                                               }
+                                                if (this.state.namespaceDescriptionEdit === row.name) {
+                                                    return <form onSubmit={this.handleDescriptionSubmit.bind(this)}>
+                                                        <input type="text" className="form-control description-edit"
+                                                               placeholder="Description"
+                                                               value={this.state.namespaceDescriptionEditValue}
+                                                               onChange={this.handleDescriptionChange.bind(this)}/>
+                                                    </form>
+                                                } else {
+                                                    return <small className="form-text text-muted editable description"
+                                                                  onClick={this.handleDescriptionEdit.bind(this, row)}>{row.description ? this.highlight(row.description) :
+                                                        <i>no description set</i>}</small>
+                                                }
                                             })()}
                                         </td>
                                         <td>
-                                            <p className="text-right">{row.podCount !== null ? row.podCount : "n/a" }</p>
+                                            <p className="text-right">{row.podCount !== null ? row.podCount : "n/a"}</p>
                                         </td>
                                         <td>
                                             {this.renderRowOwner(row)}
                                         </td>
                                         <td className="small">
                                             <div>
-                                                <span className="badge badge-warning">NetworkPolicy: {row.networkPolicy || "none"}</span>
+                                                <span
+                                                    className="badge badge-warning">NetworkPolicy: {row.networkPolicy || "none"}</span>
                                             </div>
                                             {namespaceSettings(row).map((setting, index) =>
                                                 <div>
-                                                    <span className="badge badge-light">{setting.label}: {this.highlight(setting.value)}</span>
+                                                    <span
+                                                        className="badge badge-light">{setting.label}: {this.highlight(setting.value)}</span>
                                                 </div>
                                             )}
                                         </td>
-                                        <td><div title={row.created}>{this.highlight(row.createdAgo)}</div></td>
+                                        <td>
+                                            <div title={row.created}>{this.highlight(row.createdAgo)}</div>
+                                        </td>
                                         <td>
                                             {(() => {
                                                 switch (row.status.toLowerCase()) {
                                                     case "terminating":
-                                                        return <span className="badge badge-danger">{this.highlight(row.status)}</span>;
+                                                        return <span
+                                                            className="badge badge-danger">{this.highlight(row.status)}</span>;
                                                     case "active":
-                                                        return <span className="badge badge-success">{this.highlight(row.status)}</span>;
+                                                        return <span
+                                                            className="badge badge-success">{this.highlight(row.status)}</span>;
                                                     default:
-                                                        return <span className="badge badge-warning">{this.highlight(row.status)}</span>;
+                                                        return <span
+                                                            className="badge badge-warning">{this.highlight(row.status)}</span>;
                                                 }
                                             })()}
                                             <br/>
@@ -426,24 +445,32 @@ class Namespace extends BaseComponent {
                                         <td className="toolbox">
                                             {(() => {
                                                 switch (row.status) {
-                                                case "Terminating":
-                                                    return <div></div>
-                                                default:
-                                                    return (
-                                                        <div className="btn-group" role="group">
-                                                            <button id={'btnGroupDrop-' + row.name } type="button"
-                                                                    className="btn btn-secondary dropdown-toggle"
-                                                                    data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                    aria-expanded="false">
-                                                                Action
-                                                            </button>
-                                                            <ul className="dropdown-menu" aria-labelledby={'btnGroupDrop-' + row.name }>
-                                                                <li><a className="dropdown-item" onClick={self.editNamespace.bind(self, row)}>Edit</a></li>
-                                                                <li><a className="dropdown-item" onClick={self.resetNamespace.bind(self, row)}>Reset Settings/RBAC</a></li>
-                                                                <li><a className={row.deleteable ? 'dropdown-item' : 'hidden'} onClick={self.deleteNamespace.bind(self, row)}>Delete</a></li>
-                                                            </ul>
-                                                        </div>
-                                                    );
+                                                    case "Terminating":
+                                                        return <div></div>
+                                                    default:
+                                                        return (
+                                                            <div className="btn-group" role="group">
+                                                                <button id={'btnGroupDrop-' + row.name} type="button"
+                                                                        className="btn btn-secondary dropdown-toggle"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">
+                                                                    Action
+                                                                </button>
+                                                                <ul className="dropdown-menu"
+                                                                    aria-labelledby={'btnGroupDrop-' + row.name}>
+                                                                    <li><a className="dropdown-item"
+                                                                           onClick={self.editNamespace.bind(self, row)}>Edit</a>
+                                                                    </li>
+                                                                    <li><a className="dropdown-item"
+                                                                           onClick={self.resetNamespace.bind(self, row)}>Reset
+                                                                        Settings/RBAC</a></li>
+                                                                    <li><a
+                                                                        className={row.deleteable ? 'dropdown-item' : 'hidden'}
+                                                                        onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        );
                                                 }
                                             })()}
                                         </td>
@@ -456,9 +483,11 @@ class Namespace extends BaseComponent {
                     <div className="card-footer small text-muted">{this.buildFooter(namespaces)}</div>
                 </div>
 
-                <NamespaceDelete config={this.state.config} namespace={this.state.selectedNamespaceDelete} callback={this.handleNamespaceDeletion.bind(this)} />
-                <NamespaceCreate config={this.state.config} callback={this.handleNamespaceCreation.bind(this)} />
-                <NamespaceEdit config={this.state.config} show={this.state.namespaceEditModalShow} namespace={this.state.selectedNamespace} callback={this.handleNamespaceEdit.bind(this)} />
+                <NamespaceDelete config={this.state.config} namespace={this.state.selectedNamespaceDelete}
+                                 callback={this.handleNamespaceDeletion.bind(this)}/>
+                <NamespaceCreate config={this.state.config} callback={this.handleNamespaceCreation.bind(this)}/>
+                <NamespaceEdit config={this.state.config} show={this.state.namespaceEditModalShow}
+                               namespace={this.state.selectedNamespace} callback={this.handleNamespaceEdit.bind(this)}/>
             </div>
         );
     }

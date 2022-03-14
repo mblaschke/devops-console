@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/PagerDuty/go-pagerduty"
+	"github.com/kataras/iris/v12"
+
 	"devops-console/models"
 	"devops-console/models/formdata"
 	"devops-console/models/response"
-	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	"github.com/kataras/iris/v12"
 )
 
 const (

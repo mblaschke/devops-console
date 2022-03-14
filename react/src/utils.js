@@ -1,5 +1,5 @@
 export function translateValueToCheckbox(val) {
-    switch(val) {
+    switch (val) {
         case "1":
         case "true":
         case "checked":

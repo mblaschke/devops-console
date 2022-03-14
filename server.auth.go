@@ -1,12 +1,14 @@
 package main
 
 import (
-	"devops-console/models"
 	"errors"
 	"fmt"
-	"github.com/kataras/iris/v12"
 	"os"
 	"strings"
+
+	"github.com/kataras/iris/v12"
+
+	"devops-console/models"
 )
 
 func (c *Server) templateLogin(ctx iris.Context) {

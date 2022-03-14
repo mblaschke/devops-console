@@ -149,12 +149,19 @@ class Settings extends BaseComponent {
                         <form method="post">
                             {this.state.settings.user.map((setting, value) =>
                                 <div className="form-group">
-                                    <label htmlFor={"personal-" + setting.name} className="inputRg">{setting.label}</label>
-                                    <input type="text" name={setting.name} id={"personal-" + setting.name} className="form-control" placeholder={setting.Plaeholder} value={this.getValue(["formUser", setting.name])} onChange={this.setValue.bind(this, ["formUser", setting.name])} />
+                                    <label htmlFor={"personal-" + setting.name}
+                                           className="inputRg">{setting.label}</label>
+                                    <input type="text" name={setting.name} id={"personal-" + setting.name}
+                                           className="form-control" placeholder={setting.Plaeholder}
+                                           value={this.getValue(["formUser", setting.name])}
+                                           onChange={this.setValue.bind(this, ["formUser", setting.name])}/>
                                 </div>
                             )}
                             <div className="toolbox">
-                                <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateUpdateButton()} onClick={this.updateUserSettings.bind(this)}>Save</button>
+                                <button type="submit" className="btn btn-primary bnt-k8s-namespace-create"
+                                        disabled={this.stateUpdateButton()}
+                                        onClick={this.updateUserSettings.bind(this)}>Save
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -170,12 +177,20 @@ class Settings extends BaseComponent {
                             <form method="post">
                                 {this.state.settings.team.map((setting, value) =>
                                     <div className="form-group">
-                                        <label htmlFor={"team-" + team.name + "-" + setting.name} className="inputRg">{setting.label}</label>
-                                        <input type="text" name={setting.name} id={"team-" + team.name + "-" + setting.name} className="form-control" placeholder={setting.placeholder} value={this.getValue(["formTeam", team.name, setting.name])} onChange={this.setValue.bind(this, ["formTeam", team.name, setting.name])} />
+                                        <label htmlFor={"team-" + team.name + "-" + setting.name}
+                                               className="inputRg">{setting.label}</label>
+                                        <input type="text" name={setting.name}
+                                               id={"team-" + team.name + "-" + setting.name} className="form-control"
+                                               placeholder={setting.placeholder}
+                                               value={this.getValue(["formTeam", team.name, setting.name])}
+                                               onChange={this.setValue.bind(this, ["formTeam", team.name, setting.name])}/>
                                     </div>
                                 )}
                                 <div className="toolbox">
-                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateUpdateButton()} onClick={this.updateTeamSettings.bind(this, team.name)}>Save</button>
+                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create"
+                                            disabled={this.stateUpdateButton()}
+                                            onClick={this.updateTeamSettings.bind(this, team.name)}>Save
+                                    </button>
                                 </div>
                             </form>
                         </div>

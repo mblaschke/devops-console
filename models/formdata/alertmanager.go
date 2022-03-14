@@ -3,9 +3,10 @@ package formdata
 import (
 	"errors"
 	"fmt"
-	"github.com/prometheus/alertmanager/api/v2/models"
 	"strings"
 	"time"
+
+	"github.com/prometheus/alertmanager/api/v2/models"
 )
 
 type (

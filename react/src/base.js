@@ -1,4 +1,4 @@
-import {React, Component} from 'react';
+import {Component, React} from 'react';
 import $ from 'jquery';
 import * as utils from "./utils";
 import _ from 'lodash';
@@ -21,7 +21,7 @@ class Base extends Component {
                 username: '',
             },
             teams: [],
-                alertmanager: {
+            alertmanager: {
                 instances: []
             },
             quota: {},
@@ -82,7 +82,9 @@ class Base extends Component {
             }
         }
 
-        return (<a className="sortable" onClick={this.triggerSortBy.bind(this, field, callback)}><span>{text}</span>{symbol}</a>)
+        return (
+            <a className="sortable" onClick={this.triggerSortBy.bind(this, field, callback)}><span>{text}</span>{symbol}
+            </a>)
     }
 
     triggerSortBy(field, callback) {
@@ -120,7 +122,7 @@ class Base extends Component {
         }
 
         let sort = this.state.sort;
-        list = list.sort(function(a,b) {
+        list = list.sort(function (a, b) {
             let aVal;
             let bVal;
 
@@ -167,7 +169,7 @@ class Base extends Component {
     }
 
     setInputFocus() {
-        setTimeout( () => {
+        setTimeout(() => {
             $(":input:text:visible:enabled").first().focus();
         }, 500);
     }
@@ -222,9 +224,9 @@ class Base extends Component {
         if (highlight && highlight !== "") {
             // Split on higlight term and include term into parts, ignore case
             let parts = text.split(new RegExp(`(${highlight})`, 'gi'));
-            return <span> { parts.map((part, i) =>
-                <span key={i} className={part.toLowerCase() === highlight.toLowerCase() ? 'highlight' : '' }>
-            { part }
+            return <span> {parts.map((part, i) =>
+                <span key={i} className={part.toLowerCase() === highlight.toLowerCase() ? 'highlight' : ''}>
+            {part}
         </span>)
             } </span>;
         } else {
@@ -286,7 +288,8 @@ class Base extends Component {
             if (selectedTeam) {
                 return
             }
-        } catch(e) {}
+        } catch (e) {
+        }
 
         // select first team if no selection available
         if (this.state.config.teams.length > 0) {
@@ -304,7 +307,8 @@ class Base extends Component {
 
         try {
             localStorage.setItem("team", value);
-        } catch(e) {}
+        } catch (e) {
+        }
 
         this.setValue(field, event);
     }
@@ -315,7 +319,8 @@ class Base extends Component {
         }
 
         return (
-            <select className="form-control" id={htmlId} value={this.getValue("team")} onChange={this.setTeam.bind(this, "team")}>
+            <select className="form-control" id={htmlId} value={this.getValue("team")}
+                    onChange={this.setTeam.bind(this, "team")}>
                 <option key="*" value="*">All teams</option>
                 {this.state.config.teams.map((row, value) =>
                     <option key={row.Id} value={row.name}>{row.name}</option>

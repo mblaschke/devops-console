@@ -136,12 +136,17 @@ class Roleassignment extends BaseComponent {
                         <form method="post">
                             <div className="form-group">
                                 <label htmlFor="inputResourceId" className="inputResourceId">Azure ResourceID</label>
-                                <input type="text" name="resourceId" id="inputResourceId" className="form-control" placeholder="/subscription/xxxxx-xxxx-xxxx-xxxx/resourceGroup/xxxxxxxx/..." required value={this.getValue("form.resourceId")} onChange={this.setValue.bind(this, "form.resourceId")} />
+                                <input type="text" name="resourceId" id="inputResourceId" className="form-control"
+                                       placeholder="/subscription/xxxxx-xxxx-xxxx-xxxx/resourceGroup/xxxxxxxx/..."
+                                       required value={this.getValue("form.resourceId")}
+                                       onChange={this.setValue.bind(this, "form.resourceId")}/>
                             </div>
 
                             <div className="form-group">
                                 <label htmlFor="selectRoleDefinition">Role</label>
-                                <select name="roleDefinition" id="selectRoleDefinition" className="form-control" value={this.getValue("form.roleDefinition")} onChange={this.setValue.bind(this, "form.roleDefinition")}>
+                                <select name="roleDefinition" id="selectRoleDefinition" className="form-control"
+                                        value={this.getValue("form.roleDefinition")}
+                                        onChange={this.setValue.bind(this, "form.roleDefinition")}>
                                     <option value="">-- select --</option>
                                     {this.roleDefinitionList().map((row, value) =>
                                         <option key={row} value={row}>{row}</option>
@@ -151,7 +156,9 @@ class Roleassignment extends BaseComponent {
 
                             <div className="form-group">
                                 <label htmlFor="selectTtl">Time (ttl)</label>
-                                <select name="ttl" id="selectTtl" className="form-control" value={this.getValue("form.ttl")} onChange={this.setValue.bind(this, "form.ttl")}>
+                                <select name="ttl" id="selectTtl" className="form-control"
+                                        value={this.getValue("form.ttl")}
+                                        onChange={this.setValue.bind(this, "form.ttl")}>
                                     {this.ttlList().map((row, value) =>
                                         <option key={row} value={row}>{row}</option>
                                     )}
@@ -160,12 +167,18 @@ class Roleassignment extends BaseComponent {
 
                             <div className="form-group">
                                 <label htmlFor="inputReason" className="inputReason">Reason</label>
-                                <textarea className="form-control" id="inputReason" rows="3" required value={this.getValue("form.reason")} onChange={this.setValue.bind(this, "form.reason")}></textarea>
+                                <textarea className="form-control" id="inputReason" rows="3" required
+                                          value={this.getValue("form.reason")}
+                                          onChange={this.setValue.bind(this, "form.reason")}></textarea>
                             </div>
 
                             <div className="toolbox">
-                                <button type="button" className="btn btn-primary" disabled={this.stateButton()} onClick={this.remove.bind(this)}>Remove RoleAssignment</button>
-                                <button type="button" className="btn btn-primary" disabled={this.stateButton()} onClick={this.create.bind(this)}>Create RoleAssignment</button>
+                                <button type="button" className="btn btn-primary" disabled={this.stateButton()}
+                                        onClick={this.remove.bind(this)}>Remove RoleAssignment
+                                </button>
+                                <button type="button" className="btn btn-primary" disabled={this.stateButton()}
+                                        onClick={this.create.bind(this)}>Create RoleAssignment
+                                </button>
                             </div>
                         </form>
                     </div>

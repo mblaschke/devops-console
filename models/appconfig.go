@@ -2,11 +2,12 @@ package models
 
 import (
 	"fmt"
-	"github.com/karrick/tparse/v2"
-	yaml "gopkg.in/yaml.v2"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/karrick/tparse/v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type (

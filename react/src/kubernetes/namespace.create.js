@@ -115,7 +115,8 @@ class NamespaceCreate extends BaseComponent {
                     state.form.team = lastSelectedTeam;
                 }
             });
-        } catch(e) {}
+        } catch (e) {
+        }
 
         // select first team if no selection available
         if (!state.form.team || state.form.team === "") {
@@ -157,23 +158,27 @@ class NamespaceCreate extends BaseComponent {
         return (
             <div>
                 <form method="post">
-                <div className="modal fade" id="createQuestion" tabIndex="-1" role="dialog" aria-labelledby="createQuestion" aria-hidden="true">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">Create namespace</h5>
-                                <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
+                    <div className="modal fade" id="createQuestion" tabIndex="-1" role="dialog"
+                         aria-labelledby="createQuestion" aria-hidden="true">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title" id="exampleModalLabel">Create namespace</h5>
+                                    <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                                 <div className="modal-body">
                                     <div className="row">
                                         <div className="col">
                                             <div className="p-3 mb-2 bg-light text-dark">
                                                 <div className="button-copy-box">
-                                                    <i>Preview: </i><span id="namespacePreview">{this.previewNamespace()}</span>
+                                                    <i>Preview: </i><span
+                                                    id="namespacePreview">{this.previewNamespace()}</span>
                                                     <CopyToClipboard text={this.previewNamespace()}>
-                                                        <button className="button-copy" onClick={this.handlePreventEvent.bind(this)}><i className="far fa-copy"></i></button>
+                                                        <button className="button-copy"
+                                                                onClick={this.handlePreventEvent.bind(this)}><i
+                                                            className="far fa-copy"></i></button>
                                                     </CopyToClipboard>
                                                 </div>
                                             </div>
@@ -183,15 +188,22 @@ class NamespaceCreate extends BaseComponent {
                                     <div className="row">
                                         <div className="col-3">
                                             <label htmlFor="inputNsEnvironment">Environment</label>
-                                            <select name="nsEnvironment" id="inputNsEnvironment" className="form-control" required value={this.getValue("form.environment")} onChange={this.setValue.bind(this, "form.environment")}>
-                                            {this.props.config.kubernetes.environments.map((row) =>
-                                                <option key={row.environment} value={row.environment}>{row.environment} ({row.description})</option>
-                                            )}
+                                            <select name="nsEnvironment" id="inputNsEnvironment"
+                                                    className="form-control" required
+                                                    value={this.getValue("form.environment")}
+                                                    onChange={this.setValue.bind(this, "form.environment")}>
+                                                {this.props.config.kubernetes.environments.map((row) =>
+                                                    <option key={row.environment}
+                                                            value={row.environment}>{row.environment} ({row.description})</option>
+                                                )}
                                             </select>
                                         </div>
                                         <div>
                                             <label htmlFor="inputNsAreaTeam">Team</label>
-                                            <select name="nsAreaTeam" id="inputNsAreaTeam" className="form-control namespace-area-team" value={this.getValue("form.team")} onChange={this.setValue.bind(this, "form.team")}>
+                                            <select name="nsAreaTeam" id="inputNsAreaTeam"
+                                                    className="form-control namespace-area-team"
+                                                    value={this.getValue("form.team")}
+                                                    onChange={this.setValue.bind(this, "form.team")}>
                                                 {this.props.config.teams.map((row, value) =>
                                                     <option key={row.Id} value={row.name}>{row.name}</option>
                                                 )}
@@ -199,19 +211,25 @@ class NamespaceCreate extends BaseComponent {
                                         </div>
                                         <div className="col">
                                             <label htmlFor="inputNsApp" className="inputNsApp">Application</label>
-                                            <input type="text" name="nsApp" id="inputNsApp" className="form-control" placeholder="Name" required value={this.getValue("form.app")} onChange={this.setValue.bind(this, "form.app")} />
+                                            <input type="text" name="nsApp" id="inputNsApp" className="form-control"
+                                                   placeholder="Name" required value={this.getValue("form.app")}
+                                                   onChange={this.setValue.bind(this, "form.app")}/>
                                         </div>
                                     </div>
 
                                     <div className="row">
                                         <div className="col">
-                                            <input type="text" name="nsDescription" className="form-control" placeholder="Description" value={this.getValue("form.description")} onChange={this.setValue.bind(this, "form.description")} />
+                                            <input type="text" name="nsDescription" className="form-control"
+                                                   placeholder="Description" value={this.getValue("form.description")}
+                                                   onChange={this.setValue.bind(this, "form.description")}/>
                                         </div>
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
-                                        <select id="inputNsNetpol" className="form-control" value={this.getValue("form.networkPolicy")} onChange={this.setValue.bind(this, "form.networkPolicy")}>
+                                        <select id="inputNsNetpol" className="form-control"
+                                                value={this.getValue("form.networkPolicy")}
+                                                onChange={this.setValue.bind(this, "form.networkPolicy")}>
                                             {this.props.config.kubernetes.namespace.networkPolicy.map((row) =>
                                                 <option key={row.name} value={row.name}>{row.description}</option>
                                             )}
@@ -219,12 +237,18 @@ class NamespaceCreate extends BaseComponent {
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <NamespaceFormelement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
+                                        <NamespaceFormelement setting={setting}
+                                                              value={this.getValue("form.settings." + setting.name)}
+                                                              onchange={this.setValue.bind(this, "form.settings." + setting.name)}/>
                                     )}
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.getButtonState()} onClick={this.createNamespace.bind(this)}>{this.state.buttonText}</button>
+                                    <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel"
+                                            data-bs-dismiss="modal">Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create"
+                                            disabled={this.getButtonState()}
+                                            onClick={this.createNamespace.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>
                         </div>

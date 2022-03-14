@@ -4,18 +4,18 @@ kind: NetworkPolicy
 metadata:
   name: default
 spec:
-  podSelector: {}
+  podSelector: { }
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
-      - ipBlock:
-          cidr: 172.17.0.0/16
+        - ipBlock:
+            cidr: 172.17.0.0/16
   egress:
     - to:
-      - ipBlock:
-          cidr: 172.17.0.0/16
+        - ipBlock:
+            cidr: 172.17.0.0/16
     - to:
         - namespaceSelector:
             matchLabels:

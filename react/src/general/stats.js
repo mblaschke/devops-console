@@ -56,13 +56,13 @@ class Stats extends Base {
                         {this.state.stats.map((category) =>
                             <table className="table table-hover table-sm">
                                 <colgroup>
-                                    <col width="200rem" />
-                                    <col width="*" />
+                                    <col width="200rem"/>
+                                    <col width="*"/>
                                 </colgroup>
                                 <thead>
-                                    <tr>
-                                        <th colSpan="2">{category.name}</th>
-                                    </tr>
+                                <tr>
+                                    <th colSpan="2">{category.name}</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                 {category.stats.map((stat) =>
@@ -75,7 +75,8 @@ class Stats extends Base {
                             </table>
                         )}
                     </div>
-                    <div className="card-footer small text-muted">Last update: {this.state.updateDate ? this.state.updateDate.toLocaleString() : 'updating...' }</div>
+                    <div className="card-footer small text-muted">Last
+                        update: {this.state.updateDate ? this.state.updateDate.toLocaleString() : 'updating...'}</div>
                 </div>
             </div>
         );

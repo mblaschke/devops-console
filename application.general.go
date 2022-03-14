@@ -1,13 +1,15 @@
 package main
 
 import (
-	"devops-console/models"
-	"devops-console/models/response"
+	"runtime"
+	"time"
+
 	"github.com/dustin/go-humanize"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	"runtime"
-	"time"
+
+	"devops-console/models"
+	"devops-console/models/response"
 )
 
 type ApplicationGeneral struct {

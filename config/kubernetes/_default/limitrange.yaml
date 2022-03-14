@@ -6,13 +6,13 @@ metadata:
     "helm.sh/resource-policy": keep
 spec:
   limits:
-  - type: Container
-    default:
-      memory: 256Mi
-      cpu: 1
-    defaultRequest:
-      memory: 256Mi
-      cpu: 100m
-    maxLimitRequestRatio:
-      memory: 1
-      cpu: 100
+    - type: Container
+      default:
+        memory: 256Mi
+        cpu: 1
+      defaultRequest:
+        memory: 256Mi
+        cpu: 100m
+      maxLimitRequestRatio:
+        memory: 1
+        cpu: 100

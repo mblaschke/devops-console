@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/authorization/mgmt/2020-04-01-preview/authorization"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
 	"github.com/Azure/go-autorest/autorest"
@@ -16,8 +16,10 @@ import (
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	"strings"
-	"time"
+
+	"devops-console/models"
+	"devops-console/models/formdata"
+	"devops-console/models/response"
 )
 
 type (

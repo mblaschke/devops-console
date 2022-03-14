@@ -55,7 +55,8 @@ class AlertmanagerSilencedelete extends BaseComponent {
         return (
             <div>
                 <form method="post">
-                    <div className="modal fade" id="deleteQuestion" tabIndex="-1" role="dialog" aria-labelledby="deleteQuestion">
+                    <div className="modal fade" id="deleteQuestion" tabIndex="-1" role="dialog"
+                         aria-labelledby="deleteQuestion">
                         <div className="modal-dialog" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
@@ -73,8 +74,11 @@ class AlertmanagerSilencedelete extends BaseComponent {
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-primary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" className="btn btn-secondary bnt-k8s-namespace-delete" onClick={this.confirm.bind(this)}>{this.state.buttonText}</button>
+                                    <button type="button" className="btn btn-primary bnt-k8s-namespace-cancel"
+                                            data-bs-dismiss="modal">Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-secondary bnt-k8s-namespace-delete"
+                                            onClick={this.confirm.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>
                         </div>

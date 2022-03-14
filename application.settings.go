@@ -2,19 +2,21 @@ package main
 
 import (
 	"context"
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
 	"errors"
 	"fmt"
+	"strings"
+	"sync"
+
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	"strings"
-	"sync"
+
+	"devops-console/models"
+	"devops-console/models/formdata"
+	"devops-console/models/response"
 )
 
 type ApplicationSettings struct {

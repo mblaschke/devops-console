@@ -52,7 +52,7 @@ class Alertmanager extends BaseComponent {
             });
 
             // wait until alertmanagers are synced
-            setTimeout(this.refresh.bind(this,true), 1250)
+            setTimeout(this.refresh.bind(this, true), 1250)
         });
     }
 
@@ -128,7 +128,8 @@ class Alertmanager extends BaseComponent {
                     state.instance = lastAlertmangerInstance;
                 }
             });
-        } catch(e) {}
+        } catch (e) {
+        }
 
         // select first team if no selection available
         if (!state.instance || state.instance === "") {
@@ -147,7 +148,8 @@ class Alertmanager extends BaseComponent {
     disableRefresh() {
         try {
             clearTimeout(this.refreshHandler);
-        } catch(e) {}
+        } catch (e) {
+        }
     }
 
     refresh(showSpinner) {
@@ -156,9 +158,10 @@ class Alertmanager extends BaseComponent {
 
         try {
             clearTimeout(this.refreshHandler);
-        } catch(e) {}
+        } catch (e) {
+        }
 
-        this.refreshHandler = setTimeout(() =>{
+        this.refreshHandler = setTimeout(() => {
             this.refresh(false);
         }, 15000);
     }
@@ -224,7 +227,7 @@ class Alertmanager extends BaseComponent {
                 __id__: new Date().toISOString(),
                 id: false,
                 startsAt: "" + new Date().toISOString(),
-                endsAt: "" + new Date( new Date().getTime() + 1*3600*1000).toISOString(),
+                endsAt: "" + new Date(new Date().getTime() + 1 * 3600 * 1000).toISOString(),
                 comment: "",
                 team: this.state.team,
                 matchers: matchers,
@@ -252,7 +255,7 @@ class Alertmanager extends BaseComponent {
                 __id__: new Date().toISOString(),
                 id: false,
                 startsAt: "" + new Date().toISOString(),
-                endsAt: "" + new Date( new Date().getTime() + 1*3600*1000).toISOString(),
+                endsAt: "" + new Date(new Date().getTime() + 1 * 3600 * 1000).toISOString(),
                 comment: "Silence alert: " + alert.annotations.summary + "\n" + alert.annotations.description,
                 matchers: matchers,
             }
@@ -286,7 +289,7 @@ class Alertmanager extends BaseComponent {
                 if (row.status.state.search(re) !== -1) return true;
 
                 if (row.labels) {
-                    for(var i in row.labels) {
+                    for (var i in row.labels) {
                         if (row.labels[i].search(re) !== -1) return true;
                     }
                 }
@@ -342,7 +345,7 @@ class Alertmanager extends BaseComponent {
                 if (row.status.state.search(re) !== -1) return true;
 
                 if (row.matchers) {
-                    for(var i in row.matchers) {
+                    for (var i in row.matchers) {
                         if (row.matchers[i].value.search(re) !== -1) return true;
                     }
                 }
@@ -479,7 +482,7 @@ class Alertmanager extends BaseComponent {
             )
         } else {
             return (
-               <span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span>
+                <span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span>
             )
         }
     }
@@ -510,7 +513,8 @@ class Alertmanager extends BaseComponent {
                                 <div className="col-sm-4">
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button"
-                                                id="dropdownMenuButtonFilter" data-bs-toggle="dropdown" aria-haspopup="true"
+                                                id="dropdownMenuButtonFilter" data-bs-toggle="dropdown"
+                                                aria-haspopup="true"
                                                 aria-expanded="false">
                                             Filter
                                         </button>
@@ -519,16 +523,20 @@ class Alertmanager extends BaseComponent {
                                             <form className="px-4 py-3">
                                                 <label>Status</label>
                                                 <div className="form-check">
-                                                    <input type="checkbox" className="form-check-input" id="alertFilterActive" checked={this.getValueCheckbox("filter.alert.active")}
-                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.active")} />
+                                                    <input type="checkbox" className="form-check-input"
+                                                           id="alertFilterActive"
+                                                           checked={this.getValueCheckbox("filter.alert.active")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.active")}/>
                                                     <label className="form-check-label" htmlFor="alertFilterActive">
                                                         Active
                                                     </label>
                                                 </div>
 
                                                 <div className="form-check">
-                                                    <input type="checkbox" className="form-check-input" id="alertFilterSuppressed" checked={this.getValueCheckbox("filter.alert.suppressed")}
-                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")} />
+                                                    <input type="checkbox" className="form-check-input"
+                                                           id="alertFilterSuppressed"
+                                                           checked={this.getValueCheckbox("filter.alert.suppressed")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.alert.suppressed")}/>
                                                     <label className="form-check-label" htmlFor="alertFilterSuppressed">
                                                         Suppressed
                                                     </label>
@@ -572,16 +580,20 @@ class Alertmanager extends BaseComponent {
                                             <form className="px-4 py-3">
                                                 <label>Status</label>
                                                 <div className="form-check">
-                                                    <input type="checkbox" className="form-check-input" id="silenceFilterActive" checked={this.getValueCheckbox("filter.silence.active")}
-                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.active")} />
+                                                    <input type="checkbox" className="form-check-input"
+                                                           id="silenceFilterActive"
+                                                           checked={this.getValueCheckbox("filter.silence.active")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.active")}/>
                                                     <label className="form-check-label" htmlFor="silenceFilterActive">
                                                         Active
                                                     </label>
                                                 </div>
 
                                                 <div className="form-check">
-                                                    <input type="checkbox" className="form-check-input" id="silenceFilteExpiredr" checked={this.getValueCheckbox("filter.silence.expired")}
-                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")} />
+                                                    <input type="checkbox" className="form-check-input"
+                                                           id="silenceFilteExpiredr"
+                                                           checked={this.getValueCheckbox("filter.silence.expired")}
+                                                           onChange={this.setValueCheckbox.bind(this, "filter.silence.expired")}/>
                                                     <label className="form-check-label" htmlFor="silenceFilteExpiredr">
                                                         Expired
                                                     </label>
@@ -604,11 +616,14 @@ class Alertmanager extends BaseComponent {
                     <div className="card-body card-body-table scrollable spinner-area">
                         {this.renderSilences(silences)}
                     </div>
-                    <div className="card-footer small text-muted">{this.buildFooter(this.state.silences, silences)}</div>
+                    <div
+                        className="card-footer small text-muted">{this.buildFooter(this.state.silences, silences)}</div>
                 </div>
 
-                <AlertmanagerSilencedelete instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceDelete.bind(this)} />
-                <AlertmanagerSilenceedit instance={this.state.instance} silence={this.state.selectedSilence} config={this.state.config} callback={this.handleSilenceEdit.bind(this)} />
+                <AlertmanagerSilencedelete instance={this.state.instance} silence={this.state.selectedSilence}
+                                           config={this.state.config} callback={this.handleSilenceDelete.bind(this)}/>
+                <AlertmanagerSilenceedit instance={this.state.instance} silence={this.state.selectedSilence}
+                                         config={this.state.config} callback={this.handleSilenceEdit.bind(this)}/>
             </div>
         );
     }
@@ -618,7 +633,8 @@ class Alertmanager extends BaseComponent {
         let instances = this.state.config.alertmanager.instances ? this.state.config.alertmanager.instances : [];
 
         return (
-            <select className="form-control" required value={this.state.instance} onChange={this.handleInstanceChange.bind(this)}>
+            <select className="form-control" required value={this.state.instance}
+                    onChange={this.handleInstanceChange.bind(this)}>
                 {instances.map((row) =>
                     <option key={row} value={row}>{row}</option>
                 )}
@@ -631,7 +647,7 @@ class Alertmanager extends BaseComponent {
 
         let collapseIndex = state.filter.alert.expanded.indexOf(alertName);
 
-        if (collapseIndex !== -1 ) {
+        if (collapseIndex !== -1) {
             // existing -> removing
             state.filter.alert.expanded.splice(collapseIndex, 1);
         } else {
@@ -712,13 +728,14 @@ class Alertmanager extends BaseComponent {
                     htmlTableRows.push(
                         <tr className="alertmanager-alertname-item">
                             <td className="detail">
-                                <strong>{this.highlight(row.annotations.summary)}</strong><br />
+                                <strong>{this.highlight(row.annotations.summary)}</strong><br/>
                                 <small>{this.highlight(row.annotations.description)}</small>
 
                                 <ul className="alertmanager-label">
                                     {Object.entries(row.labels).map((item) =>
                                         <li>
-                                            <span className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                            <span
+                                                className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
                                         </li>
                                     )}
                                 </ul>
@@ -729,11 +746,14 @@ class Alertmanager extends BaseComponent {
                                 {(() => {
                                     switch (row.status.state) {
                                         case "active":
-                                            return <span className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
                                         case "suppressed":
-                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-warning">{this.highlight(row.status.state)}</span>
                                         default:
-                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-secondary">{this.highlight(row.status.state)}</span>
                                     }
                                 })()}
                             </td>
@@ -741,7 +761,8 @@ class Alertmanager extends BaseComponent {
                                 {(() => {
                                     switch (row.status.state) {
                                         case "active":
-                                            return <button type="button" className="btn btn-secondary" onClick={this.silenceNewFromAlert.bind(this, row)}>
+                                            return <button type="button" className="btn btn-secondary"
+                                                           onClick={this.silenceNewFromAlert.bind(this, row)}>
                                                 Silence
                                             </button>
                                     }
@@ -769,20 +790,24 @@ class Alertmanager extends BaseComponent {
                         </colgroup>
                         <thead>
                         <tr>
-                            <th>{this.sortBy("annotations.summary", "Alert", (a) => {return a.annotations.summary})}</th>
+                            <th>{this.sortBy("annotations.summary", "Alert", (a) => {
+                                return a.annotations.summary
+                            })}</th>
                             <th>{this.sortBy("startsAt", "Started")}</th>
                             <th>{this.sortBy("updatedAt", "Last update")}</th>
-                            <th>{this.sortBy("status.state", "Status", (a) => {return a.status.state})}</th>
+                            <th>{this.sortBy("status.state", "Status", (a) => {
+                                return a.status.state
+                            })}</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                            {htmlTableRows.length === 0 &&
-                                <tr>
-                                    <td colspan="5" className="not-found">No alerts found.</td>
-                                </tr>
-                            }
-                            {htmlTableRows}
+                        {htmlTableRows.length === 0 &&
+                            <tr>
+                                <td colspan="5" className="not-found">No alerts found.</td>
+                            </tr>
+                        }
+                        {htmlTableRows}
                         </tbody>
                     </table>
                 </div>
@@ -827,7 +852,7 @@ class Alertmanager extends BaseComponent {
 
         let collapseIndex = state.filter.silence.expanded.indexOf(alertName);
 
-        if (collapseIndex !== -1 ) {
+        if (collapseIndex !== -1) {
             // existing -> removing
             state.filter.silence.expanded.splice(collapseIndex, 1);
         } else {
@@ -869,7 +894,8 @@ class Alertmanager extends BaseComponent {
             htmlTableRows.push(
                 <tr className="alertmanager-alertname-group">
                     <th colSpan="5">
-                        <a href="#" className="group-filter" onClick={this.silenceTriggerCollapse.bind(this, alertName)}>
+                        <a href="#" className="group-filter"
+                           onClick={this.silenceTriggerCollapse.bind(this, alertName)}>
                             <i className={alertGroupIconClassName}></i>&nbsp;
                             {alertName} <span className="group-stats">{this.buildGroupHeader(silenceList)}</span>
                         </a>
@@ -898,11 +924,14 @@ class Alertmanager extends BaseComponent {
                                 {(() => {
                                     switch (row.status.state) {
                                         case "active":
-                                            return <span className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
                                         case "expired":
-                                            return <span className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-warning">{this.highlight(row.status.state)}</span>
                                         default:
-                                            return <span className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                            return <span
+                                                className="badge badge-secondary">{this.highlight(row.status.state)}</span>
                                     }
                                 })()}
                             </td>
@@ -917,13 +946,18 @@ class Alertmanager extends BaseComponent {
                                     {(() => {
                                         switch (row.status.state) {
                                             case "expired":
-                                                return <ul className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + row.id}>
-                                                    <li><a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
+                                                return <ul className="dropdown-menu"
+                                                           aria-labelledby={"btnGroupDrop-" + row.id}>
+                                                    <li><a className="dropdown-item"
+                                                           onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
                                                 </ul>
                                             default:
-                                                return <ul className="dropdown-menu" aria-labelledby={"btnGroupDrop-" + row.id}>
-                                                    <li><a className="dropdown-item" onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
-                                                    <li><a className="dropdown-item" onClick={this.silenceDelete.bind(this, row)}>Delete</a></li>
+                                                return <ul className="dropdown-menu"
+                                                           aria-labelledby={"btnGroupDrop-" + row.id}>
+                                                    <li><a className="dropdown-item"
+                                                           onClick={this.silenceEdit.bind(this, row)}>Edit</a></li>
+                                                    <li><a className="dropdown-item"
+                                                           onClick={this.silenceDelete.bind(this, row)}>Delete</a></li>
                                                 </ul>
                                         }
                                     })()}
@@ -956,19 +990,20 @@ class Alertmanager extends BaseComponent {
                             <th>Until</th>
                             <th></th>
                             <th className="toolbox">
-                                <button type="button" className="btn btn-secondary" onClick={this.silenceNew.bind(this)}>
+                                <button type="button" className="btn btn-secondary"
+                                        onClick={this.silenceNew.bind(this)}>
                                     <i className="fas fa-plus"></i>
                                 </button>
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                            {htmlTableRows.length === 0 &&
+                        {htmlTableRows.length === 0 &&
                             <tr>
                                 <td colspan="5" className="not-found">No alerts found.</td>
                             </tr>
-                            }
-                            {htmlTableRows}
+                        }
+                        {htmlTableRows}
                         </tbody>
                     </table>
                 </div>

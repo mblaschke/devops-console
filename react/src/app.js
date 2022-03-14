@@ -1,9 +1,5 @@
-import React, { Component } from 'react';
-import {
-    BrowserRouter,
-    Routes,
-    Route
-} from "react-router-dom";
+import React from 'react';
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Base from './base';
 import K8sNamespace from './kubernetes/namespace';
 import K8sAccess from './kubernetes/access';
@@ -43,7 +39,8 @@ class App extends Base {
                 if (this.searchCallback) {
                     try {
                         this.searchCallback(event);
-                    } catch(e) {}
+                    } catch (e) {
+                    }
                 }
             },
 
@@ -80,8 +77,8 @@ class App extends Base {
                 });
 
                 // hide elements if expired
-                messageList.forEach(function(part, index) {
-                    if((now - this[index].created) > window.App.MessageExpiry) {
+                messageList.forEach(function (part, index) {
+                    if ((now - this[index].created) > window.App.MessageExpiry) {
                         this[index].show = false;
                         timeout = timeoutCleanup;
                     } else {
@@ -112,7 +109,8 @@ class App extends Base {
             if (this.janitorTimeout) {
                 try {
                     this.janitorTimeout.cancel();
-                } catch(e) {}
+                } catch (e) {
+                }
             }
             this.janitorTimeout = setTimeout(janitorFunc, timeout);
         };
@@ -189,7 +187,8 @@ class App extends Base {
                     messageList: messageList
                 });
             }
-        } catch(e) {}
+        } catch (e) {
+        }
 
         this.handlePreventEvent(event);
     }
@@ -216,7 +215,8 @@ class App extends Base {
                 {this.state.messageList.map((row, num) =>
                     <div className={this.renderMessageClass(row)} role="alert">
                         {row.text}
-                        <button type="button" className="close" aria-label="Close" onClick={this.removeGlobalMessage.bind(this, num)}>
+                        <button type="button" className="close" aria-label="Close"
+                                onClick={this.removeGlobalMessage.bind(this, num)}>
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -239,18 +239,18 @@ class App extends Base {
                 <div>
                     <div className="globalmessages">{this.renderGlobalMessages()}</div>
                     <Routes>
-                        <Route path="/kubernetes/namespaces" element={<K8sNamespace />} />
-                        <Route path="/kubernetes/access" element={<K8sAccess />} />
+                        <Route path="/kubernetes/namespaces" element={<K8sNamespace/>}/>
+                        <Route path="/kubernetes/access" element={<K8sAccess/>}/>
 
-                        <Route path="/azure/resourcegroup" element={<AzureResourceGroups />} />
-                        <Route path="/azure/roleassignment" element={<AzureRoleAssignment />} />
+                        <Route path="/azure/resourcegroup" element={<AzureResourceGroups/>}/>
+                        <Route path="/azure/roleassignment" element={<AzureRoleAssignment/>}/>
 
-                        <Route path="/support/pagerduty" element={<SupportPagerduty />} />
+                        <Route path="/support/pagerduty" element={<SupportPagerduty/>}/>
 
-                        <Route path="/monitoring/alertmanager" element={<MonitoringAlertmanager />} />
+                        <Route path="/monitoring/alertmanager" element={<MonitoringAlertmanager/>}/>
 
-                        <Route path="/general/settings" element={<Settings />} />
-                        <Route path="/general/about" element={<GeneralStats />} />
+                        <Route path="/general/settings" element={<Settings/>}/>
+                        <Route path="/general/about" element={<GeneralStats/>}/>
                     </Routes>
                 </div>
             </BrowserRouter>

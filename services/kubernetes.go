@@ -2,8 +2,11 @@ package services
 
 import (
 	"context"
-	"devops-console/models"
 	"fmt"
+	"os"
+	"regexp"
+	"strings"
+
 	"k8s.io/api/core/v1"
 	rbacV1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -17,9 +20,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"regexp"
-	"strings"
+
+	"devops-console/models"
 )
 
 type Kubernetes struct {

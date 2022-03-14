@@ -27,7 +27,7 @@ class Breadcrumb extends Base {
         });
 
         if (state.breadcrumbs.length >= 1) {
-            state.breadcrumbs[state.breadcrumbs.length-1].className += " active"
+            state.breadcrumbs[state.breadcrumbs.length - 1].className += " active"
         }
 
         this.setState(state);

@@ -106,29 +106,36 @@ class NamespaceEdit extends BaseComponent {
         return (
             <div>
                 <form method="post">
-                <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog" aria-labelledby="editQuestion" aria-hidden="true">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">Edit namespace</h5>
-                                <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
+                    <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog"
+                         aria-labelledby="editQuestion" aria-hidden="true">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title" id="exampleModalLabel">Edit namespace</h5>
+                                    <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                                 <div className="modal-body">
                                     <div className="form-group">
                                         <label htmlFor="inputNsApp" className="inputRg">Namespace</label>
-                                        <input className="form-control" type="text" value={this.state.form.name} readOnly />
+                                        <input className="form-control" type="text" value={this.state.form.name}
+                                               readOnly/>
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsDescription" className="inputRg">Description</label>
-                                        <input type="text" name="nsDescription" id="inputNsDescription" className="form-control" placeholder="Description" value={this.getValue("form.description")} onChange={this.setValue.bind(this, "form.description")} />
+                                        <input type="text" name="nsDescription" id="inputNsDescription"
+                                               className="form-control" placeholder="Description"
+                                               value={this.getValue("form.description")}
+                                               onChange={this.setValue.bind(this, "form.description")}/>
                                     </div>
 
                                     <div className="form-group">
                                         <label htmlFor="inputNsNetpol" className="inputRg">NetworkPolicy</label>
-                                        <select id="inputNsNetpol" className="form-control" value={this.getValue("form.networkPolicy")} onChange={this.setValue.bind(this, "form.networkPolicy")}>
+                                        <select id="inputNsNetpol" className="form-control"
+                                                value={this.getValue("form.networkPolicy")}
+                                                onChange={this.setValue.bind(this, "form.networkPolicy")}>
                                             {this.props.config.kubernetes.namespace.networkPolicy.map((row) =>
                                                 <option key={row.name} value={row.name}>{row.description}</option>
                                             )}
@@ -136,17 +143,23 @@ class NamespaceEdit extends BaseComponent {
                                     </div>
 
                                     {this.kubernetesSettingsConfig().map((setting, value) =>
-                                        <NamespaceFormelement setting={setting} value={this.getValue("form.settings." + setting.name)} onchange={this.setValue.bind(this, "form.settings." + setting.name)} />
+                                        <NamespaceFormelement setting={setting}
+                                                              value={this.getValue("form.settings." + setting.name)}
+                                                              onchange={this.setValue.bind(this, "form.settings." + setting.name)}/>
                                     )}
 
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.stateButton()} onClick={this.saveNamespace.bind(this)}>{this.state.buttonText}</button>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel"
+                                                data-bs-dismiss="modal">Cancel
+                                        </button>
+                                        <button type="submit" className="btn btn-primary bnt-k8s-namespace-create"
+                                                disabled={this.stateButton()}
+                                                onClick={this.saveNamespace.bind(this)}>{this.state.buttonText}</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 </form>
             </div>
         );

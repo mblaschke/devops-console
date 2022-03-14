@@ -1,14 +1,15 @@
 package main
 
 import (
+	"math"
+	"net/http"
+	"time"
+
 	"github.com/gorilla/securecookie"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"go.uber.org/zap"
-	"math"
-	"net/http"
-	"time"
 )
 
 const (

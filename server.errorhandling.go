@@ -1,10 +1,12 @@
 package main
 
 import (
-	"devops-console/models/response"
 	"fmt"
-	"github.com/kataras/iris/v12"
 	"strings"
+
+	"github.com/kataras/iris/v12"
+
+	"devops-console/models/response"
 )
 
 func (c *Server) respondError(ctx iris.Context, err error) {

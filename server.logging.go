@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"runtime"
+
 	"github.com/containrrr/shoutrrr"
 	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
 	"go.uber.org/zap"
-	"runtime"
 )
 
 func (c *Server) initLogging() {

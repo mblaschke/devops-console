@@ -2,10 +2,11 @@ package main
 
 import (
 	"errors"
+	"time"
+
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"go.uber.org/zap"
-	"time"
 )
 
 const (

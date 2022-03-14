@@ -27,7 +27,7 @@ application:
     cookieSecure: {{env "SESSION_COOKIE_SECURE" | default "true" }}
     cookieDomain: {{env "SESSION_COOKIE_DOMAIN" | default "" | toJson }}
 
-    internal: {}
+    internal: { }
 
     secureCookie:
       # 32 chars
@@ -42,7 +42,7 @@ application:
       password: {{env "SESSION_REDIS_PASSWORD"  | default "" | toJson }}
       database: {{env "SESSION_REDIS_DATABASE"  | default "" | toJson }}
       prefix: {{env "SESSION_REDIS_PREFIX"  | default "" | toJson }}
-      delim:  {{env "SESSION_REDIS_DELIM"  | default "|" | toJson }}
+      delim: {{env "SESSION_REDIS_DELIM"  | default "|" | toJson }}
 
   oauth:
     provider: {{env "OAUTH_PROVIDER" | toJson }}
@@ -63,15 +63,15 @@ application:
       usernameBlacklist: {{env "OAUTH_USERNAME_FILTER_BLACKLIST" | toJson }}
 
   notification:
-    channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
+    channels: { { env "NOTIFICATION_CHANNELS" | splitList " " | toJson } }
     message: {{env "NOTIFICATION_MESSAGE" | default "%s: %s" | toJson }}
 
 settings:
   vault:
     url: {{env "AZURE_VAULT_URL" | toJson }}
 
-  user: []
-  team: []
+  user: [ ]
+  team: [ ]
 
 azure:
   roleassignment:
@@ -89,17 +89,17 @@ azure:
     validation:
       regexp: "^(.+)-rg$"
 
-    tags: []
+    tags: [ ]
 
 
 kubernetes:
   objectsPath: ./config/kubernetes
 
   roleBinding:
-    annotations: {}
-    labels: {}
+    annotations: { }
+    labels: { }
 
-  environments: []
+  environments: [ ]
 
   namespace:
     filter:
@@ -132,7 +132,7 @@ kubernetes:
       user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
       team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
 
-    settings: []
+    settings: [ ]
 
     networkPolicy:
       - name: none
@@ -158,10 +158,10 @@ support:
 
 permissions:
   default:
-    teams: []
+    teams: [ ]
 
-  user: {}
-  group: {}
-  team: {}
+  user: { }
+  group: { }
+  team: { }
 
-alertmanager: {}
+alertmanager: { }

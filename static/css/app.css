@@ -26,13 +26,13 @@ main,
 #layoutSidenav_content,
 #wrapper #content-wrapper > .container-fluid,
 #root,
-#root >div  {
+#root > div {
     min-height: 100%;
     height: 100%
 }
 
 #root {
-    height: calc(100%-10rem);
+    height: calc(100% - 10rem);
 }
 
 div.flexcontainer {
@@ -57,6 +57,7 @@ div.autoheight {
     right: 0;
     height: auto;
 }
+
 #wrapper #content-wrapper {
     padding-bottom: 0;
     padding-top: 1rem;
@@ -102,10 +103,10 @@ div.autoheight {
 
 .table-responsive {
     height: 30rem;
-    overflow:scroll;
+    overflow: scroll;
 }
 
-.table-responsive thead tr:nth-child(1) th{
+.table-responsive thead tr:nth-child(1) th {
     background: white;
     position: sticky;
     top: 0;
@@ -177,7 +178,7 @@ a.group-filter .group-stats {
 }
 
 .reltime {
-color: #95999c;
+    color: #95999c;
 }
 
 .kubeconfig {
@@ -186,16 +187,16 @@ color: #95999c;
 }
 
 body.hide-search #global-search-form {
-visibility: collapse !important;
+    visibility: collapse !important;
 }
 
 .table thead tr:first-child th {
-border-top: 0;
+    border-top: 0;
 }
 
 .sortable {
-    display:flex;
-    justify-content:space-between;
+    display: flex;
+    justify-content: space-between;
     cursor: pointer;
     white-space: nowrap;
     user-select: none;
@@ -221,53 +222,53 @@ border-top: 0;
 }
 
 .globalmessages {
-position: fixed;
-top: 1rem;
-right: 5rem;
-min-width: 25%;
-max-width: 50%;
-z-index: 999999;
+    position: fixed;
+    top: 1rem;
+    right: 5rem;
+    min-width: 25%;
+    max-width: 50%;
+    z-index: 999999;
 }
 
 .globalmessages .alert {
-margin-bottom: 0.5rem;
-padding-right: 2rem;
+    margin-bottom: 0.5rem;
+    padding-right: 2rem;
 }
 
 .globalmessages .alert,
 .globalmessages .alert button.close {
-padding: 0.5rem .75rem;
+    padding: 0.5rem .75rem;
 }
 
 .hidden {
-display: none;
+    display: none;
 }
 
 .invisible {
-visibility: hidden;
+    visibility: hidden;
 }
 
 .search-input {
-width: 5rem;
--webkit-transition: width 0.5s ease-in-out;
--moz-transition:width 0.5s ease-in-out;
--o-transition: width 0.5s ease-in-out;
-transition: width 0.5s ease-in-out;
+    width: 5rem;
+    -webkit-transition: width 0.5s ease-in-out;
+    -moz-transition: width 0.5s ease-in-out;
+    -o-transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out;
 }
 
 .search-input:focus,
 .search-input:not([value=""]) {
-width: 15rem;
+    width: 15rem;
 }
 
 td.toolbox,
 th.toolbox {
-text-align: right;
+    text-align: right;
 }
 
 div.toolbox {
-padding-top: 1rem;
-text-align: right;
+    padding-top: 1rem;
+    text-align: right;
 }
 
 div.toolbox .btn {
@@ -278,297 +279,412 @@ thead td.toolbox,
 thead th.toolbox,
 tfoot td.toolbox,
 tfoot th.toolbox {
-opacity: 1;
+    opacity: 1;
 }
 
 button {
-cursor: pointer;
+    cursor: pointer;
 }
 
 .modal-body .row {
-padding-bottom: 1rem;
+    padding-bottom: 1rem;
 }
 
 .container-toolbar-main {
-padding-bottom: 1rem;
+    padding-bottom: 1rem;
 }
 
 .container-toolbar-main .search-input {
-float: right;
+    float: right;
 }
 
 .container-toolbar {
-text-align: right;
-padding-bottom: 1rem;
+    text-align: right;
+    padding-bottom: 1rem;
 }
 
 .dropdown-menu a {
-cursor: pointer;
+    cursor: pointer;
 }
 
 .table.table-hover td.toolbox .btn {
-opacity: 0.2;
+    opacity: 0.2;
 }
 
 .table.table-hover td.toolbox .btn.show,
 .table.table-hover tr:hover td.toolbox .btn {
-opacity: 1;
+    opacity: 1;
 }
 
 table tr.k8s-master {
-background-color: #fff3cd;
+    background-color: #fff3cd;
 }
 
 
 table.table thead th {
-vertical-align: top ;
+    vertical-align: top;
 }
 
 .editable {
-cursor: pointer;
+    cursor: pointer;
 }
 
 .alert {
-white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 
 .floating-message {
-position: relative;
-z-index: -1;
+    position: relative;
+    z-index: -1;
 }
 
 .floating-message .alert {
-position: absolute;
-left: 0;
-right: 6rem;
+    position: absolute;
+    left: 0;
+    right: 6rem;
 }
 
 .k8s-namespace {
-white-space: nowrap;
+    white-space: nowrap;
 }
 
 .k8s-namespace .button-copy {
-visibility: hidden;
+    visibility: hidden;
 }
 
 .k8s-namespace:hover .button-copy {
-visibility: visible;
+    visibility: visible;
 }
 
 .badge-list {
-font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .button-copy-box {
-position: relative;
-display: inline-block;
-padding-right: 2rem;
+    position: relative;
+    display: inline-block;
+    padding-right: 2rem;
 }
 
 .button-copy {
-display: inline-block;
-vertical-align: middle;
-cursor: pointer;
-border: 0;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 0;
 
-border-radius: 1rem;
-position: absolute;
-right: 0;
+    border-radius: 1rem;
+    position: absolute;
+    right: 0;
 }
 
 .form-group-rel {
-position: relative;
+    position: relative;
 }
 
 .bnt-abs-right {
-position: absolute;
-right: 0.25rem;
-top: 0.25rem;
+    position: absolute;
+    right: 0.25rem;
+    top: 0.25rem;
 }
 
 .button-copy:focus {
--webkit-animation-name: wiggle;
--moz-animation-name: wiggle;
--ms-animation-name: wiggle;
--o-animation-name: wiggle;
-animation-name: wiggle;
--webkit-animation-timing-function: ease-in;
--moz-animation-timing-function: ease-in;
--ms-animation-timing-function: ease-in;
--o-animation-timing-function: ease-in;
-animation-timing-function: ease-in;
--webkit-animation-duration: 1s;
--moz-animation-duration: 1s;
--ms-animation-duration: 1s;
--o-animation-duration: 1s;
-animation-duration: 1s;
+    -webkit-animation-name: wiggle;
+    -moz-animation-name: wiggle;
+    -ms-animation-name: wiggle;
+    -o-animation-name: wiggle;
+    animation-name: wiggle;
+    -webkit-animation-timing-function: ease-in;
+    -moz-animation-timing-function: ease-in;
+    -ms-animation-timing-function: ease-in;
+    -o-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-duration: 1s;
+    -moz-animation-duration: 1s;
+    -ms-animation-duration: 1s;
+    -o-animation-duration: 1s;
+    animation-duration: 1s;
 }
 
 .highlight {
-background: yellow !important;
-border-radius: 0.1rem !important;
+    background: yellow !important;
+    border-radius: 0.1rem !important;
 }
 
 .spinner-area {
-position: relative;
+    position: relative;
 }
 
 .spinner-wrapper {
-position: fixed;
-z-index: 999;
-top: 0px;
-left: 0px;
-right: 0px;
-bottom: 0px;
-background-color: rgba(0,123,255,0.2);
+    position: fixed;
+    z-index: 999;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(0, 123, 255, 0.2);
 }
 
 .spinner-area .spinner-wrapper {
-position: absolute;
+    position: absolute;
 }
 
 .spinner {
-margin: 100px auto;
-width: 50px;
-height: 40px;
-text-align: center;
-font-size: 10px;
+    margin: 100px auto;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    font-size: 10px;
 }
 
 .spinner > div {
-background-color: #333;
-height: 100%;
-width: 6px;
-display: inline-block;
+    background-color: #333;
+    height: 100%;
+    width: 6px;
+    display: inline-block;
 
--webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    animation: sk-stretchdelay 1.2s infinite ease-in-out;
 }
 
 .spinner .rect2 {
--webkit-animation-delay: -1.1s;
-animation-delay: -1.1s;
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
 }
 
 .spinner .rect3 {
--webkit-animation-delay: -1.0s;
-animation-delay: -1.0s;
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
 }
 
 .spinner .rect4 {
--webkit-animation-delay: -0.9s;
-animation-delay: -0.9s;
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
 }
 
 .spinner .rect5 {
--webkit-animation-delay: -0.8s;
-animation-delay: -0.8s;
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
 }
 
 @-webkit-keyframes sk-stretchdelay {
-0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
-20% { -webkit-transform: scaleY(1.0) }
+    0%, 40%, 100% {
+        -webkit-transform: scaleY(0.4)
+    }
+    20% {
+        -webkit-transform: scaleY(1.0)
+    }
 }
 
 @keyframes sk-stretchdelay {
-0%, 40%, 100% {
-transform: scaleY(0.4);
--webkit-transform: scaleY(0.4);
-}  20% {
-   transform: scaleY(1.0);
-   -webkit-transform: scaleY(1.0);
-}
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }
+    20% {
+        transform: scaleY(1.0);
+        -webkit-transform: scaleY(1.0);
+    }
 }
 
 @-webkit-keyframes wiggle {
-0% { -webkit-transform: skewX(9deg); }
-10% { -webkit-transform: skewX(-8deg); }
-20% { -webkit-transform: skewX(7deg); }
-30% { -webkit-transform: skewX(-6deg); }
-40% { -webkit-transform: skewX(5deg); }
-50% { -webkit-transform: skewX(-4deg); }
-60% { -webkit-transform: skewX(3deg); }
-70% { -webkit-transform: skewX(-2deg); }
-80% { -webkit-transform: skewX(1deg); }
-90% { -webkit-transform: skewX(0deg); }
-100% { -webkit-transform: skewX(0deg); }
+    0% {
+        -webkit-transform: skewX(9deg);
+    }
+    10% {
+        -webkit-transform: skewX(-8deg);
+    }
+    20% {
+        -webkit-transform: skewX(7deg);
+    }
+    30% {
+        -webkit-transform: skewX(-6deg);
+    }
+    40% {
+        -webkit-transform: skewX(5deg);
+    }
+    50% {
+        -webkit-transform: skewX(-4deg);
+    }
+    60% {
+        -webkit-transform: skewX(3deg);
+    }
+    70% {
+        -webkit-transform: skewX(-2deg);
+    }
+    80% {
+        -webkit-transform: skewX(1deg);
+    }
+    90% {
+        -webkit-transform: skewX(0deg);
+    }
+    100% {
+        -webkit-transform: skewX(0deg);
+    }
 }
 
 @-moz-keyframes wiggle {
-0% { -moz-transform: skewX(9deg); }
-10% { -moz-transform: skewX(-8deg); }
-20% { -moz-transform: skewX(7deg); }
-30% { -moz-transform: skewX(-6deg); }
-40% { -moz-transform: skewX(5deg); }
-50% { -moz-transform: skewX(-4deg); }
-60% { -moz-transform: skewX(3deg); }
-70% { -moz-transform: skewX(-2deg); }
-80% { -moz-transform: skewX(1deg); }
-90% { -moz-transform: skewX(0deg); }
-100% { -moz-transform: skewX(0deg); }
+    0% {
+        -moz-transform: skewX(9deg);
+    }
+    10% {
+        -moz-transform: skewX(-8deg);
+    }
+    20% {
+        -moz-transform: skewX(7deg);
+    }
+    30% {
+        -moz-transform: skewX(-6deg);
+    }
+    40% {
+        -moz-transform: skewX(5deg);
+    }
+    50% {
+        -moz-transform: skewX(-4deg);
+    }
+    60% {
+        -moz-transform: skewX(3deg);
+    }
+    70% {
+        -moz-transform: skewX(-2deg);
+    }
+    80% {
+        -moz-transform: skewX(1deg);
+    }
+    90% {
+        -moz-transform: skewX(0deg);
+    }
+    100% {
+        -moz-transform: skewX(0deg);
+    }
 }
 
 @-ms-keyframes wiggle {
-0% { -ms-transform: skewX(9deg); }
-10% { -ms-transform: skewX(-8deg); }
-20% { -ms-transform: skewX(7deg); }
-30% { -ms-transform: skewX(-6deg); }
-40% { -ms-transform: skewX(5deg); }
-50% { -ms-transform: skewX(-4deg); }
-60% { -ms-transform: skewX(3deg); }
-70% { -ms-transform: skewX(-2deg); }
-80% { -ms-transform: skewX(1deg); }
-90% { -ms-transform: skewX(0deg); }
-100% { -ms-transform: skewX(0deg); }
+    0% {
+        -ms-transform: skewX(9deg);
+    }
+    10% {
+        -ms-transform: skewX(-8deg);
+    }
+    20% {
+        -ms-transform: skewX(7deg);
+    }
+    30% {
+        -ms-transform: skewX(-6deg);
+    }
+    40% {
+        -ms-transform: skewX(5deg);
+    }
+    50% {
+        -ms-transform: skewX(-4deg);
+    }
+    60% {
+        -ms-transform: skewX(3deg);
+    }
+    70% {
+        -ms-transform: skewX(-2deg);
+    }
+    80% {
+        -ms-transform: skewX(1deg);
+    }
+    90% {
+        -ms-transform: skewX(0deg);
+    }
+    100% {
+        -ms-transform: skewX(0deg);
+    }
 }
 
 @-o-keyframes wiggle {
-0% { -o-transform: skewX(9deg); }
-10% { -o-transform: skewX(-8deg); }
-20% { -o-transform: skewX(7deg); }
-30% { -o-transform: skewX(-6deg); }
-40% { -o-transform: skewX(5deg); }
-50% { -o-transform: skewX(-4deg); }
-60% { -o-transform: skewX(3deg); }
-70% { -o-transform: skewX(-2deg); }
-80% { -o-transform: skewX(1deg); }
-90% { -o-transform: skewX(0deg); }
-100% { -o-transform: skewX(0deg); }
+    0% {
+        -o-transform: skewX(9deg);
+    }
+    10% {
+        -o-transform: skewX(-8deg);
+    }
+    20% {
+        -o-transform: skewX(7deg);
+    }
+    30% {
+        -o-transform: skewX(-6deg);
+    }
+    40% {
+        -o-transform: skewX(5deg);
+    }
+    50% {
+        -o-transform: skewX(-4deg);
+    }
+    60% {
+        -o-transform: skewX(3deg);
+    }
+    70% {
+        -o-transform: skewX(-2deg);
+    }
+    80% {
+        -o-transform: skewX(1deg);
+    }
+    90% {
+        -o-transform: skewX(0deg);
+    }
+    100% {
+        -o-transform: skewX(0deg);
+    }
 }
 
 @keyframes wiggle {
-0% { transform: skewX(9deg); }
-10% { transform: skewX(-8deg); }
-20% { transform: skewX(7deg); }
-30% { transform: skewX(-6deg); }
-40% { transform: skewX(5deg); }
-50% { transform: skewX(-4deg); }
-60% { transform: skewX(3deg); }
-70% { transform: skewX(-2deg); }
-80% { transform: skewX(1deg); }
-90% { transform: skewX(0deg); }
-100% { transform: skewX(0deg); }
+    0% {
+        transform: skewX(9deg);
+    }
+    10% {
+        transform: skewX(-8deg);
+    }
+    20% {
+        transform: skewX(7deg);
+    }
+    30% {
+        transform: skewX(-6deg);
+    }
+    40% {
+        transform: skewX(5deg);
+    }
+    50% {
+        transform: skewX(-4deg);
+    }
+    60% {
+        transform: skewX(3deg);
+    }
+    70% {
+        transform: skewX(-2deg);
+    }
+    80% {
+        transform: skewX(1deg);
+    }
+    90% {
+        transform: skewX(0deg);
+    }
+    100% {
+        transform: skewX(0deg);
+    }
 }
 
 @media (min-width: 576px) {
-.modal-dialog {
-max-width: 650px;
-margin: 1.75rem auto;
-}
+    .modal-dialog {
+        max-width: 650px;
+        margin: 1.75rem auto;
+    }
 }
 
 .blinking {
-animation: blinker 2s ease-in-out infinite;
+    animation: blinker 2s ease-in-out infinite;
 }
 
 @keyframes blinker {
-65% {
-opacity: 1;
-}
-50% {
-opacity: 0.2;
-}
-35% {
-opacity: 1;
-}
+    65% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    35% {
+        opacity: 1;
+    }
 }

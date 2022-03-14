@@ -2,14 +2,16 @@ package main
 
 import (
 	"crypto/rand"
-	"devops-console/models"
 	"fmt"
 	"io/ioutil"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes/scheme"
 	"math/big"
 	"os"
 	"path/filepath"
+
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/scheme"
+
+	"devops-console/models"
 )
 
 func createKubernetesObjectList() models.KubernetesObjectList {

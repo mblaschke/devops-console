@@ -69,7 +69,8 @@ class NamespaceDelete extends BaseComponent {
         return (
             <div>
                 <form method="post">
-                    <div className="modal fade" id="deleteQuestion" tabIndex="-1" role="dialog" aria-labelledby="deleteQuestion">
+                    <div className="modal fade" id="deleteQuestion" tabIndex="-1" role="dialog"
+                         aria-labelledby="deleteQuestion">
                         <div className="modal-dialog" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
@@ -81,18 +82,26 @@ class NamespaceDelete extends BaseComponent {
                                 <div className="modal-body">
                                     <div className="row">
                                         <div className="col">
-                                            Do you really want to delete namespace <strong className="k8s-namespace">{this.props.namespace.name}</strong>?
+                                            Do you really want to delete namespace <strong
+                                            className="k8s-namespace">{this.props.namespace.name}</strong>?
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col">
-                                            <input type="text" id="inputNsDeleteConfirm" className="form-control" placeholder="Enter namespace for confirmation" required value={this.getValue("confirmNamespace")} onChange={this.setValue.bind(this, "confirmNamespace")} />
+                                            <input type="text" id="inputNsDeleteConfirm" className="form-control"
+                                                   placeholder="Enter namespace for confirmation" required
+                                                   value={this.getValue("confirmNamespace")}
+                                                   onChange={this.setValue.bind(this, "confirmNamespace")}/>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-primary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" className="btn btn-secondary bnt-k8s-namespace-delete" disabled={this.renderButtonState()} onClick={this.deleteNamespace.bind(this)}>{this.state.buttonText}</button>
+                                    <button type="button" className="btn btn-primary bnt-k8s-namespace-cancel"
+                                            data-bs-dismiss="modal">Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-secondary bnt-k8s-namespace-delete"
+                                            disabled={this.renderButtonState()}
+                                            onClick={this.deleteNamespace.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>
                         </div>

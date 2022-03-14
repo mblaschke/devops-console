@@ -1,4 +1,3 @@
-
 settings:
   vault:
     url: {{env "AZURE_VAULT_URL" | toJson }}
@@ -162,7 +161,7 @@ permissions:
         - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
           role: contributor
       serviceconnection:
-        - {token: "923eh2ihrwpihfg9s0gh0923423ih42po"}
+        - { token: "923eh2ihrwpihfg9s0gh0923423ih42po" }
 
     devteam0:
       rolebinding:
@@ -179,7 +178,7 @@ permissions:
         - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
           role: contributor
       serviceconnection:
-        - {token: "923eh2ihrwpihfg9s0gh0923423ih42po"}
+        - { token: "923eh2ihrwpihfg9s0gh0923423ih42po" }
 
     devteam1:
       rolebinding:
@@ -245,15 +244,15 @@ permissions:
 
 alertmanager:
   instances:
-  - name: dev
-    url: http://localhost:9093/
-  - name: int
-    url: http://localhost:9093/
-  - name: prod
-    url: http://localhost:9093/
-  - name: with-auth
-    url: http://localhost:9094/
-    auth:
-      type: basic
-      username: foo
-      password: bar
+    - name: dev
+      url: http://localhost:9093/
+    - name: int
+      url: http://localhost:9093/
+    - name: prod
+      url: http://localhost:9093/
+    - name: with-auth
+      url: http://localhost:9094/
+      auth:
+        type: basic
+        username: foo
+        password: bar

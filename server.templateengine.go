@@ -1,12 +1,13 @@
 package main
 
 import (
+	"reflect"
+	"runtime"
+
 	azureSdkVersion "github.com/Azure/azure-sdk-for-go/version"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/view"
 	"go.uber.org/zap"
-	"reflect"
-	"runtime"
 )
 
 func (c *Server) initTemplateEngine() {

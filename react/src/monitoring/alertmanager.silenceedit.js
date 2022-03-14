@@ -33,7 +33,8 @@ class AlertmanagerSilenceedit extends BaseComponent {
                     state.team = lastSelectedTeam;
                 }
             });
-        } catch(e) {}
+        } catch (e) {
+        }
 
         // select first team if no selection available
         if (!state.team || state.team === "") {
@@ -175,7 +176,8 @@ class AlertmanagerSilenceedit extends BaseComponent {
                 }
             }
 
-        } catch(e) {}
+        } catch (e) {
+        }
 
         // set to state
         this.setState({
@@ -187,7 +189,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
 
     deleteMatcher(num) {
         var state = this.state;
-        state.form.matchers.splice(num, 1 );
+        state.form.matchers.splice(num, 1);
         this.setState(state);
     }
 
@@ -226,7 +228,8 @@ class AlertmanagerSilenceedit extends BaseComponent {
             return (
                 <div>
                     <form method="post">
-                        <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog" aria-labelledby="editQuestion" aria-hidden="true">
+                        <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog"
+                             aria-labelledby="editQuestion" aria-hidden="true">
                         </div>
                     </form>
                 </div>
@@ -258,20 +261,23 @@ class AlertmanagerSilenceedit extends BaseComponent {
         return (
             <div>
                 <form method="post">
-                <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog" aria-labelledby="editQuestion" aria-hidden="true">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">Silence</h5>
-                                <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
+                    <div className="modal fade" id="editQuestion" tabIndex="-1" role="dialog"
+                         aria-labelledby="editQuestion" aria-hidden="true">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title" id="exampleModalLabel">Silence</h5>
+                                    <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                                 <div className="modal-body">
 
                                     <div className="form-group">
                                         <label htmlFor="silence-form-team">Team</label>
-                                        <select name="inputTeam" id="silence-form-team" className="form-control" value={this.getValue("team")} onChange={this.setValue.bind(this, "team")}>
+                                        <select name="inputTeam" id="silence-form-team" className="form-control"
+                                                value={this.getValue("team")}
+                                                onChange={this.setValue.bind(this, "team")}>
                                             {this.props.config.teams.map((row, value) =>
                                                 <option key={row.Id} value={row.name}>{row.name}</option>
                                             )}
@@ -280,15 +286,20 @@ class AlertmanagerSilenceedit extends BaseComponent {
 
                                     <div className="form-group">
                                         <label htmlFor="silence-form-comment" className="inputRg">Description</label>
-                                        <textarea id="silence-form-comment" className="form-control" value={this.getValue("form.comment")} onChange={this.setValue.bind(this, "form.comment")}  />
+                                        <textarea id="silence-form-comment" className="form-control"
+                                                  value={this.getValue("form.comment")}
+                                                  onChange={this.setValue.bind(this, "form.comment")}/>
                                     </div>
 
                                     <div className="form-group">
                                         <div className="form-row">
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="silence-form-startsAt" className="inputRg">Starts at {reltime(this.getValue("form.startsAt"))}</label>
+                                                <label htmlFor="silence-form-startsAt" className="inputRg">Starts
+                                                    at {reltime(this.getValue("form.startsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input id="silence-form-startsAt" className="form-control" value={this.getValue("form.startsAt")} onChange={this.setValue.bind(this, "form.startsAt")}  />
+                                                    <input id="silence-form-startsAt" className="form-control"
+                                                           value={this.getValue("form.startsAt")}
+                                                           onChange={this.setValue.bind(this, "form.startsAt")}/>
 
                                                     <div className="btn-group bnt-abs-right" role="group">
                                                         <button id="btnGroupDrop-startsAt" type="button"
@@ -297,27 +308,53 @@ class AlertmanagerSilenceedit extends BaseComponent {
                                                                 aria-expanded="false">
                                                             +
                                                         </button>
-                                                        <ul className="dropdown-menu"aria-labelledby="btnGroupDrop-startsAt">
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "h")}>1 hour</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "h")}>2 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "h")}>4 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 8, "h")}>8 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "d")}>1 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "d")}>2 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "d")}>4 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 1, "w")}>1 week</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 2, "w")}>2 weeks</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 3, "w")}>3 weeks</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.startsAt", 4, "w")}>4 weeks</a></li>
+                                                        <ul className="dropdown-menu"
+                                                            aria-labelledby="btnGroupDrop-startsAt">
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 1, "h")}>1
+                                                                hour</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 2, "h")}>2
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 4, "h")}>4
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 8, "h")}>8
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 1, "d")}>1
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 2, "d")}>2
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 4, "d")}>4
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 1, "w")}>1
+                                                                week</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 2, "w")}>2
+                                                                weeks</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 3, "w")}>3
+                                                                weeks</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.startsAt", 4, "w")}>4
+                                                                weeks</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="form-group col-md-6 form-group-rel">
-                                                <label htmlFor="silence-form-endsAt" className="inputRg">Ends at {reltime(this.getValue("form.endsAt"))}</label>
+                                                <label htmlFor="silence-form-endsAt" className="inputRg">Ends
+                                                    at {reltime(this.getValue("form.endsAt"))}</label>
                                                 <div className="form-group-rel">
-                                                    <input id="silence-form-endsAt" className="form-control" value={this.getValue("form.endsAt")} onChange={this.setValue.bind(this, "form.endsAt")}  />
+                                                    <input id="silence-form-endsAt" className="form-control"
+                                                           value={this.getValue("form.endsAt")}
+                                                           onChange={this.setValue.bind(this, "form.endsAt")}/>
 
                                                     <div className="btn-group bnt-abs-right" role="group">
                                                         <button id="btnGroupDrop-endsAt" type="button"
@@ -326,18 +363,41 @@ class AlertmanagerSilenceedit extends BaseComponent {
                                                                 aria-expanded="false">
                                                             +
                                                         </button>
-                                                        <ul className="dropdown-menu"aria-labelledby="btnGroupDrop-endsAt">
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "h")}>1 hour</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "h")}>2 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "h")}>4 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 8, "h")}>8 hours</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "d")}>1 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "d")}>2 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "d")}>4 day</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 1, "w")}>1 week</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 2, "w")}>2 weeks</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 3, "w")}>3 weeks</a></li>
-                                                            <li><a className="dropdown-item" onClick={this.addTime.bind(this, "form.endsAt", 4, "w")}>4 weeks</a></li>
+                                                        <ul className="dropdown-menu"
+                                                            aria-labelledby="btnGroupDrop-endsAt">
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 1, "h")}>1
+                                                                hour</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 2, "h")}>2
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 4, "h")}>4
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 8, "h")}>8
+                                                                hours</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 1, "d")}>1
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 2, "d")}>2
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 4, "d")}>4
+                                                                day</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 1, "w")}>1
+                                                                week</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 2, "w")}>2
+                                                                weeks</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 3, "w")}>3
+                                                                weeks</a></li>
+                                                            <li><a className="dropdown-item"
+                                                                   onClick={this.addTime.bind(this, "form.endsAt", 4, "w")}>4
+                                                                weeks</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -347,36 +407,42 @@ class AlertmanagerSilenceedit extends BaseComponent {
 
                                     <table className="table table-sm table-borderless table-striped">
                                         <colgroup>
-                                            <col widht="*" />
-                                            <col widht="*" />
-                                            <col widht="50rem" />
-                                            <col widht="20rem" />
+                                            <col widht="*"/>
+                                            <col widht="*"/>
+                                            <col widht="50rem"/>
+                                            <col widht="20rem"/>
                                         </colgroup>
                                         <thead>
-                                            <tr>
-                                                <th colspan="4">Matchers <small>(Alerts affected by this silence)</small></th>
-                                            </tr>
-                                            <tr>
-                                                <th>Label</th>
-                                                <th>Value</th>
-                                                <th></th>
-                                                <th>
-                                                    <button type="button" className="btn btn-secondary btn-sm" onClick={this.addMatcher.bind(this)}>
-                                                        <i className="fas fa-plus"></i>
-                                                    </button>
-                                                </th>
-                                            </tr>
+                                        <tr>
+                                            <th colspan="4">Matchers <small>(Alerts affected by this silence)</small>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Label</th>
+                                            <th>Value</th>
+                                            <th></th>
+                                            <th>
+                                                <button type="button" className="btn btn-secondary btn-sm"
+                                                        onClick={this.addMatcher.bind(this)}>
+                                                    <i className="fas fa-plus"></i>
+                                                </button>
+                                            </th>
+                                        </tr>
                                         </thead>
 
                                         <tbody>
-                                        {matchers.map((item,key) =>
+                                        {matchers.map((item, key) =>
                                             <tr>
                                                 <td>
-                                                    <input className="form-control" value={this.getValue("form.matchers[" + key + "].name")} onChange={this.setValue.bind(this, "form.matchers[" + key + "].name")}  />
+                                                    <input className="form-control"
+                                                           value={this.getValue("form.matchers[" + key + "].name")}
+                                                           onChange={this.setValue.bind(this, "form.matchers[" + key + "].name")}/>
                                                 </td>
 
                                                 <td>
-                                                    <input className="form-control" value={this.getValue("form.matchers[" + key + "].value")} onChange={this.setValue.bind(this, "form.matchers[" + key + "].value")}  />
+                                                    <input className="form-control"
+                                                           value={this.getValue("form.matchers[" + key + "].value")}
+                                                           onChange={this.setValue.bind(this, "form.matchers[" + key + "].value")}/>
                                                 </td>
 
                                                 <td>
@@ -393,7 +459,8 @@ class AlertmanagerSilenceedit extends BaseComponent {
                                                 </td>
 
                                                 <td>
-                                                    <button type="button" className="btn btn-secondary btn-sm" onClick={this.deleteMatcher.bind(this, key)}>
+                                                    <button type="button" className="btn btn-secondary btn-sm"
+                                                            onClick={this.deleteMatcher.bind(this, key)}>
                                                         <i className="fas fa-trash-alt"></i>
                                                     </button>
                                                 </td>
@@ -403,8 +470,12 @@ class AlertmanagerSilenceedit extends BaseComponent {
                                     </table>
 
                                     <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" className="btn btn-primary bnt-k8s-namespace-create" disabled={this.state.buttonState} onClick={this.save.bind(this)}>{this.state.buttonText}</button>
+                                        <button type="button" className="btn btn-secondary bnt-k8s-namespace-cancel"
+                                                data-bs-dismiss="modal">Cancel
+                                        </button>
+                                        <button type="submit" className="btn btn-primary bnt-k8s-namespace-create"
+                                                disabled={this.state.buttonState}
+                                                onClick={this.save.bind(this)}>{this.state.buttonText}</button>
                                     </div>
                                 </div>
                             </div>

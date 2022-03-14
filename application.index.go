@@ -1,9 +1,11 @@
 package main
 
 import (
-	"devops-console/models"
 	"fmt"
+
 	"github.com/kataras/iris/v12"
+
+	"devops-console/models"
 )
 
 type ApplicationIndex struct {
