@@ -91,6 +91,7 @@ func (c *Server) initSession() {
 func (c *Server) initSessionInternal() {
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
+		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
 	})
@@ -104,6 +105,7 @@ func (c *Server) initSessionSecureCookie() {
 
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
+		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Encode:                      secureCookie.Encode,
 		Decode:                      secureCookie.Decode,
 		AllowReclaim:                true,
@@ -162,6 +164,7 @@ func (c *Server) initSessionRedis() {
 
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
+		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
 		AllowReclaim:                true,
@@ -179,6 +182,7 @@ func (c *Server) initSessionRedisSecureCookie() {
 
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
+		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Encode:                      secureCookie.Encode,
 		Decode:                      secureCookie.Decode,
 		AllowReclaim:                true,
