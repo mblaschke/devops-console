@@ -63,7 +63,7 @@ application:
       usernameBlacklist: {{env "OAUTH_USERNAME_FILTER_BLACKLIST" | toJson }}
 
   notification:
-    channels: { { env "NOTIFICATION_CHANNELS" | splitList " " | toJson } }
+    channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
     message: {{env "NOTIFICATION_MESSAGE" | default "%s: %s" | toJson }}
 
 settings:
