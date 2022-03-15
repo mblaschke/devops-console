@@ -18,7 +18,9 @@ const (
 )
 
 func (c *Server) startSession(ctx iris.Context) *sessions.Session {
-	s := c.session.Start(ctx)
+	s := c.session.Start(ctx, func(cookie *http.Cookie) {
+		c.applySessionSetting(cookie)
+	})
 	invalidSession := false
 
 	// invalidate sessions for different app versions
@@ -58,6 +60,16 @@ func (c *Server) destroySession(ctx iris.Context) {
 	c.session.Destroy(ctx)
 }
 
+func (c *Server) applySessionSetting(cookie *http.Cookie) {
+	if c.config.App.Session.CookieSecure {
+		cookie.Secure = true
+	}
+
+	if c.config.App.Session.CookieDomain != "" {
+		cookie.Domain = c.config.App.Session.CookieDomain
+	}
+}
+
 func (c *Server) initSession() {
 	contextLogger := c.logger.With(zap.String("setup", "session"))
 	contextLogger.Infof("using %v session", c.config.App.Session.Type)
@@ -78,13 +90,7 @@ func (c *Server) initSession() {
 	}
 
 	c.app.Use(c.session.Handler(func(cookie *http.Cookie) {
-		if c.config.App.Session.CookieSecure {
-			cookie.Secure = true
-		}
-
-		if c.config.App.Session.CookieDomain != "" {
-			cookie.Domain = c.config.App.Session.CookieDomain
-		}
+		c.applySessionSetting(cookie)
 	}))
 }
 
