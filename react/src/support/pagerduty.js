@@ -108,7 +108,7 @@ class SupportPagerduty extends BaseComponent {
 
                         <form method="post">
                             <div className="form-group">
-                                <label htmlFor="inputNsAreaTeam">Team</label>
+                                <label htmlFor="inputNsAreaTeam">Request assistance for team</label>
                                 <select name="nsAreaTeam" id="inputNsAreaTeam"
                                         className="form-control namespace-area-team" value={this.getValue("form.team")}
                                         onChange={this.setTeam.bind(this, "form.team")}>
