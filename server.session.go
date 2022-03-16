@@ -65,7 +65,7 @@ func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.Cook
 }
 
 func (c *Server) renewSession(ctx iris.Context) {
-	if err := c.session.ShiftExpiration(ctx); err != nil {
+	if err := c.session.ShiftExpiration(ctx, c.applySessionSetting); err != nil {
 		c.session.Destroy(ctx)
 	}
 }
