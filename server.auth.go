@@ -11,7 +11,11 @@ import (
 	"devops-console/models"
 )
 
-func (c *Server) templateLogin(ctx iris.Context) {
+func (c *Server) templateLogin(ctx iris.Context, logout bool) {
+	if logout {
+		c.destroySession(ctx)
+	}
+
 	ctx.ViewData("title", "Login")
 	if err := ctx.View("login.jet"); err != nil {
 		c.logger.Error(err)

@@ -87,7 +87,7 @@ func (c *Server) initRoutes() {
 
 	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionRegenrateToken)
 	{
-		pageParty.Get("/home", func(ctx iris.Context) { c.template(ctx, "Home", "home.jet") })
+		pageParty.Get("/home", func(ctx iris.Context) { c.home(ctx) })
 
 		if c.config.App.FeatureIsEnabled("general", "settings") {
 			pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
@@ -187,7 +187,7 @@ func (c *Server) notFound(ctx iris.Context) {
 		recover() //nolint:golint,errcheck
 	}()
 
-	c.respondErrorWithPenalty(ctx, errors.New("Document not found"))
+	c.respondErrorWithPenalty(ctx, errors.New("document not found"))
 }
 
 func (c *Server) before(ctx iris.Context) {

@@ -1,6 +1,6 @@
 {{import "includes/blocks.jet"}}
 <!DOCTYPE html>
-<html lang="en" app:csrf="{{ CSRF_TOKEN }}" app:version="{{ appVersion }}">
+<html lang="en" app:csrf="{{ if CSRF_TOKEN }}{{ CSRF_TOKEN }}{{ end }}" app:version="{{ if appVersion }}{{ appVersion }}{{ end }}">
 <head>
     {{include "includes/html-header.jet"}}
 </head>

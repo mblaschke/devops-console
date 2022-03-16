@@ -16,19 +16,17 @@ func (c *Server) index(ctx iris.Context) {
 	user, err := c.getUser(ctx)
 
 	if err == nil && user != nil {
-		ctx.Redirect("/kubernetes/namespaces")
+		ctx.Redirect("/home")
 	} else {
-		c.destroySession(ctx)
-		c.templateLogin(ctx)
+		c.templateLogin(ctx, true)
 	}
 }
 
-func (c *Server) redirectWithHtml(ctx iris.Context, title, redirect string) {
-	ctx.ViewData("title", title)
-	ctx.ViewData("redirect", redirect)
-	if err := ctx.View("redirect.jet"); err != nil {
-		c.logger.Error(err)
-	}
+func (c *Server) home(ctx iris.Context) {
+	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
+		c.renewSession(ctx)
+		c.template(ctx, "Home", "home.jet")
+	})
 }
 
 func (c *Server) template(ctx iris.Context, title, template string) {
@@ -42,6 +40,7 @@ func (c *Server) template(ctx iris.Context, title, template string) {
 
 func (c *Server) react(ctx iris.Context, title string) {
 	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
+		c.renewSession(ctx)
 		ctx.ViewData("title", title)
 		if err := ctx.View("react.jet"); err != nil {
 			c.logger.Error(err)
