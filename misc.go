@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"fmt"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -42,7 +41,7 @@ func addK8sConfigsFromPath(configPath string, list models.KubernetesObjectList) 
 	})
 
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err)
+		panic(err)
 	}
 
 	for _, path := range fileList {
