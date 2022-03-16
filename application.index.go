@@ -52,6 +52,7 @@ func (c *Server) react(ctx iris.Context, title string) {
 func (c *Server) heartbeat(ctx iris.Context) {
 	user, err := c.getUser(ctx)
 	if err == nil && user != nil {
+		c.renewSession(ctx)
 		ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
 		if _, err = ctx.JSON("Ok"); err != nil {
 			c.logger.Errorf("error while sending response: %v", err)

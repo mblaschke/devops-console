@@ -21,7 +21,7 @@ application:
 
   session:
     type: {{env "SESSION_TYPE" | default "internal" | toJson }}
-    expiry: {{env "SESSION_EXPIRY" | default "168h" | toJson }}
+    expiry: {{env "SESSION_EXPIRY" | default "2h" | toJson }}
 
     cookieName: {{env "SESSION_COOKIE_NAME" | default "devconsole-sid" | toJson }}
     cookieSecure: {{env "SESSION_COOKIE_SECURE" | default "true" }}
