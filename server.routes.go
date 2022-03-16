@@ -87,6 +87,8 @@ func (c *Server) initRoutes() {
 
 	pageParty := c.app.Party("/", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionRegenrateToken)
 	{
+		pageParty.Get("/home", func(ctx iris.Context) { c.template(ctx, "Home", "home.jet") })
+
 		if c.config.App.FeatureIsEnabled("general", "settings") {
 			pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
 		}
@@ -243,10 +245,9 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 		}
 	}
 
-	// inject token
-	ctx.Header(httpHeaderCsrfToken, sessionToken)
+	// ctx.Header(httpHeaderCsrfToken, sessionToken)
 
-	ctx.ViewData("CSRF_TOKEN_JSON", sessionToken)
+	ctx.ViewData("CSRF_TOKEN", sessionToken)
 
 	ctx.Next()
 }
@@ -263,7 +264,7 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 	s.Set("CSRF", token)
 	ctx.Header(httpHeaderCsrfToken, token)
 
-	ctx.ViewData("CSRF_TOKEN_JSON", token)
+	ctx.ViewData("CSRF_TOKEN", token)
 
 	return token
 }

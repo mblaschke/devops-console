@@ -3,10 +3,12 @@ package main
 import (
 	"math"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"go.uber.org/zap"
@@ -17,10 +19,14 @@ const (
 	SessionVarNameUserAgent  = "__USERAGENT__"
 )
 
-func (c *Server) startSession(ctx iris.Context) *sessions.Session {
-	s := c.session.Start(ctx, func(cookie *http.Cookie) {
-		c.applySessionSetting(cookie)
-	})
+func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
+	cookieOptionList := []context.CookieOption{
+		func(cookie *http.Cookie) {
+			c.applySessionSetting(cookie)
+		},
+	}
+	cookieOptionList = append(cookieOptionList, cookieOptions...)
+	s := c.session.Start(ctx, cookieOptionList...)
 	invalidSession := false
 
 	// invalidate sessions for different app versions
@@ -51,9 +57,11 @@ func (c *Server) startSession(ctx iris.Context) *sessions.Session {
 	return s
 }
 
-func (c *Server) recreateSession(ctx iris.Context) *sessions.Session {
+func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
 	c.session.Destroy(ctx)
-	return c.startSession(ctx)
+	c.session.Destroy(ctx)
+
+	return c.startSession(ctx, cookieOptions...)
 }
 
 func (c *Server) destroySession(ctx iris.Context) {
@@ -61,8 +69,17 @@ func (c *Server) destroySession(ctx iris.Context) {
 }
 
 func (c *Server) applySessionSetting(cookie *http.Cookie) {
-	if c.config.App.Session.CookieSecure {
-		cookie.Secure = true
+	cookie.Secure = c.config.App.Session.CookieSecure
+
+	switch strings.ToLower(c.config.App.Session.CookieSameSite) {
+	case "default":
+		cookie.SameSite = http.SameSiteDefaultMode
+	case "lax":
+		cookie.SameSite = http.SameSiteLaxMode
+	case "strict":
+		cookie.SameSite = http.SameSiteStrictMode
+	case "none":
+		cookie.SameSite = http.SameSiteNoneMode
 	}
 
 	if c.config.App.Session.CookieDomain != "" {
@@ -88,10 +105,6 @@ func (c *Server) initSession() {
 	default:
 		panic("invalid session type defined")
 	}
-
-	c.app.Use(c.session.Handler(func(cookie *http.Cookie) {
-		c.applySessionSetting(cookie)
-	}))
 }
 
 func (c *Server) initSessionInternal() {

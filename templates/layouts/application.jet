@@ -1,13 +1,13 @@
 {{import "includes/blocks.jet"}}
 <!DOCTYPE html>
-<html lang="en" app:csrf="{{ CSRF_TOKEN_JSON }}" app:version="{{ appVersion }}">
+<html lang="en" app:csrf="{{ CSRF_TOKEN }}" app:version="{{ appVersion }}">
 <head>
     {{include "includes/html-header.jet"}}
 </head>
 <body class="hide-search">
 
   <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand mr-1" href="/"><i class="fas fa-terminal"></i> /devops/console<span class="version">v{{appVersion}}</span></a>
+    <a class="navbar-brand mr-1" href="/home"><i class="fas fa-terminal"></i> /devops/console<span class="version">v{{appVersion}}</span></a>
     <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
     {{include "includes/navbar-search.jet"}}

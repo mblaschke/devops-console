@@ -1,0 +1,22 @@
+{{extends "layouts/application.jet"}}
+{{import "includes/blocks.jet"}}
+
+{{block documentBody()}}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active">home</li>
+    </ol>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-terminal"></i>
+            /devops/console</span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success" role="alert">Welcome {{user.Username}}</div>
+            <p>self service for DevOps people, built in Germany with love</p>
+            <p class="text-center">
+                <i>Great things in business are never done by one person; they're done by a team of people.</i><br>Steve Jobs
+            ️</p>
+        </div>
+    </div>
+{{end}}

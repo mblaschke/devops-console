@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"regexp"
 
 	iris "github.com/kataras/iris/v12"
@@ -18,7 +19,10 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
-	s := c.recreateSession(ctx)
+	s := c.recreateSession(ctx, func(cookie *http.Cookie) {
+		// need lax mode for oauth redirect
+		cookie.SameSite = http.SameSiteLaxMode
+	})
 
 	randReader := rand.Reader
 	b := make([]byte, 16)
@@ -139,6 +143,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		// regenerate session
 		s := c.recreateSession(ctx)
 
+		// inject user information into session
 		s.Set("user", userSession)
 		c.csrfProtectionTokenRegenerate(ctx)
 	} else {
@@ -150,7 +155,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "login"}).Inc()
 
-	ctx.Redirect("/kubernetes/namespaces")
+	c.template(ctx, "Home", "home.jet")
 }
 
 func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {

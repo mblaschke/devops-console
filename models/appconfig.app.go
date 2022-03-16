@@ -10,11 +10,12 @@ type (
 		Features map[string]bool
 
 		Session struct {
-			Type         string
-			Expiry       time.Duration
-			CookieName   string `yaml:"cookieName"`
-			CookieSecure bool   `yaml:"cookieSecure"`
-			CookieDomain string `yaml:"cookieDomain"`
+			Type           string
+			Expiry         time.Duration
+			CookieName     string `yaml:"cookieName"`
+			CookieSecure   bool   `yaml:"cookieSecure"`
+			CookieDomain   string `yaml:"cookieDomain"`
+			CookieSameSite string `yaml:"cookieSameSite"`
 
 			Internal struct {
 			} `yaml:"internal"`

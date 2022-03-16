@@ -26,6 +26,7 @@ application:
     cookieName: {{env "SESSION_COOKIE_NAME" | default "devconsole-sid" | toJson }}
     cookieSecure: {{env "SESSION_COOKIE_SECURE" | default "true" }}
     cookieDomain: {{env "SESSION_COOKIE_DOMAIN" | default "" | toJson }}
+    cookieSameSite: {{env "SESSION_COOKIE_SAMESITE" | default "strict" | toJson }}
 
     internal: { }
 
