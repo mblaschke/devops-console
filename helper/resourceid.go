@@ -22,7 +22,7 @@ type (
 	}
 )
 
-func (resource *AzureResourceDetails) ResourceId() (resourceId string) {
+func (resource *AzureResourceDetails) ResourceID() (resourceId string) {
 	if resource.Subscription != "" {
 		resourceId += fmt.Sprintf(
 			"/subscriptions/%s",

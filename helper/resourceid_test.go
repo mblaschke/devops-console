@@ -42,8 +42,8 @@ func Test_ParseResourceId(t *testing.T) {
 func assertResourceId(t *testing.T, expect string, val string) {
 	t.Helper()
 
-	if info, err := ParseResourceId(val); err == nil {
-		resourceId := info.ResourceId()
+	if info, err := ParseResourceID(val); err == nil {
+		resourceId := info.ResourceID()
 		if resourceId != expect {
 			infoJson, _ := json.Marshal(info)
 			t.Errorf("expected: \"%s\", got \"%s\" (%s)", expect, resourceId, infoJson)
@@ -56,7 +56,7 @@ func assertResourceId(t *testing.T, expect string, val string) {
 
 func assertInvalidResourceId(t *testing.T, val string) {
 	t.Helper()
-	if info, err := ParseResourceId(val); err == nil {
+	if info, err := ParseResourceID(val); err == nil {
 		infoJson, _ := json.Marshal(info)
 		t.Errorf("assumed invalid resourceid but was parsed successfull \"%s\": %s", val, infoJson)
 	}
