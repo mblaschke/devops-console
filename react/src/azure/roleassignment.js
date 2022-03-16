@@ -36,7 +36,6 @@ class Roleassignment extends BaseComponent {
     }
 
     init() {
-        this.componentWillMount();
         this.resetForm();
     }
 
