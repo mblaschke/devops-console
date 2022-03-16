@@ -44,13 +44,16 @@ func (c *Server) initLogging() {
 
 func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 	username := "*anonymous*"
+	userId := ""
 	user, _ := c.getUser(ctx)
 	if user != nil {
-		username = fmt.Sprintf("%s (%s)", user.Username, user.Uuid)
+		username = user.Username
+		userId = user.Uuid
 	}
 
 	c.auditLogger.With(
 		zap.String("user", username),
+		zap.String("userID", userId),
 	).Info(message)
 }
 
