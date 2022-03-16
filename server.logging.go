@@ -52,6 +52,8 @@ func (c *Server) auditLog(ctx iris.Context, message string, depth int) {
 	}
 
 	c.auditLogger.With(
+		zap.String("requestMethod", ctx.Method()),
+		zap.String("requestPath", ctx.Path()),
 		zap.String("user", username),
 		zap.String("userID", userId),
 	).Info(message)
