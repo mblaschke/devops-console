@@ -10,13 +10,13 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/authorization/mgmt/2020-04-01-preview/authorization"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 
+	"devops-console/helper"
 	"devops-console/models"
 	"devops-console/models/formdata"
 	"devops-console/models/response"
@@ -342,7 +342,7 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 		return
 	}
 	if !stringInSlice(formData.RoleDefinition, c.config.Azure.RoleAssignment.RoleDefinitions) {
-		c.respondError(ctx, fmt.Errorf("invalid RoleDefinition specified"))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("invalid RoleDefinition specified"))
 		return
 	}
 
@@ -352,7 +352,7 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 		return
 	}
 	if !stringInSlice(formData.Ttl, c.config.Azure.RoleAssignment.Ttl) {
-		c.respondError(ctx, fmt.Errorf("invalid TTL specified"))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("invalid TTL specified"))
 		return
 	}
 
@@ -371,23 +371,23 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	}
 
 	// parse and validate resourceid
-	resourceIdInfo, err := azure.ParseResourceID(formData.ResourceId)
+	resourceIdInfo, err := helper.ParseResourceID(formData.ResourceId)
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %v", err))
 		return
 	}
 
-	if resourceIdInfo.SubscriptionID == "" {
+	if resourceIdInfo.Subscription == "" {
 		c.respondError(ctx, fmt.Errorf("unable to parse subscription id, please check your resource id"))
 		return
 	}
 
 	if resourceIdInfo.ResourceGroup == "" {
-		c.respondError(ctx, fmt.Errorf("unable to parse subscription id, please check your resource id"))
+		c.respondError(ctx, fmt.Errorf("unable to parse resourcegroup, please check your resource id"))
 		return
 	}
 
-	subscriptionId := resourceIdInfo.SubscriptionID
+	subscriptionId := resourceIdInfo.Subscription
 	resourceGroupName := resourceIdInfo.ResourceGroup
 
 	// setup clients
@@ -397,19 +397,21 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	// check for existing resourcegroup
 	group, err = groupsClient.Get(azureContext, resourceGroupName)
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %v", err))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %v", err))
 		return
 	}
 
-	if owner, exists := group.Tags["owner"]; exists {
-		if owner == nil || *owner == "" {
+	resourceGroupTags := to.StringMap(group.Tags)
+	if owner, exists := resourceGroupTags["owner"]; exists {
+		owner = strings.ToLower(strings.TrimSpace(owner))
+		if owner == "" {
 			c.respondError(ctx, fmt.Errorf("found empty owner tag in Azure ResourceGroup"))
 			return
 		}
 
 		// membership check
-		if !user.IsMemberOf(*owner) {
-			c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", err))
+		if !user.IsMemberOf(owner) {
+			c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", owner))
 			return
 		}
 	} else {

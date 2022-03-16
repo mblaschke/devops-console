@@ -61,6 +61,10 @@ build-frontend:
 	cp -a react/node_modules/@fortawesome/fontawesome-free/webfonts/* static/dist/webfonts/
 	touch static/js/.gitkeep
 
+.PHONY: test
+test:
+	go test ./...
+
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
 	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=25m
