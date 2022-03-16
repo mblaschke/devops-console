@@ -59,7 +59,6 @@ func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieO
 
 func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
 	c.session.Destroy(ctx)
-	c.session.Destroy(ctx)
 
 	return c.startSession(ctx, cookieOptions...)
 }
