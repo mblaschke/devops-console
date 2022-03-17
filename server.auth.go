@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/kataras/iris/v12"
@@ -93,14 +92,6 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
 	s := c.startSession(ctx)
 	userJson := s.GetString("user")
-
-	if opts.Debug && len(userJson) == 0 {
-		if val := os.Getenv("DEBUG_SESSION_USER"); val != "" {
-			s.Set("user", userJson)
-			userJson = val
-		}
-	}
-
 	user, err = models.UserCreateFromJson(userJson, &c.config)
 	return
 }
