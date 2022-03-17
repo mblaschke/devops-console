@@ -47,8 +47,7 @@ vendor:
 .PHONY: build-frontend
 build-frontend:
 	npm run --prefix=react build
-	cp react/build/index.html templates/includes/react.jet
-	cat templates/includes/react.jet | sed 's/ defer="defer"//g' | sed 's/<script/<script nonce="{{ CSP_NONCE }}"/g' | tee templates/includes/react.jet > /dev/null
+	cat react/build/index.html | sed 's/ defer="defer"//g' | sed 's/<script/<script nonce="{{ CSP_NONCE }}"/g' > templates/includes/react.jet
 	test -s templates/includes/react.jet
 	rm -rf static/js static/dist/boostrap static/dist/popper.js static/dist/sb-admin static/dist/webfonts
 	mkdir -p static/js
