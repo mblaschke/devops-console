@@ -181,7 +181,7 @@ func (c *Server) initRoutes() {
 		}
 	}
 
-	c.app.OnErrorCode(iris.StatusNotFound, c.notFound)
+	c.app.OnErrorCode(iris.StatusNotFound, c.defaultHeaders, c.notFound)
 }
 
 func (c *Server) notFound(ctx iris.Context) {
