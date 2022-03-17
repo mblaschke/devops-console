@@ -2,8 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
+	uuid "github.com/iris-contrib/go.uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"go.uber.org/zap"
@@ -197,11 +199,24 @@ func (c *Server) before(ctx iris.Context) {
 }
 
 func (c *Server) defaultHeaders(ctx iris.Context) {
+	nonce, err := uuid.NewV4()
+	if err == nil {
+		ctx.ViewData("CSP_NONCE", nonce.String())
+		ctx.Header(
+			"Content-Security-Policy",
+			fmt.Sprintf(
+				"default-src 'self'; script-src 'nonce-%[1]s', style-src 'nonce-%[1]s'",
+				nonce,
+			),
+		)
+	} else {
+		ctx.ViewData("CSP_NONCE", "")
+		ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'")
+	}
 	// security headers
 	ctx.Header("X-Frame-Options", "DENY")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
-	ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'")
 	ctx.Next()
 }
 

@@ -32,9 +32,10 @@
         </main>
     </div>
   </div>
-  <script src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}"></script>
-  <script src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}"></script>
+  <script src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
+  <script src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
   {{include "includes/react.jet"}}
+  <script src="/static/dist/sb-admin/sb-admin.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
   {{include "includes/html-footer.jet"}}
 </body>
 </html>

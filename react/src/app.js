@@ -225,15 +225,7 @@ class App extends Base {
         )
     }
 
-    loadJavascript(src) {
-        const script = document.createElement("script");
-        script.src = src;
-        document.body.appendChild(script);
-    }
-
     render() {
-        this.loadJavascript("/static/dist/sb-admin/sb-admin.js?ver=" + window.APP_VERSION)
-
         return (
             <BrowserRouter>
                 <div>
