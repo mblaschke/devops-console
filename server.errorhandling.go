@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/kataras/iris/v12"
@@ -41,22 +42,24 @@ func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 }
 
 func (c *Server) handleError(ctx iris.Context, err error, logout bool) {
+	c.handleErrorWithStatus(ctx, http.StatusBadRequest, err, logout)
+}
+
+func (c *Server) handleErrorWithStatus(ctx iris.Context, statusCode int, err error, logout bool) {
 	message := fmt.Sprintf("Error: %v", err)
 	c.auditLog(ctx, message, 1)
 
 	if logout {
 		c.destroySession(ctx)
+		ctx.StatusCode(iris.StatusUnauthorized)
+	} else {
+		ctx.StatusCode(statusCode)
 	}
 
-	ctx.StatusCode(iris.StatusBadRequest)
 	// clear X-CSRF-token header, make sure it's empty
 	ctx.Header("X-CSRF-Token", "")
 
 	if strings.Contains(ctx.GetHeader("Content-Type"), "application/json") {
-		if logout {
-			ctx.StatusCode(iris.StatusUnauthorized)
-		}
-
 		// XHR error
 		c.responseJson(ctx, response.GeneralMessage{
 			Message: message,

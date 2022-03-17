@@ -2,10 +2,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
-	uuid "github.com/iris-contrib/go.uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"go.uber.org/zap"
@@ -196,90 +194,4 @@ func (c *Server) before(ctx iris.Context) {
 	// view information
 	ctx.ViewData("navigationRoute", ctx.GetCurrentRoute().Path())
 	ctx.Next()
-}
-
-func (c *Server) defaultHeaders(ctx iris.Context) {
-	nonce, err := uuid.NewV4()
-	if err == nil {
-		ctx.ViewData("CSP_NONCE", nonce.String())
-		ctx.Header(
-			"Content-Security-Policy",
-			fmt.Sprintf(
-				"default-src 'self'; script-src 'nonce-%[1]s', style-src 'nonce-%[1]s'",
-				nonce,
-			),
-		)
-	} else {
-		ctx.ViewData("CSP_NONCE", "")
-		ctx.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'")
-	}
-	// security headers
-	ctx.Header("X-Frame-Options", "DENY")
-	ctx.Header("X-XSS-Protection", "1; mode=block")
-	ctx.Header("X-Content-Type-Options", "nosniff")
-	ctx.Next()
-}
-
-func (c *Server) csrfProtectionReferer(ctx iris.Context) {
-	ctx.Next()
-}
-
-func (c *Server) csrfProtectionRegenrateToken(ctx iris.Context) {
-	c.csrfProtectionTokenRegenerate(ctx)
-	ctx.Next()
-}
-
-func (c *Server) csrfProtectionToken(ctx iris.Context) {
-	if opts.DisableCsrfProtection {
-		ctx.ViewData("CSRF_TOKEN_JSON", "")
-		ctx.Next()
-		return
-	}
-
-	s := c.startSession(ctx)
-
-	// get token
-	sessionToken := ""
-	if val, ok := s.Get("CSRF").(string); ok {
-		sessionToken = val
-	}
-
-	if sessionToken == "" {
-		sessionToken = c.csrfProtectionTokenRegenerate(ctx)
-	}
-
-	method := ctx.Method()
-
-	// check token if not HEAD (safe methods)
-	if method != "HEAD" {
-		clientToken := ctx.GetHeader(httpHeaderCsrfToken)
-
-		if sessionToken == "" || clientToken != sessionToken {
-			c.respondErrorWithPenalty(ctx, errors.New("invalid CSRF token"))
-			return
-		}
-	}
-
-	// ctx.Header(httpHeaderCsrfToken, sessionToken)
-
-	ctx.ViewData("CSRF_TOKEN", sessionToken)
-
-	ctx.Next()
-}
-
-func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
-	if opts.DisableCsrfProtection {
-		return ""
-	}
-
-	s := c.startSession(ctx)
-
-	// set new token
-	token := randomString(64)
-	s.Set("CSRF", token)
-	ctx.Header(httpHeaderCsrfToken, token)
-
-	ctx.ViewData("CSRF_TOKEN", token)
-
-	return token
 }

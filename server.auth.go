@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/kataras/iris/v12"
@@ -80,7 +81,7 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 	user, err := c.getUser(ctx)
 
 	if err != nil {
-		c.handleError(ctx, errors.New("invalid session or not logged in"), true)
+		c.handleErrorWithStatus(ctx, http.StatusNotFound, errors.New("invalid session or not logged in"), true)
 		return
 	}
 
