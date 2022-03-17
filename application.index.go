@@ -38,6 +38,11 @@ func (c *Server) template(ctx iris.Context, title, template string) {
 	})
 }
 
+func (c *Server) redirectHtml(ctx iris.Context, url string) {
+	ctx.ViewData("redirectUrl", url)
+	c.template(ctx, "Home", "redirect.jet")
+}
+
 func (c *Server) react(ctx iris.Context, title string) {
 	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
 		c.renewSession(ctx)

@@ -150,8 +150,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	}
 
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "login"}).Inc()
-
-	c.template(ctx, "Home", "home.jet")
+	c.redirectHtml(ctx, "/home")
 }
 
 func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {
