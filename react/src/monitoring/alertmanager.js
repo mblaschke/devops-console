@@ -65,8 +65,7 @@ class Alertmanager extends BaseComponent {
             loadingAlerts: showSpinner,
         });
 
-
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'GET',
             url: '/_webapi/alertmanager/' + encodeURI(this.state.instance) + '/alerts'
         }).done((jqxhr) => {
@@ -93,7 +92,7 @@ class Alertmanager extends BaseComponent {
             loadingSilences: showSpinner,
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'GET',
             url: '/_webapi/alertmanager/' + encodeURI(this.state.instance) + '/silences'
         }).done((jqxhr) => {

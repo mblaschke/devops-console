@@ -210,6 +210,8 @@ class Base extends Component {
                 window.App.pushGlobalMessage("success", jqxhr.message);
             }
         });
+
+        return jqxhr;
     }
 
     handlePreventEvent(event) {
@@ -353,9 +355,7 @@ class Base extends Component {
             opts.contentType = "application/json";
         }
 
-        let jqxhr = $.ajax(opts);
-        this.handleXhr(jqxhr);
-        return jqxhr;
+        return this.handleXhr($.ajax(opts));
     }
 
     generateHtmlId(prefix) {

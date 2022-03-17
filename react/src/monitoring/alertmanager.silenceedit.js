@@ -64,7 +64,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
             buttonText: "Saving...",
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'PUT',
             contentType: 'application/json; charset=UTF-8',
             url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence/" + encodeURI(this.props.silence.id),
@@ -96,7 +96,7 @@ class AlertmanagerSilenceedit extends BaseComponent {
             buttonText: "Creating...",
         });
 
-        let jqxhr = this.ajax({
+        this.ajax({
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             url: "/_webapi/alertmanager/" + encodeURI(this.props.instance) + "/silence",
