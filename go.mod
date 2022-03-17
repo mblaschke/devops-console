@@ -16,6 +16,7 @@ require (
 	github.com/go-openapi/strfmt v0.21.2
 	github.com/gorilla/securecookie v1.1.1
 	github.com/hashicorp/go-uuid v1.0.2
+	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/kataras/golog v0.1.7
@@ -83,7 +84,6 @@ require (
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/iris-contrib/blackfriday v2.0.0+incompatible // indirect
-	github.com/iris-contrib/go.uuid v2.0.0+incompatible // indirect
 	github.com/iris-contrib/jade v1.1.3 // indirect
 	github.com/iris-contrib/pongo2 v0.0.1 // indirect
 	github.com/iris-contrib/schema v0.0.1 // indirect
