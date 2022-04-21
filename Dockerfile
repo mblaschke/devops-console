@@ -27,7 +27,11 @@ RUN set -x \
 #############################################
 # BUILD GO APP
 #############################################
-FROM golang:1.17 as backend
+FROM golang:1.18-alpine as backend
+
+RUN apk upgrade --no-cache --force
+RUN apk add --update build-base make git
+
 WORKDIR /go/src/devops-console
 COPY ./ /go/src/devops-console
 RUN make vendor

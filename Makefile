@@ -1,7 +1,7 @@
 NAME				:= devops-console
 GIT_TAG				:= $(shell git describe --dirty --tags --always)
 GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
-LDFLAGS             := -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMMIT)" -extldflags "-static"
+LDFLAGS				:= -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMMIT)" -linkmode external -extldflags "-static" -s -w
 
 FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
@@ -20,7 +20,7 @@ build-run: build-frontend build-backend run
 recreate-go-mod:
 	rm -f go.mod go.sum
 	go mod init devops-console
-	go get k8s.io/client-go@v0.22.0
+	go get k8s.io/client-go@v0.23.0
 	go get -u github.com/Azure/azure-sdk-for-go/...
 	go get -u github.com/microcosm-cc/bluemonday
 	go get
