@@ -21,8 +21,8 @@ const (
 
 func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
 	cookieOptionList := []context.CookieOption{
-		func(cookie *http.Cookie) {
-			c.applySessionSetting(cookie)
+		func(ctx *context.Context, cookie *http.Cookie, op uint8) {
+			c.applySessionSetting(ctx, cookie, op)
 		},
 	}
 	cookieOptionList = append(cookieOptionList, cookieOptions...)
@@ -47,8 +47,7 @@ func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieO
 	}
 
 	if invalidSession {
-		c.session.Destroy(ctx)
-		s = c.session.Start(ctx)
+		s = c.recreateSession(ctx, cookieOptionList...)
 	}
 
 	s.Set(SessionVarNameAppVersion, gitTag)
@@ -59,7 +58,6 @@ func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieO
 
 func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
 	c.session.Destroy(ctx)
-
 	return c.startSession(ctx, cookieOptions...)
 }
 
@@ -73,7 +71,7 @@ func (c *Server) destroySession(ctx iris.Context) {
 	c.session.Destroy(ctx)
 }
 
-func (c *Server) applySessionSetting(cookie *http.Cookie) {
+func (c *Server) applySessionSetting(ctx *context.Context, cookie *http.Cookie, op uint8) {
 	cookie.Secure = c.config.App.Session.CookieSecure
 
 	switch strings.ToLower(c.config.App.Session.CookieSameSite) {
@@ -130,8 +128,7 @@ func (c *Server) initSessionSecureCookie() {
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
 		CookieSecureTLS:             c.config.App.Session.CookieSecure,
-		Encode:                      secureCookie.Encode,
-		Decode:                      secureCookie.Decode,
+		Encoding:                    secureCookie,
 		AllowReclaim:                true,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
@@ -149,17 +146,17 @@ func (c *Server) createRedisConnection() {
 		durationTime := math.Min(15, float64(i*2))
 		retryTime := time.Duration(time.Duration(durationTime) * time.Second)
 
-		c.redisConnection = redis.New(redis.Config{
+		c.redisConfig = &redis.Config{
 			Network:   "tcp",
 			Addr:      c.config.App.Session.Redis.Addr,
-			Timeout:   c.config.App.Session.Redis.Timeout,
-			MaxActive: c.config.App.Session.Redis.MaxActive,
 			Password:  c.config.App.Session.Redis.Password,
 			Database:  c.config.App.Session.Redis.Database,
+			MaxActive: c.config.App.Session.Redis.MaxActive,
+			Timeout:   c.config.App.Session.Redis.Timeout,
 			Prefix:    c.config.App.Session.Redis.Prefix,
-			Delim:     c.config.App.Session.Redis.Delim,
-			Driver:    redis.Redigo(),
-		})
+		}
+
+		c.redisConnection = redis.New(*c.redisConfig)
 
 		if c.redisConnection != nil {
 			break
@@ -207,8 +204,7 @@ func (c *Server) initSessionRedisSecureCookie() {
 	c.session = sessions.New(sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
 		CookieSecureTLS:             c.config.App.Session.CookieSecure,
-		Encode:                      secureCookie.Encode,
-		Decode:                      secureCookie.Decode,
+		Encoding:                    secureCookie,
 		AllowReclaim:                true,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,

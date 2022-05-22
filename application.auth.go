@@ -9,6 +9,7 @@ import (
 	"regexp"
 
 	iris "github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"devops-console/services"
@@ -19,7 +20,7 @@ type ApplicationAuth struct {
 }
 
 func (c *Server) Login(ctx iris.Context) {
-	s := c.recreateSession(ctx, func(cookie *http.Cookie) {
+	s := c.recreateSession(ctx, func(ctx *context.Context, cookie *http.Cookie, op uint8) {
 		// need lax mode for oauth redirect
 		cookie.SameSite = http.SameSiteLaxMode
 	})

@@ -17,7 +17,7 @@ func (c *Server) templateLogin(ctx iris.Context, logout bool) {
 	}
 
 	ctx.ViewData("title", "Login")
-	if err := ctx.View("login.jet"); err != nil {
+	if err := ctx.View("pages/login.jet"); err != nil {
 		c.logger.Error(err)
 	}
 }

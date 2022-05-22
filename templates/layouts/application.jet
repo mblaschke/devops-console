@@ -1,8 +1,8 @@
-{{import "includes/blocks.jet"}}
+{{import "../includes/blocks.jet"}}
 <!DOCTYPE html>
 <html lang="en" app:csrf="{{ if CSRF_TOKEN }}{{ CSRF_TOKEN }}{{ end }}" app:version="{{ if appVersion }}{{ appVersion }}{{ end }}">
 <head>
-    {{include "includes/html-header.jet"}}
+    {{include "../includes/html-header.jet"}}
 </head>
 <body class="hide-search">
 
@@ -10,15 +10,15 @@
     <a class="navbar-brand mr-1" href="/home"><i class="fas fa-terminal"></i> /devops/console<span class="version">v{{appVersion}}</span></a>
     <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-    {{include "includes/navbar-search.jet"}}
-    {{include "includes/navbar-right.jet"}}
+    {{include "../includes/navbar-search.jet"}}
+    {{include "../includes/navbar-right.jet"}}
     </form>
   </nav>
 
   <div id="wrapper">
      <div id="layoutSidenav">
        <div id="layoutSidenav_nav">
-            {{include "includes/sidebar.jet"}}
+            {{include "../includes/sidebar.jet"}}
         </div>
 
        <div id="layoutSidenav_content">
@@ -34,8 +34,8 @@
   </div>
   <script src="/static/dist/popper.js/popper.min.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
   <script src="/static/dist/bootstrap/js/bootstrap.min.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
-  {{include "includes/react.jet"}}
+  {{include "../includes/react.jet"}}
   <script src="/static/dist/sb-admin/sb-admin.js?ver={{appVersion}}" nonce="{{ CSP_NONCE }}"></script>
-  {{include "includes/html-footer.jet"}}
+  {{include "../includes/html-footer.jet"}}
 </body>
 </html>

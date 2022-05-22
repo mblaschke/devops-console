@@ -9,8 +9,8 @@ type ApplicationSystem struct {
 }
 
 func (c *Server) Healthz(ctx iris.Context) {
-	if c.redisConnection != nil {
-		redisSuccess, redisError := c.redisConnection.Config().Driver.PingPong()
+	if c.redisConnection != nil && c.redisConfig != nil {
+		redisSuccess, redisError := c.redisConfig.Driver.PingPong()
 		if redisError != nil {
 			c.logger.Error("healthz: redis error: ", redisSuccess)
 			ctx.StatusCode(iris.StatusInternalServerError)

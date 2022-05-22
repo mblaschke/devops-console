@@ -1,4 +1,4 @@
-{{extends "layouts/application.jet"}}
+{{extends "../layouts/application.jet"}}
 
 {{block documentBody()}}
 <div id="root"></div>

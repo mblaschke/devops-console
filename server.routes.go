@@ -53,8 +53,9 @@ func (c *Server) initRoutes() {
 	staticParty.HandleDir("/static", "./static", iris.DirOptions{
 		IndexName: "/index.html",
 
-		Gzip:     false,
-		ShowList: false,
+		ShowHidden: false,
+		Compress:   false,
+		ShowList:   false,
 	})
 	c.app.Favicon("./static/img/favicon.ico")
 

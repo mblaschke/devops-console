@@ -28,6 +28,7 @@ type Server struct {
 	session *sessions.Sessions
 
 	redisConnection *redis.Database
+	redisConfig     *redis.Config
 
 	config models.AppConfig
 

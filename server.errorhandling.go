@@ -70,12 +70,12 @@ func (c *Server) handleErrorWithStatus(ctx iris.Context, statusCode int, err err
 
 		if logout {
 			ctx.ViewData("title", "Login")
-			if err := ctx.View("login.jet"); err != nil {
+			if err := ctx.View("pages/login.jet"); err != nil {
 				c.logger.Error(err)
 			}
 		} else {
 			ctx.ViewData("title", "Error")
-			if err := ctx.View("error.jet"); err != nil {
+			if err := ctx.View("pages/error.jet"); err != nil {
 				c.logger.Error(err)
 			}
 		}

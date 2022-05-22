@@ -32,7 +32,7 @@ func (c *Server) home(ctx iris.Context) {
 func (c *Server) template(ctx iris.Context, title, template string) {
 	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
 		ctx.ViewData("title", title)
-		if err := ctx.View(template); err != nil {
+		if err := ctx.View("pages/" + template); err != nil {
 			c.logger.Error(err)
 		}
 	})
@@ -47,7 +47,7 @@ func (c *Server) react(ctx iris.Context, title string) {
 	c.ensureLoggedIn(ctx, func(ctx iris.Context, user *models.User) {
 		c.renewSession(ctx)
 		ctx.ViewData("title", title)
-		if err := ctx.View("react.jet"); err != nil {
+		if err := ctx.View("pages/react.jet"); err != nil {
 			c.logger.Error(err)
 		}
 	})

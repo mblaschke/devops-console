@@ -1,5 +1,5 @@
-{{extends "layouts/application.jet"}}
-{{import "includes/blocks.jet"}}
+{{extends "../layouts/application.jet"}}
+{{import "../includes/blocks.jet"}}
 
 {{block documentBody()}}
     <ol class="breadcrumb">

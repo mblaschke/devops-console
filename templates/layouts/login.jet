@@ -1,8 +1,8 @@
-{{import "includes/blocks.jet"}}
+{{import "../includes/blocks.jet"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {{include "includes/html-header.jet"}}
+    {{include "../includes/html-header.jet"}}
 </head>
 <body class="bg-dark">
 <div class="container">

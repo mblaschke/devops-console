@@ -31,6 +31,7 @@ func (c *Server) defaultHeaders(ctx iris.Context) {
 	ctx.Header("X-Frame-Options", "DENY")
 	ctx.Header("X-XSS-Protection", "1; mode=block")
 	ctx.Header("X-Content-Type-Options", "nosniff")
+
 	ctx.Next()
 }
 
@@ -45,7 +46,7 @@ func (c *Server) csrfProtectionRegenrateToken(ctx iris.Context) {
 
 func (c *Server) csrfProtectionToken(ctx iris.Context) {
 	if opts.DisableCsrfProtection {
-		ctx.ViewData("CSRF_TOKEN_JSON", "")
+		ctx.ViewData("CSRF_TOKEN", "")
 		ctx.Next()
 		return
 	}
