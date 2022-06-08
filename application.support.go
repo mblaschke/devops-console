@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/PagerDuty/go-pagerduty"
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 
 	"devops-console/models"
 	"devops-console/models/formdata"

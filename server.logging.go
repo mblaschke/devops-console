@@ -6,7 +6,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/kataras/golog"
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 	"go.uber.org/zap"
 )
 

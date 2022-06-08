@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	uuid "github.com/iris-contrib/go.uuid"
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 )
 
 func (c *Server) defaultHeaders(ctx iris.Context) {

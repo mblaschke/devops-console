@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 
 	"devops-console/models"
 )

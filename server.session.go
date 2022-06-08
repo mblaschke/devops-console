@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/kataras/iris/v12"
+	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
