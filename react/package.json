@@ -28,9 +28,7 @@
         "eject": "react-scripts eject"
     },
     "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not ie all",
-        "not op_mini all"
+        "defaults",
+        "not IE 11"
     ]
 }
