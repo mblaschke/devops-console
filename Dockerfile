@@ -1,8 +1,11 @@
 #############################################
-# GET/CACHE NPM DEPS
+# BUILD REACT APP
 #############################################
-FROM node:alpine as npm-dependencies
-WORKDIR /app
+FROM --platform=$BUILDPLATFORM node:alpine as frontend
+
+RUN apk upgrade --no-cache --force
+RUN apk add --update build-base make git
+
 # get npm modules (cache)
 COPY ./react/package.json /app/react/
 COPY ./react/package-lock.json /app/react/
@@ -10,15 +13,9 @@ RUN set -x \
     && cd /app/react \
     && npm install
 
-#############################################
-# BUILD REACT APP
-#############################################
-FROM node:alpine as frontend
 # Copy app and build
 WORKDIR /app
-RUN apk --no-cache add make
-COPY ./ /app
-COPY --from=npm-dependencies /app/react/node_modules/ /app/react/node_modules/
+COPY . .
 RUN set -x \
     && make build-frontend \
     && rm -rf /app/react \
@@ -27,20 +24,31 @@ RUN set -x \
 #############################################
 # BUILD GO APP
 #############################################
-FROM golang:1.18-alpine as backend
+FROM --platform=$BUILDPLATFORM golang:1.18-alpine as backend
 
 RUN apk upgrade --no-cache --force
 RUN apk add --update build-base make git
 
 WORKDIR /go/src/devops-console
 COPY ./ /go/src/devops-console
-RUN make vendor
-COPY --from=frontend /app/templates /go/src/devops-console/templates
-COPY --from=frontend /app/static /go/src/devops-console/static
+RUN go mod vendor
+
 RUN git status
 RUN make test
-RUN make build-backend
-RUN ./devops-console --help
+ARG TARGETOS TARGETARCH
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make build-backend
+
+#############################################
+# Test
+#############################################
+FROM gcr.io/distroless/static as test
+USER 0:0
+WORKDIR /app
+COPY --from=backend /go/src/devops-console/devops-console .
+COPY --from=backend /go/src/devops-console/config ./config
+COPY --from=frontend /app/templates ./templates
+COPY --from=frontend /app/static ./static
+RUN ["./devops-console", "--help"]
 
 #############################################
 # FINAL IMAGE
@@ -48,7 +56,7 @@ RUN ./devops-console --help
 FROM gcr.io/distroless/static
 ENV LOG_JSON=1
 WORKDIR /app
-COPY --from=backend /go/src/devops-console/ /app/
+COPY --from=test /app .
 USER 1000:1000
 EXPOSE 9000
-CMD ["/app/devops-console"]
+ENTRYPOINT ["/app/devops-console"]

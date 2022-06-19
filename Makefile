@@ -1,48 +1,18 @@
-NAME				:= devops-console
+PROJECT_NAME		:= $(shell basename $(CURDIR))
 GIT_TAG				:= $(shell git describe --dirty --tags --always)
 GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
-LDFLAGS				:= -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMMIT)" -linkmode external -extldflags "-static" -s -w
+LDFLAGS				:= -X "main.gitTag=$(GIT_TAG)" -X "main.gitCommit=$(GIT_COMMIT)" -extldflags "-static" -s -w
 
-FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
-GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
-GOSEC_BIN			:= $(FIRST_GOPATH)/bin/gosec
+FIRST_GOPATH			:= $(firstword $(subst :, ,$(shell go env GOPATH)))
+GOLANGCI_LINT_BIN		:= $(FIRST_GOPATH)/bin/golangci-lint
+GOSEC_BIN				:= $(FIRST_GOPATH)/bin/gosec
 
 .PHONY: all
-all: vendor build-frontend build-backend
+all: build-frontend build-backend
 
-.PHONY: build
-build: build-frontend build-backend
-
-.PHONY: build-run
-build-run: build-frontend build-backend run
-
-.PHONY: recreate-go-mod
-recreate-go-mod:
-	rm -f go.mod go.sum
-	go mod init devops-console
-	go get k8s.io/client-go@v0.23.0
-	go get -u github.com/Azure/azure-sdk-for-go/...
-	go get -u github.com/microcosm-cc/bluemonday
-	go get
-	go mod vendor
-
-.PHONY: image
-image: build
-	docker build -t $(NAME):$(TAG) .
-
-.PHONY: build-backend
-build-backend:
-	CGO_ENABLED=0 go build -a -ldflags '$(LDFLAGS)' -o $(NAME) .
-
-.PHONY: run
-run:
-	./devops-console
-
-.PHONY: vendor
-vendor:
-	go mod tidy
-	go mod vendor
-	go mod verify
+.PHONY: clean
+clean:
+	git clean -Xfd .
 
 .PHONY: build-frontend
 build-frontend:
@@ -62,23 +32,55 @@ build-frontend:
 	cp -a react/node_modules/@fortawesome/fontawesome-free/webfonts/* static/dist/webfonts/
 	touch static/js/.gitkeep
 
+.PHONY: build-backend
+build-backend:
+	GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -a -ldflags '$(LDFLAGS)' -o $(PROJECT_NAME) .
+
+.PHONY: vendor
+vendor:
+	go mod tidy
+	go mod vendor
+	go mod verify
+
+.PHONY: image
+image: build
+	docker build -t $(PROJECT_NAME):$(GIT_TAG) .
+
+build-push-development:
+	docker buildx create --use
+	docker buildx build -t webdevops/$(PROJECT_NAME):development --platform linux/amd64,linux/arm,linux/arm64 --push .
+
 .PHONY: test
 test:
 	go test ./...
 
+.PHONY: dependencies
+dependencies:
+	go mod vendor
+
+.PHONY: check-release
+check-release: vendor lint gosec test
+
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
-	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=25m
+	$(GOLANGCI_LINT_BIN) run -E exportloopref,gofmt --timeout=30m
 
 .PHONY: gosec
 gosec: $(GOSEC_BIN)
 	$(GOSEC_BIN) ./...
-
-.PHONY: dependencies
-dependencies: $(GOLANGCI_LINT_BIN) $(GOSEC_BIN)
 
 $(GOLANGCI_LINT_BIN):
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(FIRST_GOPATH)/bin
 
 $(GOSEC_BIN):
 	curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(FIRST_GOPATH)/bin
+
+.PHONY: recreate-go-mod
+recreate-go-mod:
+	rm -f go.mod go.sum
+	go mod init devops-console
+	go get k8s.io/client-go@v0.23.0
+	go get -u github.com/Azure/azure-sdk-for-go/...
+	go get -u github.com/microcosm-cc/bluemonday
+	go get
+	go mod vendor

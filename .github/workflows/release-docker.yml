@@ -1,4 +1,4 @@
-name: "release: docker"
+name: "Release: docker"
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         with:
           args: ./...
 
-      - name: golangci-lint
+      - name: Run Golangci lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
