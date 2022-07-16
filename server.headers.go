@@ -22,7 +22,7 @@ func (c *Server) defaultHeaders(ctx iris.Context) {
 	ctx.Header(
 		"Content-Security-Policy",
 		fmt.Sprintf(
-			`default-src 'none'; connect-src 'self'; img-src 'self'; font-src 'self'; script-src %[1]s; style-src %[1]s;`,
+			`default-src 'none'; connect-src 'self'; img-src 'self' data:; font-src 'self'; script-src %[1]s; style-src %[1]s;`,
 			cspNoneHeader,
 		),
 	)

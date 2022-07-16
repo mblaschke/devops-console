@@ -152,15 +152,15 @@ class Namespace extends BaseComponent {
 
         if (row) {
             if (row.name && row.name.match(/^user-[^-]+-.*/i)) {
-                personalBadge = <span className="badge badge-light">Personal Namespace</span>
+                personalBadge = <span className="badge bg-secondary">Personal Namespace</span>
             }
 
             if (row.ownerTeam && row.ownerTeam !== "") {
-                teamBadge = <div><span className="badge badge-light">Team: {this.highlight(row.ownerTeam)}</span></div>
+                teamBadge = <div><span className="badge bg-secondary">Team: {this.highlight(row.ownerTeam)}</span></div>
             }
 
             if (row.ownerUser && row.ownerUser !== "") {
-                userBadge = <div><span className="badge badge-light">User: {this.highlight(row.ownerUser)}</span></div>
+                userBadge = <div><span className="badge bg-secondary">User: {this.highlight(row.ownerUser)}</span></div>
             }
         }
 
@@ -363,7 +363,7 @@ class Namespace extends BaseComponent {
                                     <th>{this.sortBy("created", "Created")}</th>
                                     <th>{this.sortBy("status", "Status")}</th>
                                     <th className="toolbox">
-                                        <button type="button" className="btn btn-secondary"
+                                        <button type="button" className="btn btn-primary"
                                                 onClick={this.createNamespace.bind(this)}>
                                             <i className="fas fa-plus"></i>
                                         </button>
@@ -413,12 +413,12 @@ class Namespace extends BaseComponent {
                                         <td className="small">
                                             <div>
                                                 <span
-                                                    className="badge badge-warning">NetworkPolicy: {row.networkPolicy || "none"}</span>
+                                                    className="badge bg-danger">NetworkPolicy: {row.networkPolicy || "none"}</span>
                                             </div>
                                             {namespaceSettings(row).map((setting, index) =>
                                                 <div>
                                                     <span
-                                                        className="badge badge-light">{setting.label}: {this.highlight(setting.value)}</span>
+                                                        className="badge bg-secondary">{setting.label}: {this.highlight(setting.value)}</span>
                                                 </div>
                                             )}
                                         </td>
@@ -430,17 +430,17 @@ class Namespace extends BaseComponent {
                                                 switch (row.status.toLowerCase()) {
                                                     case "terminating":
                                                         return <span
-                                                            className="badge badge-danger">{this.highlight(row.status)}</span>;
+                                                            className="badge bg-danger">{this.highlight(row.status)}</span>;
                                                     case "active":
                                                         return <span
-                                                            className="badge badge-success">{this.highlight(row.status)}</span>;
+                                                            className="badge bg-success">{this.highlight(row.status)}</span>;
                                                     default:
                                                         return <span
-                                                            className="badge badge-warning">{this.highlight(row.status)}</span>;
+                                                            className="badge bg-warning">{this.highlight(row.status)}</span>;
                                                 }
                                             })()}
                                             <br/>
-                                            <span className={row.deleteable ? 'hidden' : 'badge badge-info'}>Not deletable</span>
+                                            <span className={row.deleteable ? 'hidden' : 'badge bg-info'}>Not deletable</span>
                                         </td>
                                         <td className="toolbox">
                                             {(() => {

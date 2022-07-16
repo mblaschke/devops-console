@@ -8,6 +8,9 @@ body {
     z-index: 1000;
 }
 
+.sb-topnav .navbar-brand {
+    width: auto;
+}
 
 .fixed-top, .sb-nav-fixed #layoutSidenav #layoutSidenav_nav, .sb-nav-fixed .sb-topnav {
     z-index: 1049;
@@ -45,6 +48,10 @@ div.autoheight {
     flex-grow: 1;
 }
 
+.card-login {
+    max-width: 35rem;
+}
+
 .card.autoheight .card-body {
     position: relative;
 }
@@ -67,6 +74,10 @@ div.autoheight {
     .sidebar .nav-item .dropdown-menu {
         display: block;
     }
+}
+
+.card-header {
+    padding: 0.75rem 1rem !important;
 }
 
 .card-header .fas,
@@ -99,6 +110,19 @@ div.autoheight {
     min-height: 10rem;
     max-height: unset;
     overflow-y: auto;
+}
+
+.card-body table thead,
+.card-body table tbody {
+    border: 0 !important;
+}
+
+.card-body table thead .toolbox button {
+    padding: 0.15rem 0.5rem;
+}
+
+.card-body table tbody td {
+    border-color: #ccc !important;
 }
 
 .table-responsive {
@@ -228,16 +252,6 @@ body.hide-search #global-search-form {
     min-width: 25%;
     max-width: 50%;
     z-index: 999999;
-}
-
-.globalmessages .alert {
-    margin-bottom: 0.5rem;
-    padding-right: 2rem;
-}
-
-.globalmessages .alert,
-.globalmessages .alert button.close {
-    padding: 0.5rem .75rem;
 }
 
 .hidden {
@@ -377,6 +391,10 @@ table.table thead th {
     right: 0;
 }
 
+.form-group {
+    margin-bottom: 1rem;
+}
+
 .form-group-rel {
     position: relative;
 }
@@ -406,6 +424,7 @@ table.table thead th {
 }
 
 .highlight {
+    color: black !important;
     background: yellow !important;
     border-radius: 0.1rem !important;
 }

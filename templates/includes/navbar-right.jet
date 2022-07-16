@@ -1,4 +1,4 @@
-    <ul class="navbar-nav ml-auto ml-md-0">
+    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
         <li class="nav-item">
             <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">{{user.Username}}</a>
         </li>

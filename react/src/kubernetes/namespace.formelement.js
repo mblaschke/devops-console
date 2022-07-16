@@ -16,9 +16,8 @@ class NamespaceFormelement extends BaseComponent {
                 <input type="text" name={this.props.setting.name} id={this.state._htmlid} className="form-control"
                        placeholder={this.props.setting.placeholder} required={this.props.setting.required}
                        value={this.props.value} onChange={this.props.onchange}/>
-                <small className="form-text text-muted">{this.props.setting.description}</small>
-                <small
-                    className="form-text text-muted">{this.props.setting.k8sType}: {this.props.setting.k8sName}</small>
+                <div className="form-text">{this.props.setting.description}</div>
+                <div className="form-text">{this.props.setting.k8sType}: {this.props.setting.k8sName}</div>
             </div>
         );
     }
@@ -41,14 +40,13 @@ class NamespaceFormelement extends BaseComponent {
         }
 
         return (
-            <div className="form-group form-check">
+            <div className="form-check">
                 <input type="checkbox" name={this.props.setting.name} id={this.state._htmlid}
                        className="form-check-input" placeholder={this.props.setting.plaeholder}
                        required={this.props.setting.required} checked={checkboxState} onChange={this.props.onchange}/>
                 <label htmlFor={this.state._htmlid} className="form-check-label">{this.props.setting.label}</label>
-                <small className="form-text text-muted">{this.props.setting.description}</small>
-                <small
-                    className="form-text text-muted">{this.props.setting.k8sType}: {this.props.setting.k8sName}</small>
+                <div className="form-text">{this.props.setting.description}</div>
+                <div className="form-text">{this.props.setting.k8sType}: {this.props.setting.k8sName}</div>
             </div>
         );
     }

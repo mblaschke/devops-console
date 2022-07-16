@@ -477,11 +477,11 @@ class Alertmanager extends BaseComponent {
     renderMatch(matcher) {
         if (matcher.isRegexp) {
             return (
-                <span className="badge badge-secondary">{matcher.name}=~{this.highlight(matcher.value)}</span>
+                <span className="badge bg-secondary">{matcher.name}=~{this.highlight(matcher.value)}</span>
             )
         } else {
             return (
-                <span className="badge badge-secondary">{matcher.name}={this.highlight(matcher.value)}</span>
+                <span className="badge bg-secondary">{matcher.name}={this.highlight(matcher.value)}</span>
             )
         }
     }
@@ -734,7 +734,7 @@ class Alertmanager extends BaseComponent {
                                     {Object.entries(row.labels).map((item) =>
                                         <li>
                                             <span
-                                                className="badge badge-secondary">{item[0]}={this.highlight(item[1])}</span>
+                                                className="badge bg-secondary">{item[0]}={this.highlight(item[1])}</span>
                                         </li>
                                     )}
                                 </ul>
@@ -746,13 +746,13 @@ class Alertmanager extends BaseComponent {
                                     switch (row.status.state) {
                                         case "active":
                                             return <span
-                                                className="badge badge-danger blinking">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-danger blinking">{this.highlight(row.status.state)}</span>
                                         case "suppressed":
                                             return <span
-                                                className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-warning">{this.highlight(row.status.state)}</span>
                                         default:
                                             return <span
-                                                className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-secondary">{this.highlight(row.status.state)}</span>
                                     }
                                 })()}
                             </td>
@@ -924,13 +924,13 @@ class Alertmanager extends BaseComponent {
                                     switch (row.status.state) {
                                         case "active":
                                             return <span
-                                                className="badge badge-success blinking">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-success blinking">{this.highlight(row.status.state)}</span>
                                         case "expired":
                                             return <span
-                                                className="badge badge-warning">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-warning">{this.highlight(row.status.state)}</span>
                                         default:
                                             return <span
-                                                className="badge badge-secondary">{this.highlight(row.status.state)}</span>
+                                                className="badge bg-secondary">{this.highlight(row.status.state)}</span>
                                     }
                                 })()}
                             </td>

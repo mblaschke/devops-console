@@ -164,9 +164,7 @@ class NamespaceCreate extends BaseComponent {
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title" id="exampleModalLabel">Create namespace</h5>
-                                    <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="row">
@@ -186,7 +184,7 @@ class NamespaceCreate extends BaseComponent {
                                     </div>
 
                                     <div className="row">
-                                        <div className="col-3">
+                                        <div className="col">
                                             <label htmlFor="inputNsEnvironment">Environment</label>
                                             <select name="nsEnvironment" id="inputNsEnvironment"
                                                     className="form-control" required
@@ -198,7 +196,7 @@ class NamespaceCreate extends BaseComponent {
                                                 )}
                                             </select>
                                         </div>
-                                        <div>
+                                        <div className="col">
                                             <label htmlFor="inputNsAreaTeam">Team</label>
                                             <select name="nsAreaTeam" id="inputNsAreaTeam"
                                                     className="form-control namespace-area-team"

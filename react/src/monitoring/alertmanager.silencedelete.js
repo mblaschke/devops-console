@@ -61,9 +61,7 @@ class AlertmanagerSilencedelete extends BaseComponent {
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title" id="exampleModalLabel">Delete namespace</h5>
-                                    <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="row">
@@ -77,7 +75,7 @@ class AlertmanagerSilencedelete extends BaseComponent {
                                     <button type="button" className="btn btn-primary bnt-k8s-namespace-cancel"
                                             data-bs-dismiss="modal">Cancel
                                     </button>
-                                    <button type="submit" className="btn btn-secondary bnt-k8s-namespace-delete"
+                                    <button type="submit" className="btn btn-danger bnt-k8s-namespace-delete"
                                             onClick={this.confirm.bind(this)}>{this.state.buttonText}</button>
                                 </div>
                             </div>

@@ -157,7 +157,7 @@ class App extends Base {
 
         let lastIndex = messageList.length - 1;
 
-        if (messageList.length > 0 && (messageList[lastIndex].type === type && messageList[lastIndex].original === message)) {
+        if (messageList.length > 0 && (messageList[lastIndex] && messageList[lastIndex].type === type && messageList[lastIndex].original === message)) {
             // duplicate check
             messageList[lastIndex].text = messageList[lastIndex].original + " (+" + messageList[lastIndex].counter++ + ")";
             messageList[lastIndex].show = true;
@@ -194,7 +194,7 @@ class App extends Base {
     }
 
     renderMessageClass(message) {
-        let ret = "alert alert-" + message.type + " alert-dismissible";
+        let ret = "alert alert-" + message.type + " alert-dismissible fade";
 
         if (message.show) {
             ret += " show";
@@ -215,10 +215,7 @@ class App extends Base {
                 {this.state.messageList.map((row, num) =>
                     <div className={this.renderMessageClass(row)} role="alert">
                         {row.text}
-                        <button type="button" className="close" aria-label="Close"
-                                onClick={this.removeGlobalMessage.bind(this, num)}>
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={this.removeGlobalMessage.bind(this, num)}></button>
                     </div>
                 )}
             </div>
