@@ -33,7 +33,7 @@ WORKDIR /go/src/devops-console
 COPY ./ /go/src/devops-console
 RUN go mod vendor
 
-RUN git status
+RUN git status && git diff --quiet
 RUN make test
 ARG TARGETOS TARGETARCH
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make build-backend
