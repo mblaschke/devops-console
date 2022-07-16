@@ -97,9 +97,9 @@ func (c *Server) initSession() {
 	contextLogger.Infof("session expiry: %v", c.config.App.Session.Expiry)
 
 	switch c.config.App.Session.Type {
-	case "internal":
+	case "internal", "memory":
 		c.initSessionInternal()
-	case "securecookie":
+	case "securecookie", "internal+securecookie", "memory+securecookie":
 		c.initSessionSecureCookie()
 	case "redis":
 		c.initSessionRedis()
