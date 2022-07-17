@@ -58,6 +58,13 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	s := c.startSession(ctx)
 	oauth := c.newServiceOauth(ctx)
 
+	if s.Get("oauth") == "" || s.Get("oauth") == nil {
+		c.destroySession(ctx)
+		ctx.ViewData("messageError", "OAuth pre check failed: invalid session")
+		c.templateLogin(ctx, true)
+		return
+	}
+
 	if err := ctx.URLParam("error"); err != "" {
 		message := err
 		if errorDesc := ctx.URLParam("error_description"); errorDesc != "" {

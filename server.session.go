@@ -57,18 +57,18 @@ func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieO
 }
 
 func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
-	c.session.Destroy(ctx)
+	sessions.Get(ctx).Destroy()
 	return c.startSession(ctx, cookieOptions...)
 }
 
 func (c *Server) renewSession(ctx iris.Context) {
 	if err := c.session.ShiftExpiration(ctx, c.applySessionSetting); err != nil {
-		c.session.Destroy(ctx)
+		sessions.Get(ctx).Destroy()
 	}
 }
 
 func (c *Server) destroySession(ctx iris.Context) {
-	c.session.Destroy(ctx)
+	sessions.Get(ctx).Destroy()
 }
 
 func (c *Server) applySessionSetting(ctx *context.Context, cookie *http.Cookie, op uint8) {
@@ -98,41 +98,46 @@ func (c *Server) initSession() {
 
 	switch c.config.App.Session.Type {
 	case "internal", "memory":
-		c.initSessionInternal()
+		config := c.createSessionConfig()
+		c.session = sessions.New(config)
 	case "securecookie", "internal+securecookie", "memory+securecookie":
-		c.initSessionSecureCookie()
+		config := c.createSessionConfigWithSecureCookie()
+		c.session = sessions.New(config)
 	case "redis":
-		c.initSessionRedis()
+		c.createRedisConnection()
+		config := c.createSessionConfig()
+		c.session = sessions.New(config)
+		c.session.UseDatabase(c.redisConnection)
 	case "redis+securecookie":
-		c.initSessionRedisSecureCookie()
+		c.createRedisConnection()
+		config := c.createSessionConfigWithSecureCookie()
+		c.session = sessions.New(config)
+		c.session.UseDatabase(c.redisConnection)
 	default:
 		panic("invalid session type defined")
 	}
+
+	c.app.Use(c.session.Handler())
 }
 
-func (c *Server) initSessionInternal() {
-	c.session = sessions.New(sessions.Config{
+func (c *Server) createSessionConfig() sessions.Config {
+	return sessions.Config{
 		Cookie:                      c.config.App.Session.CookieName,
 		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
-	})
+	}
 }
 
-func (c *Server) initSessionSecureCookie() {
+func (c *Server) createSessionConfigWithSecureCookie() sessions.Config {
 	secureCookie := securecookie.New(
 		[]byte(c.config.App.Session.SecureCookie.HashKey),
 		[]byte(c.config.App.Session.SecureCookie.BlockKey),
 	)
 
-	c.session = sessions.New(sessions.Config{
-		Cookie:                      c.config.App.Session.CookieName,
-		CookieSecureTLS:             c.config.App.Session.CookieSecure,
-		Encoding:                    secureCookie,
-		AllowReclaim:                true,
-		Expires:                     c.config.App.Session.Expiry,
-		DisableSubdomainPersistence: true,
-	})
+	config := c.createSessionConfig()
+	config.Encoding = secureCookie
+	return config
 }
 
 func (c *Server) createRedisConnection() {
@@ -144,7 +149,7 @@ func (c *Server) createRedisConnection() {
 	// try connect to redis server (with retry)
 	for i := 0; i < 25; i++ {
 		durationTime := math.Min(15, float64(i*2))
-		retryTime := time.Duration(time.Duration(durationTime) * time.Second)
+		retryTime := time.Duration(durationTime) * time.Second
 
 		c.redisConfig = &redis.Config{
 			Network:   "tcp",
@@ -178,36 +183,4 @@ func (c *Server) createRedisConnection() {
 			contextLogger.Error(err)
 		}
 	})
-}
-
-func (c *Server) initSessionRedis() {
-	c.createRedisConnection()
-
-	c.session = sessions.New(sessions.Config{
-		Cookie:                      c.config.App.Session.CookieName,
-		CookieSecureTLS:             c.config.App.Session.CookieSecure,
-		Expires:                     c.config.App.Session.Expiry,
-		DisableSubdomainPersistence: true,
-		AllowReclaim:                true,
-	})
-	c.session.UseDatabase(c.redisConnection)
-}
-
-func (c *Server) initSessionRedisSecureCookie() {
-	c.createRedisConnection()
-
-	secureCookie := securecookie.New(
-		[]byte(c.config.App.Session.SecureCookie.HashKey),
-		[]byte(c.config.App.Session.SecureCookie.BlockKey),
-	)
-
-	c.session = sessions.New(sessions.Config{
-		Cookie:                      c.config.App.Session.CookieName,
-		CookieSecureTLS:             c.config.App.Session.CookieSecure,
-		Encoding:                    secureCookie,
-		AllowReclaim:                true,
-		Expires:                     c.config.App.Session.Expiry,
-		DisableSubdomainPersistence: true,
-	})
-	c.session.UseDatabase(c.redisConnection)
 }
