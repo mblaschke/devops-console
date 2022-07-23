@@ -58,13 +58,9 @@ func (c *Server) heartbeat(ctx iris.Context) {
 	if err == nil && user != nil {
 		c.renewSession(ctx)
 		ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
-		if _, err = ctx.JSON("Ok"); err != nil {
-			c.logger.Errorf("error while sending response: %v", err)
-		}
+		c.responseJson(ctx, "Ok")
 	} else {
 		ctx.StatusCode(iris.StatusUnauthorized)
-		if _, err := ctx.JSON("Failed"); err != nil {
-			c.logger.Errorf("error while sending response: %v", err)
-		}
+		c.responseJson(ctx, "Failed")
 	}
 }

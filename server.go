@@ -185,7 +185,7 @@ func (c *Server) Run(addr string) {
 }
 
 func (c *Server) responseJson(ctx iris.Context, v interface{}) {
-	if _, err := ctx.JSON(v); err != nil {
+	if err := ctx.JSON(v); err != nil {
 		c.logger.Error(err)
 	}
 }
