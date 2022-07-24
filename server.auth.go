@@ -20,6 +20,8 @@ func (c *Server) templateLogin(ctx iris.Context, logout bool) {
 	if err := ctx.View("pages/login.jet"); err != nil {
 		c.logger.Error(err)
 	}
+	ctx.StopExecution()
+	panic(ctx)
 }
 
 func (c *Server) getServiceConnectionUser(ctx iris.Context) (user *models.User) {
@@ -77,7 +79,6 @@ func (c *Server) ensureServiceUser(ctx iris.Context, callback func(ctx iris.Cont
 }
 
 func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context, user *models.User)) {
-	c.startSession(ctx)
 	user, err := c.getUser(ctx)
 
 	if err != nil {
@@ -91,9 +92,17 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 }
 
 func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
-	s := c.startSession(ctx)
+	s := c.getSession(ctx)
+	if s == nil {
+		return nil, fmt.Errorf(`not logged in`)
+	}
+
 	userJson := s.GetString("user")
-	user, err = models.UserCreateFromJson(userJson, &c.config)
+	if len(userJson) >= 1 {
+		user, err = models.UserCreateFromJson(userJson, &c.config)
+	} else {
+		return nil, fmt.Errorf(`not logged in`)
+	}
 	return
 }
 

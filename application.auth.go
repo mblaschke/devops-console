@@ -21,8 +21,10 @@ type ApplicationAuth struct {
 
 func (c *Server) Login(ctx iris.Context) {
 	s := c.recreateSession(ctx, func(ctx *context.Context, cookie *http.Cookie, op uint8) {
-		// need lax mode for oauth redirect
-		cookie.SameSite = http.SameSiteLaxMode
+		if op == 1 {
+			// need lax mode for oauth redirect
+			cookie.SameSite = http.SameSiteLaxMode
+		}
 	})
 
 	randReader := rand.Reader
@@ -55,11 +57,10 @@ func (c *Server) LogoutForced(ctx iris.Context) {
 }
 
 func (c *Server) LoginViaOauth(ctx iris.Context) {
-	s := c.startSession(ctx)
+	s := c.getSession(ctx)
 	oauth := c.newServiceOauth(ctx)
 
 	if s.Get("oauth") == "" || s.Get("oauth") == nil {
-		c.destroySession(ctx)
 		ctx.ViewData("messageError", "OAuth pre check failed: invalid session")
 		c.templateLogin(ctx, true)
 		return

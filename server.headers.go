@@ -51,7 +51,7 @@ func (c *Server) csrfProtectionToken(ctx iris.Context) {
 		return
 	}
 
-	s := c.startSession(ctx)
+	s := c.getSession(ctx)
 
 	// get token
 	sessionToken := ""
@@ -87,7 +87,7 @@ func (c *Server) csrfProtectionTokenRegenerate(ctx iris.Context) string {
 		return ""
 	}
 
-	s := c.startSession(ctx)
+	s := c.getSession(ctx)
 
 	// set new token
 	token := randomString(64)

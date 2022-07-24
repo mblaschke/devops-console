@@ -16,7 +16,7 @@ func (c *Server) respondError(ctx iris.Context, err error) {
 
 func (c *Server) respondErrorWithPenalty(ctx iris.Context, err error) {
 	if opts.ErrorPunishmentThreshold >= 0 {
-		s := c.startSession(ctx)
+		s := c.getSession(ctx)
 
 		// ignore new sessions
 		errorCounter, errorCounterErr := s.GetInt64("__errorCounter")

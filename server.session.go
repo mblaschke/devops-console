@@ -19,6 +19,10 @@ const (
 	SessionVarNameUserAgent  = "__USERAGENT__"
 )
 
+func (c *Server) getSession(ctx iris.Context) *sessions.Session {
+	return c.startSession(ctx)
+}
+
 func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
 	cookieOptionList := []context.CookieOption{
 		func(ctx *context.Context, cookie *http.Cookie, op uint8) {
@@ -57,36 +61,39 @@ func (c *Server) startSession(ctx iris.Context, cookieOptions ...context.CookieO
 }
 
 func (c *Server) recreateSession(ctx iris.Context, cookieOptions ...context.CookieOption) *sessions.Session {
-	sessions.Get(ctx).Destroy()
+	c.session.Destroy(ctx)
 	return c.startSession(ctx, cookieOptions...)
 }
 
-func (c *Server) renewSession(ctx iris.Context) {
+func (c *Server) renewSession(ctx iris.Context) *sessions.Session {
 	if err := c.session.ShiftExpiration(ctx, c.applySessionSetting); err != nil {
 		sessions.Get(ctx).Destroy()
 	}
+	return c.getSession(ctx)
 }
 
 func (c *Server) destroySession(ctx iris.Context) {
-	sessions.Get(ctx).Destroy()
+	c.session.Destroy(ctx)
 }
 
 func (c *Server) applySessionSetting(ctx *context.Context, cookie *http.Cookie, op uint8) {
-	cookie.Secure = c.config.App.Session.CookieSecure
+	if op == 1 {
+		cookie.Secure = c.config.App.Session.CookieSecure
 
-	switch strings.ToLower(c.config.App.Session.CookieSameSite) {
-	case "default":
-		cookie.SameSite = http.SameSiteDefaultMode
-	case "lax":
-		cookie.SameSite = http.SameSiteLaxMode
-	case "strict":
-		cookie.SameSite = http.SameSiteStrictMode
-	case "none":
-		cookie.SameSite = http.SameSiteNoneMode
-	}
+		switch strings.ToLower(c.config.App.Session.CookieSameSite) {
+		case "default":
+			cookie.SameSite = http.SameSiteDefaultMode
+		case "lax":
+			cookie.SameSite = http.SameSiteLaxMode
+		case "strict":
+			cookie.SameSite = http.SameSiteStrictMode
+		case "none":
+			cookie.SameSite = http.SameSiteNoneMode
+		}
 
-	if c.config.App.Session.CookieDomain != "" {
-		cookie.Domain = c.config.App.Session.CookieDomain
+		if c.config.App.Session.CookieDomain != "" {
+			cookie.Domain = c.config.App.Session.CookieDomain
+		}
 	}
 }
 
@@ -117,7 +124,7 @@ func (c *Server) initSession() {
 		panic("invalid session type defined")
 	}
 
-	c.app.Use(c.session.Handler())
+	// c.app.Use(c.session.Handler())
 }
 
 func (c *Server) createSessionConfig() sessions.Config {
