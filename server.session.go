@@ -123,8 +123,6 @@ func (c *Server) initSession() {
 	default:
 		panic("invalid session type defined")
 	}
-
-	// c.app.Use(c.session.Handler())
 }
 
 func (c *Server) createSessionConfig() sessions.Config {
@@ -133,6 +131,7 @@ func (c *Server) createSessionConfig() sessions.Config {
 		CookieSecureTLS:             c.config.App.Session.CookieSecure,
 		Expires:                     c.config.App.Session.Expiry,
 		DisableSubdomainPersistence: true,
+		AllowReclaim:                true,
 	}
 }
 
