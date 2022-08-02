@@ -34,7 +34,7 @@ build-frontend:
 
 .PHONY: build-backend
 build-backend:
-	GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -a -ldflags '$(LDFLAGS)' -o $(PROJECT_NAME) .
+	GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -ldflags '$(LDFLAGS)' -o $(PROJECT_NAME) .
 
 .PHONY: vendor
 vendor:
