@@ -24,7 +24,7 @@ RUN set -x \
 #############################################
 # BUILD GO APP
 #############################################
-FROM --platform=$BUILDPLATFORM golang:1.18-alpine as backend
+FROM --platform=$BUILDPLATFORM golang:1.19-alpine as backend
 
 RUN apk upgrade --no-cache --force
 RUN apk add --update build-base make git
