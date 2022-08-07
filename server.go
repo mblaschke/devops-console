@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -73,7 +72,7 @@ func (c *Server) setupConfig(path string) {
 	contextLogger := c.logger.With(zap.String("config", path))
 	contextLogger.Infof("reading configuration from file %v", path)
 
-	if data, err := ioutil.ReadFile(filepath.Clean(path)); err == nil {
+	if data, err := os.ReadFile(filepath.Clean(path)); err == nil {
 		config = data
 	} else {
 		panic(err)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -86,7 +85,7 @@ func IsK8sConfigFile(path string) bool {
 }
 
 func KubeParseConfig(path string) runtime.Object {
-	data, err := ioutil.ReadFile(filepath.Clean(path))
+	data, err := os.ReadFile(filepath.Clean(path))
 	if err != nil {
 		panic(err)
 	}
