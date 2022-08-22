@@ -58,5 +58,5 @@ ENV LOG_JSON=1
 WORKDIR /app
 COPY --from=test /app .
 USER 1000:1000
-EXPOSE 9000
+EXPOSE 9000 9001
 ENTRYPOINT ["/app/devops-console"]
