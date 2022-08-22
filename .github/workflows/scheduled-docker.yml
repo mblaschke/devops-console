@@ -28,7 +28,7 @@ jobs:
       matrix:
         Dockerfile: [Dockerfile]
         suffix: [""]
-        latest: ["false"]
+        latest: ["auto"]
         include: []
     runs-on: ubuntu-latest
     steps:
