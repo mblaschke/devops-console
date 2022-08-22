@@ -32,7 +32,7 @@ jobs:
       matrix:
         Dockerfile: [Dockerfile]
         suffix: [""]
-        latest: ["true"]
+        latest: ["auto"]
         include: []
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: ${{ github.repository }},quay.io/${{ github.repository }}
           labels: |
