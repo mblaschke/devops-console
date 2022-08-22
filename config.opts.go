@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"time"
 )
 
 type (
@@ -28,8 +29,16 @@ type (
 		}
 
 		// general options
-		ServerBind  string `long:"bind"     env:"SERVER_BIND"   description:"Server address"     default:":9000"`
-		MetricsBind string `long:"metrics-bind" env:"METRICS_BIND" description:"Server address" default:":9001"`
+		Server struct {
+			Bind string `long:"server.bind"     env:"SERVER_BIND"   description:"Server address"     default:":9000"`
+		}
+
+		MetricsServer struct {
+			// general options
+			Bind         string        `long:"metrics.bind"              env:"SERVER_BIND"           description:"Metrics Server address"        default:":9001"`
+			ReadTimeout  time.Duration `long:"metrics.timeout.read"      env:"SERVER_TIMEOUT_READ"   description:"Metrics Server read timeout"   default:"5s"`
+			WriteTimeout time.Duration `long:"metrics.timeout.write"     env:"SERVER_TIMEOUT_WRITE"  description:"Metrics Server write timeout"  default:"10s"`
+		}
 
 		Debug                    bool  `long:"debug" description:"Enable debug mode"`
 		DisableCsrfProtection    bool  `long:"disable-csrf" env:"DISABLE_CSRF_PROTECTION" description:"Disable CSFR protection"`

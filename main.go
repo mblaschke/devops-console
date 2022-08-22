@@ -42,13 +42,13 @@ func main() {
 		panic(err)
 	}
 	log = logger.Sugar()
-	defer log.Sync() //nolint flushes buffer, if any
+	defer log.Sync() // nolint flushes buffer, if any
 
 	startPrometheus()
 
 	devopsConsole := NewServer(opts.Config.Path)
 	startupDuration = time.Since(startupTime)
-	devopsConsole.Run(opts.ServerBind)
+	devopsConsole.Run(opts.Server.Bind)
 }
 
 // init argparser and parse/validate arguments
@@ -101,9 +101,16 @@ func startPrometheus() {
 	prometheus.MustRegister(PrometheusActions)
 
 	go func() {
-		http.Handle("/metrics", promhttp.Handler())
-		if err := http.ListenAndServe(opts.MetricsBind, nil); err != nil {
-			log.Panic(err)
+		mux := http.NewServeMux()
+
+		mux.Handle("/metrics", promhttp.Handler())
+
+		srv := &http.Server{
+			Addr:         opts.MetricsServer.Bind,
+			Handler:      mux,
+			ReadTimeout:  opts.MetricsServer.ReadTimeout,
+			WriteTimeout: opts.MetricsServer.WriteTimeout,
 		}
+		log.Fatal(srv.ListenAndServe())
 	}()
 }
