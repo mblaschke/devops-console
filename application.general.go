@@ -8,8 +8,8 @@ import (
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"devops-console/models"
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 type ApplicationGeneral struct {

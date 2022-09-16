@@ -17,7 +17,7 @@ import (
 	"gopkg.in/yaml.v2"
 	networkingV1 "k8s.io/api/networking/v1"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 type Server struct {

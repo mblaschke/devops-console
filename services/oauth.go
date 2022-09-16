@@ -9,7 +9,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 var (

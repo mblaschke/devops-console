@@ -8,7 +8,7 @@ import (
 
 	iris "github.com/kataras/iris/v12"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 func (c *Server) templateLogin(ctx iris.Context, logout bool) {

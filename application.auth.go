@@ -12,7 +12,7 @@ import (
 	"github.com/kataras/iris/v12/context"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"devops-console/services"
+	"github.com/mblaschke/devops-console/services"
 )
 
 type ApplicationAuth struct {

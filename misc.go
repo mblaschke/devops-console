@@ -9,7 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 func createKubernetesObjectList() models.KubernetesObjectList {

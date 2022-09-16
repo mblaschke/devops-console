@@ -11,9 +11,9 @@ import (
 	alertmanagerSilence "github.com/prometheus/alertmanager/api/v2/client/silence"
 	alertmanagerModels "github.com/prometheus/alertmanager/api/v2/models"
 
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/formdata"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 type ApplicationAlertmanager struct {

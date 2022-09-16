@@ -5,7 +5,7 @@ import (
 
 	iris "github.com/kataras/iris/v12"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 type ApplicationIndex struct {

@@ -13,10 +13,10 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
-	"devops-console/services"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/formdata"
+	"github.com/mblaschke/devops-console/models/response"
+	"github.com/mblaschke/devops-console/services"
 )
 
 type ApplicationKubernetes struct {

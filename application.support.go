@@ -7,9 +7,9 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	iris "github.com/kataras/iris/v12"
 
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/formdata"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 const (

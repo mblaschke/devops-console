@@ -3,8 +3,8 @@ package main
 import (
 	iris "github.com/kataras/iris/v12"
 
-	"devops-console/models"
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 type ApplicationConfig struct {

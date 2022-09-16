@@ -7,7 +7,7 @@ import (
 
 	iris "github.com/kataras/iris/v12"
 
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 func (c *Server) respondError(ctx iris.Context, err error) {

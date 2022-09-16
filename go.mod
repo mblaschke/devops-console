@@ -1,4 +1,4 @@
-module devops-console
+module github.com/mblaschke/devops-console
 
 go 1.19
 

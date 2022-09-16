@@ -21,7 +21,7 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"devops-console/models"
+	"github.com/mblaschke/devops-console/models"
 )
 
 type Kubernetes struct {

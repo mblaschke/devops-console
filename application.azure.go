@@ -16,10 +16,10 @@ import (
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"devops-console/helper"
-	"devops-console/models"
-	"devops-console/models/formdata"
-	"devops-console/models/response"
+	"github.com/mblaschke/devops-console/helper"
+	"github.com/mblaschke/devops-console/models"
+	"github.com/mblaschke/devops-console/models/formdata"
+	"github.com/mblaschke/devops-console/models/response"
 )
 
 type (
