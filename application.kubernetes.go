@@ -510,7 +510,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 
 	// update
 	if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
-		c.respondError(ctx, fmt.Errorf("update of namespace \"%s\" failed: %v", namespace.Name, err))
+		c.respondError(ctx, fmt.Errorf("update of namespace \"%s\" failed: %w", namespace.Name, err))
 		return
 	}
 

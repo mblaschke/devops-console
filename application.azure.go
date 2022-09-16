@@ -70,7 +70,7 @@ func (c *ApplicationAzure) translateRoleDefinitionNameToId(ctx context.Context, 
 		filter := fmt.Sprintf("roleName eq '%s'", strings.Replace(name, "'", "\\'", -1))
 		result, err := roleDefinitionsClient.List(ctx, fmt.Sprintf("/subscriptions/%s", subscriptionId), filter)
 		if err != nil {
-			return nil, fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+			return nil, fmt.Errorf("error fetching Azure RoleDefinition: %w", err)
 		}
 
 		roleDefinitions := result.Values()
@@ -101,7 +101,7 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 			roleAssignment.RoleDefinitionName,
 		)
 		if err != nil {
-			return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+			return fmt.Errorf("error fetching Azure RoleDefinition: %w", err)
 		}
 		list[i].RoleDefinitionId = *roleDefinitionId
 	}
@@ -111,14 +111,14 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 	roleAssignmentsClient.Authorizer = *authorizer
 	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "", "")
 	if err != nil {
-		return fmt.Errorf("error fetching Azure RoleAssignments: %v", err)
+		return fmt.Errorf("error fetching Azure RoleAssignments: %w", err)
 	}
 
 	for _, scopeRoleAssignment := range *result.Response().Value {
 		for _, roleAssignment := range list {
 			if *scopeRoleAssignment.PrincipalID == roleAssignment.PrincipalId && *scopeRoleAssignment.RoleDefinitionID == roleAssignment.RoleDefinitionId {
 				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID, ""); err != nil {
-					return fmt.Errorf("unable to delete Azure RoleAssignment: %v", err)
+					return fmt.Errorf("unable to delete Azure RoleAssignment: %w", err)
 				}
 			}
 		}
@@ -143,7 +143,7 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 			roleAssignment.RoleDefinitionName,
 		)
 		if err != nil {
-			return fmt.Errorf("error fetching Azure RoleDefinition: %v", err)
+			return fmt.Errorf("error fetching Azure RoleDefinition: %w", err)
 		}
 		list[i].RoleDefinitionId = *roleDefinitionId
 	}
@@ -163,11 +163,11 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 		// create uuid
 		roleAssignmentId, err := uuid.GenerateUUID()
 		if err != nil {
-			return fmt.Errorf("unable to build UUID: %v", err)
+			return fmt.Errorf("unable to build UUID: %w", err)
 		}
 		_, err = roleAssignmentsClient.Create(ctx, scopeId, roleAssignmentId, properties)
 		if err != nil {
-			return fmt.Errorf("unable to create Azure RoleAssignment: %v", err)
+			return fmt.Errorf("unable to create Azure RoleAssignment: %w", err)
 		}
 	}
 
@@ -199,7 +199,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	// membership check
 	if !user.IsMemberOf(formData.Team) {
-		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", err))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", formData.Team))
 		return
 	}
 
@@ -252,7 +252,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	// azure authorizer
 	authorizer, err := c.azureAuthorizer()
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %v", err))
+		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %w", err))
 		return
 	}
 
@@ -285,13 +285,13 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	group, err = groupsClient.CreateOrUpdate(azureContext, formData.Name, resourceGroup)
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to create Azure ResourceGroup: %v", err))
+		c.respondError(ctx, fmt.Errorf("unable to create Azure ResourceGroup: %w", err))
 		return
 	}
 
 	err = c.createRoleAssignmentOnScope(subscriptionId, *group.ID, roleAssignmentList)
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
+		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %w", err))
 		return
 	}
 
@@ -366,14 +366,14 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	// azure authorizer
 	authorizer, err := c.azureAuthorizer()
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %v", err))
+		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %w", err))
 		return
 	}
 
 	// parse and validate resourceid
 	resourceIdInfo, err := helper.ParseResourceID(formData.ResourceId)
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %v", err))
+		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %w", err))
 		return
 	}
 
@@ -397,7 +397,7 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	// check for existing resourcegroup
 	group, err = groupsClient.Get(azureContext, resourceGroupName)
 	if err != nil {
-		c.respondErrorWithPenalty(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %v", err))
+		c.respondErrorWithPenalty(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %w", err))
 		return
 	}
 
@@ -434,13 +434,13 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	case "create":
 		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
 		if err != nil {
-			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %v", err))
+			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %w", err))
 			return
 		}
 
 		err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
 		if err != nil {
-			c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %v", err))
+			c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %w", err))
 			return
 		}
 		PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "createRoleAssignment"}).Inc()
@@ -451,7 +451,7 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	case "delete":
 		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
 		if err != nil {
-			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %v", err))
+			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %w", err))
 			return
 		}
 		PrometheusActions.With(prometheus.Labels{"scope": "azure", "type": "deleteRoleAssignment"}).Inc()

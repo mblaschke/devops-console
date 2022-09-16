@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"k8s.io/api/core/v1"
+	coreV1 "k8s.io/api/core/v1"
 	rbacV1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -106,13 +106,13 @@ func (k *Kubernetes) findGVR(gvk schema.GroupVersionKind) (*meta.RESTMapping, er
 }
 
 // Returns list of (filtered) namespaces
-func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error) {
+func (k *Kubernetes) NamespaceList() (nsList map[string]coreV1.Namespace, err error) {
 	ctx := context.Background()
 
 	result, kubeErr := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 
 	if kubeErr == nil {
-		nsList = make(map[string]v1.Namespace, len(result.Items))
+		nsList = make(map[string]coreV1.Namespace, len(result.Items))
 		for _, ns := range result.Items {
 			if err := k.namespaceValidate(ns.Name); err == nil {
 				nsList[ns.Name] = ns
@@ -127,12 +127,12 @@ func (k *Kubernetes) NamespaceList() (nsList map[string]v1.Namespace, err error)
 
 // Returns count of namespaces
 func (k *Kubernetes) NamespaceCount(regexp *regexp.Regexp) (count int, err error) {
-	var nsList map[string]v1.Namespace
+	var nsList map[string]coreV1.Namespace
 	nsList, err = k.NamespaceList()
 
 	if err == nil {
 		if regexp != nil {
-			nsListTemp := make(map[string]v1.Namespace, len(nsList))
+			nsListTemp := make(map[string]coreV1.Namespace, len(nsList))
 			for key, val := range nsList {
 				if regexp.MatchString(key) {
 					nsListTemp[key] = val
@@ -148,13 +148,13 @@ func (k *Kubernetes) NamespaceCount(regexp *regexp.Regexp) (count int, err error
 }
 
 // Returns list of nodes
-func (k *Kubernetes) Nodes() (*v1.NodeList, error) {
+func (k *Kubernetes) Nodes() (*coreV1.NodeList, error) {
 	ctx := context.Background()
 	return k.Client().CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 }
 
 // Returns one namespace
-func (k *Kubernetes) NamespaceGet(namespace string) (*v1.Namespace, error) {
+func (k *Kubernetes) NamespaceGet(namespace string) (*coreV1.Namespace, error) {
 	ctx := context.Background()
 	if err := k.namespaceValidate(namespace); err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func (k *Kubernetes) NamespaceGet(namespace string) (*v1.Namespace, error) {
 }
 
 // Create one namespace
-func (k *Kubernetes) NamespaceCreate(namespace v1.Namespace) (*v1.Namespace, error) {
+func (k *Kubernetes) NamespaceCreate(namespace coreV1.Namespace) (*coreV1.Namespace, error) {
 	ctx := context.Background()
 	if err := k.namespaceValidate(namespace.Name); err != nil {
 		return nil, err
@@ -176,7 +176,7 @@ func (k *Kubernetes) NamespaceCreate(namespace v1.Namespace) (*v1.Namespace, err
 }
 
 // Updates namespace
-func (k *Kubernetes) NamespaceUpdate(namespace *v1.Namespace) (*v1.Namespace, error) {
+func (k *Kubernetes) NamespaceUpdate(namespace *coreV1.Namespace) (*coreV1.Namespace, error) {
 	ctx := context.Background()
 	if err := k.namespaceValidate(namespace.Name); err != nil {
 		return nil, err
