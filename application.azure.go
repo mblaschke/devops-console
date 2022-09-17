@@ -401,6 +401,9 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 		return
 	}
 
+	ownerList := []string{}
+
+	// build owner list (from owner tag)
 	resourceGroupTags := to.StringMap(group.Tags)
 	if owner, exists := resourceGroupTags["owner"]; exists {
 		owner = strings.ToLower(strings.TrimSpace(owner))
@@ -409,13 +412,34 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 			return
 		}
 
-		// membership check
-		if !user.IsMemberOf(owner) {
-			c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", owner))
-			return
-		}
+		ownerList = append(ownerList, owner)
 	} else {
 		c.respondError(ctx, fmt.Errorf("no owner tag found in Azure ResourceGroup"))
+		return
+	}
+
+	// build owner list (from jitaccess tag)
+	if val, exists := resourceGroupTags["jitaccess"]; exists {
+		valList := strings.Split(val, ",")
+		for _, owner := range valList {
+			owner := strings.TrimSpace(owner)
+			if owner == "" {
+				continue
+			}
+			ownerList = append(ownerList, owner)
+		}
+	}
+
+	scopeAccess := false
+	for _, owner := range ownerList {
+		// membership check
+		if user.IsMemberOf(owner) {
+			scopeAccess = true
+		}
+	}
+
+	if !scopeAccess {
+		c.respondError(ctx, fmt.Errorf("access to Azure ResourceGroup denied (owners: %v)", strings.Join(ownerList, ", ")))
 		return
 	}
 
