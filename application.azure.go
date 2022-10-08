@@ -7,16 +7,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/authorization/mgmt/2020-04-01-preview/authorization" //nolint:staticcheck
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"                         //nolint:staticcheck
+	armauthorization "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2"
+	armresources "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+	//nolint:staticcheck
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
+	logrus "github.com/sirupsen/logrus"
+	"github.com/webdevops/go-common/azuresdk/armclient"
+	"github.com/webdevops/go-common/utils/to"
 
-	"github.com/mblaschke/devops-console/helper"
 	"github.com/mblaschke/devops-console/models"
 	"github.com/mblaschke/devops-console/models/formdata"
 	"github.com/mblaschke/devops-console/models/response"
@@ -25,6 +26,8 @@ import (
 type (
 	ApplicationAzure struct {
 		*Server
+
+		armClient *armclient.ArmClient
 
 		authorizer *autorest.Authorizer
 
@@ -39,16 +42,18 @@ type (
 	}
 )
 
-func (c *ApplicationAzure) azureAuthorizer() (*autorest.Authorizer, error) {
-	if c.authorizer == nil {
-		authorizer, err := auth.NewAuthorizerFromEnvironment()
-		if err != nil {
-			return nil, err
-		}
-		c.authorizer = &authorizer
+func NewApplicationAzure(c *Server) *ApplicationAzure {
+	app := ApplicationAzure{Server: c}
+
+	armClient, err := armclient.NewArmClientWithCloudName(opts.Azure.Environment, logrus.StandardLogger())
+	if err != nil {
+		log.Panic(err.Error())
 	}
 
-	return c.authorizer, nil
+	armClient.SetUserAgent(UserAgent + gitTag)
+
+	app.armClient = armClient
+	return &app
 }
 
 func (c *ApplicationAzure) translateRoleDefinitionNameToId(ctx context.Context, subscriptionId, name string) (*string, error) {
@@ -56,39 +61,49 @@ func (c *ApplicationAzure) translateRoleDefinitionNameToId(ctx context.Context, 
 		c.roleDefinitionMap = map[string]string{}
 	}
 
-	authorizer, err := c.azureAuthorizer()
+	client, err := armauthorization.NewRoleDefinitionsClient(c.armClient.GetCred(), c.armClient.NewArmClientOptions())
 	if err != nil {
 		return nil, err
 	}
 
-	roleDefinitionsClient := authorization.NewRoleDefinitionsClient(subscriptionId)
-	roleDefinitionsClient.Authorizer = *authorizer
+	cacheKey := fmt.Sprintf("%v:%v", subscriptionId, strings.ToLower(name))
 
-	cacheKey := fmt.Sprintf("%v:%v", subscriptionId, name)
 	if _, exists := c.roleDefinitionMap[cacheKey]; !exists {
-		// get role definition via API
-		filter := fmt.Sprintf("roleName eq '%s'", strings.Replace(name, "'", "\\'", -1))
-		result, err := roleDefinitionsClient.List(ctx, fmt.Sprintf("/subscriptions/%s", subscriptionId), filter)
-		if err != nil {
-			return nil, fmt.Errorf("error fetching Azure RoleDefinition: %w", err)
+		// update roledefintionlist
+		scope := fmt.Sprintf("/subscriptions/%v", subscriptionId)
+		pager := client.NewListPager(scope, nil)
+		for pager.More() {
+			result, err := pager.NextPage(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, roleDefinition := range result.Value {
+				key := fmt.Sprintf("%v:%v", subscriptionId, to.StringLower(roleDefinition.Properties.RoleName))
+
+				c.roleDefinitionMap[key] = *roleDefinition.ID
+			}
 		}
 
-		roleDefinitions := result.Values()
-		if len(roleDefinitions) != 1 {
-			return nil, fmt.Errorf("could not find Azure RoleDefinition: %v", name)
-		}
-
-		c.roleDefinitionMap[cacheKey] = *roleDefinitions[0].ID
 	}
 
-	roleDefinitionId := c.roleDefinitionMap[cacheKey]
-	return &roleDefinitionId, nil
+	if roleDefinitionId, exists := c.roleDefinitionMap[cacheKey]; exists {
+		return &roleDefinitionId, nil
+	} else {
+		return nil, fmt.Errorf(`unable to find RoleDefintion "%v" for subscription %v`, name, subscriptionId)
+	}
+
 }
 
-func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
+func (c *ApplicationAzure) removeRoleAssignmentOnScope(scopeId string, list []azureRoleAssignment) error {
 	ctx := context.Background()
 
-	authorizer, err := c.azureAuthorizer()
+	scopeInfo, err := armclient.ParseResourceId(scopeId)
+	if err != nil {
+		return err
+	}
+
+	client, err := armauthorization.NewRoleAssignmentsClient(scopeInfo.Subscription, c.armClient.GetCred(), c.armClient.NewArmClientOptions())
 	if err != nil {
 		return err
 	}
@@ -97,7 +112,7 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 	for i, roleAssignment := range list {
 		roleDefinitionId, err := c.translateRoleDefinitionNameToId(
 			ctx,
-			subscriptionId,
+			scopeInfo.Subscription,
 			roleAssignment.RoleDefinitionName,
 		)
 		if err != nil {
@@ -106,19 +121,20 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 		list[i].RoleDefinitionId = *roleDefinitionId
 	}
 
-	// delete RoleAssignments on scope
-	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
-	roleAssignmentsClient.Authorizer = *authorizer
-	result, err := roleAssignmentsClient.ListForScopeComplete(ctx, scopeId, "", "")
-	if err != nil {
-		return fmt.Errorf("error fetching Azure RoleAssignments: %w", err)
-	}
+	pager := client.NewListForScopePager(scopeId, nil)
+	for pager.More() {
+		result, err := pager.NextPage(ctx)
+		if err != nil {
+			return err
+		}
 
-	for _, scopeRoleAssignment := range *result.Response().Value {
-		for _, roleAssignment := range list {
-			if *scopeRoleAssignment.PrincipalID == roleAssignment.PrincipalId && *scopeRoleAssignment.RoleDefinitionID == roleAssignment.RoleDefinitionId {
-				if _, err := roleAssignmentsClient.DeleteByID(ctx, *scopeRoleAssignment.ID, ""); err != nil {
-					return fmt.Errorf("unable to delete Azure RoleAssignment: %w", err)
+		for _, existingRoleAssignment := range result.Value {
+			for _, roleAssignment := range list {
+				if *existingRoleAssignment.Properties.PrincipalID == roleAssignment.PrincipalId && *existingRoleAssignment.Properties.RoleDefinitionID == roleAssignment.RoleDefinitionId {
+					_, err := client.DeleteByID(ctx, *existingRoleAssignment.ID, nil)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -127,21 +143,22 @@ func (c *ApplicationAzure) removeRoleAssignmentOnScope(subscriptionId string, sc
 	return nil
 }
 
-func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, scopeId string, list []azureRoleAssignment) error {
+func (c *ApplicationAzure) createRoleAssignmentOnScope(scopeId string, list []azureRoleAssignment) error {
 	ctx := context.Background()
 
-	authorizer, err := c.azureAuthorizer()
+	scopeInfo, err := armclient.ParseResourceId(scopeId)
+	if err != nil {
+		return err
+	}
+
+	client, err := armauthorization.NewRoleAssignmentsClient(scopeInfo.Subscription, c.armClient.GetCred(), c.armClient.NewArmClientOptions())
 	if err != nil {
 		return err
 	}
 
 	// translate RoleDefinition Id
 	for i, roleAssignment := range list {
-		roleDefinitionId, err := c.translateRoleDefinitionNameToId(
-			ctx,
-			subscriptionId,
-			roleAssignment.RoleDefinitionName,
-		)
+		roleDefinitionId, err := c.translateRoleDefinitionNameToId(ctx, scopeInfo.Subscription, roleAssignment.RoleDefinitionName)
 		if err != nil {
 			return fmt.Errorf("error fetching Azure RoleDefinition: %w", err)
 		}
@@ -149,23 +166,22 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 	}
 
 	// create RoleAssignments on scope
-	roleAssignmentsClient := authorization.NewRoleAssignmentsClient(subscriptionId)
-	roleAssignmentsClient.Authorizer = *authorizer
 	for _, roleAssignment := range list {
-		properties := authorization.RoleAssignmentCreateParameters{
-			RoleAssignmentProperties: &authorization.RoleAssignmentProperties{
+		// create uuid
+		roleAssignmentId, err := uuid.GenerateUUID()
+		if err != nil {
+			return fmt.Errorf("unable to build UUID: %w", err)
+		}
+
+		roleAssignmentProperties := armauthorization.RoleAssignmentCreateParameters{
+			Properties: &armauthorization.RoleAssignmentProperties{
 				RoleDefinitionID: &roleAssignment.RoleDefinitionId,
 				PrincipalID:      &roleAssignment.PrincipalId,
 				Description:      to.StringPtr(roleAssignment.Description),
 			},
 		}
 
-		// create uuid
-		roleAssignmentId, err := uuid.GenerateUUID()
-		if err != nil {
-			return fmt.Errorf("unable to build UUID: %w", err)
-		}
-		_, err = roleAssignmentsClient.Create(ctx, scopeId, roleAssignmentId, properties)
+		_, err = client.Create(ctx, scopeId, roleAssignmentId, roleAssignmentProperties, nil)
 		if err != nil {
 			return fmt.Errorf("unable to create Azure RoleAssignment: %w", err)
 		}
@@ -175,8 +191,6 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(subscriptionId string, sc
 }
 
 func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models.User) {
-	azureContext := context.Background()
-	var group resources.Group
 	validationMessages := []string{}
 
 	formData := formdata.AzureResourceGroup{}
@@ -250,22 +264,18 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	}
 
 	// azure authorizer
-	authorizer, err := c.azureAuthorizer()
+	client, err := armresources.NewResourceGroupsClient(subscriptionId, c.armClient.GetCred(), c.armClient.NewArmClientOptions())
 	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %w", err))
+		c.respondError(ctx, fmt.Errorf("unable to create Azure Client: %w", err))
 		return
 	}
 
-	// setup clients
-	groupsClient := resources.NewGroupsClient(subscriptionId)
-	groupsClient.Authorizer = *authorizer
-
 	// check for existing resourcegroup
-	group, _ = groupsClient.Get(azureContext, formData.Name)
-	if group.ID != nil {
+	existingResourceGroup, _ := client.Get(ctx, formData.Name, nil)
+	if existingResourceGroup.ID != nil {
 		tagList := []string{}
 
-		for tagName, tagValue := range group.Tags {
+		for tagName, tagValue := range existingResourceGroup.Tags {
 			tagList = append(tagList, fmt.Sprintf("%v=%v", tagName, to.String(tagValue)))
 		}
 
@@ -278,18 +288,18 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		return
 	}
 
-	resourceGroup := resources.Group{
+	resourceGroup := armresources.ResourceGroup{
 		Location: to.StringPtr(formData.Location),
 		Tags:     tagList,
 	}
 
-	group, err = groupsClient.CreateOrUpdate(azureContext, formData.Name, resourceGroup)
+	createdResourceGroup, err := client.CreateOrUpdate(ctx, formData.Name, resourceGroup, nil)
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to create Azure ResourceGroup: %w", err))
 		return
 	}
 
-	err = c.createRoleAssignmentOnScope(subscriptionId, *group.ID, roleAssignmentList)
+	err = c.createRoleAssignmentOnScope(*createdResourceGroup.ID, roleAssignmentList)
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %w", err))
 		return
@@ -302,7 +312,7 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 		ResoruceId string `json:"resourceId"`
 	}{
 		Message:    fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name),
-		ResoruceId: *group.ID,
+		ResoruceId: *createdResourceGroup.ID,
 	}
 
 	c.notificationMessage(ctx, fmt.Sprintf("Azure ResourceGroup \"%s\" created", formData.Name))
@@ -320,9 +330,6 @@ func (c *ApplicationAzure) ApiRoleAssignmentDelete(ctx iris.Context, user *model
 }
 
 func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *models.User, task string) {
-	azureContext := context.Background()
-	var group resources.Group
-
 	formData := formdata.AzureRoleAssignment{}
 	err := ctx.ReadJSON(&formData)
 	if err != nil {
@@ -363,15 +370,8 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 		return
 	}
 
-	// azure authorizer
-	authorizer, err := c.azureAuthorizer()
-	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to setup Azure Authorizer: %w", err))
-		return
-	}
-
 	// parse and validate resourceid
-	resourceIdInfo, err := helper.ParseResourceID(formData.ResourceId)
+	resourceIdInfo, err := armclient.ParseResourceId(formData.ResourceId)
 	if err != nil {
 		c.respondError(ctx, fmt.Errorf("unable to parse Azure ResourceID: %w", err))
 		return
@@ -391,11 +391,14 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	resourceGroupName := resourceIdInfo.ResourceGroup
 
 	// setup clients
-	groupsClient := resources.NewGroupsClient(subscriptionId)
-	groupsClient.Authorizer = *authorizer
+	client, err := armresources.NewResourceGroupsClient(subscriptionId, c.armClient.GetCred(), c.armClient.NewArmClientOptions())
+	if err != nil {
+		c.respondError(ctx, fmt.Errorf("unable to create Azure Client: %w", err))
+		return
+	}
 
 	// check for existing resourcegroup
-	group, err = groupsClient.Get(azureContext, resourceGroupName)
+	group, err := client.Get(ctx, resourceGroupName, nil)
 	if err != nil {
 		c.respondErrorWithPenalty(ctx, fmt.Errorf("unable to fetch Azure ResourceGroup: %w", err))
 		return
@@ -456,13 +459,13 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 
 	switch task {
 	case "create":
-		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		err = c.removeRoleAssignmentOnScope(formData.ResourceId, roleAssignmentList)
 		if err != nil {
 			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %w", err))
 			return
 		}
 
-		err = c.createRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		err = c.createRoleAssignmentOnScope(formData.ResourceId, roleAssignmentList)
 		if err != nil {
 			c.respondError(ctx, fmt.Errorf("unable to create RoleAssignments: %w", err))
 			return
@@ -473,7 +476,7 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 		c.notificationMessage(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason))
 		c.auditLog(ctx, fmt.Sprintf("Azure RoleAssignment for \"%s\" with role \"%s\" by \"%s\" created: %v", formData.ResourceId, formData.RoleDefinition, user.Username, formData.Reason), 1)
 	case "delete":
-		err = c.removeRoleAssignmentOnScope(subscriptionId, formData.ResourceId, roleAssignmentList)
+		err = c.removeRoleAssignmentOnScope(formData.ResourceId, roleAssignmentList)
 		if err != nil {
 			c.respondError(ctx, fmt.Errorf("unable to remove RoleAssignments: %w", err))
 			return

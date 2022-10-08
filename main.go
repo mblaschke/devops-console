@@ -14,6 +14,10 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+const (
+	UserAgent = "devops-console/"
+)
+
 var (
 	argparser *flags.Parser
 	opts      ConfigOpts

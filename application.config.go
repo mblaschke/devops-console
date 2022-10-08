@@ -11,6 +11,11 @@ type ApplicationConfig struct {
 	*Server
 }
 
+func NewApplicationConfig(c *Server) *ApplicationConfig {
+	app := ApplicationConfig{Server: c}
+	return &app
+}
+
 func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.User) {
 	ret := response.ResponseConfig{}
 	ret.User.Username = user.Username

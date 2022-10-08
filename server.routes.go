@@ -61,16 +61,16 @@ func (c *Server) initRoutes() {
 
 	contextLogger.Infof("init app routes")
 
-	applicationKubernetes := ApplicationKubernetes{Server: c}
-	applicationAlertmanager := ApplicationAlertmanager{Server: c}
-	applicationAzure := ApplicationAzure{Server: c}
-	applicationSettings := ApplicationSettings{Server: c}
-	applicationGeneral := ApplicationGeneral{Server: c}
-	applicationConfig := ApplicationConfig{Server: c}
-	applicationAuth := ApplicationAuth{Server: c}
-	applicationSystem := ApplicationSystem{Server: c}
-	applicationIndex := ApplicationIndex{Server: c}
-	applicationSupport := ApplicationSupport{Server: c}
+	applicationKubernetes := NewApplicationKubernetes(c)
+	applicationAlertmanager := NewApplicationAlertmanager(c)
+	applicationAzure := NewApplicationAzure(c)
+	applicationSettings := NewApplicationSettings(c)
+	applicationGeneral := NewApplicationGeneral(c)
+	applicationConfig := NewApplicationConfig(c)
+	applicationAuth := NewApplicationAuth(c)
+	applicationSystem := NewApplicationSystem(c)
+	applicationIndex := NewApplicationIndex(c)
+	applicationSupport := NewApplicationSupport(c)
 
 	publicParty := c.app.Party("/", requestLogger, c.defaultHeaders)
 	{

@@ -8,6 +8,11 @@ type ApplicationSystem struct {
 	*Server
 }
 
+func NewApplicationSystem(c *Server) *ApplicationSystem {
+	app := ApplicationSystem{Server: c}
+	return &app
+}
+
 func (c *Server) Healthz(ctx iris.Context) {
 	if c.redisConnection != nil && c.redisConfig != nil {
 		redisSuccess, redisError := c.redisConfig.Driver.PingPong()

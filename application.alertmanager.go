@@ -20,6 +20,11 @@ type ApplicationAlertmanager struct {
 	*Server
 }
 
+func NewApplicationAlertmanager(c *Server) *ApplicationAlertmanager {
+	app := ApplicationAlertmanager{Server: c}
+	return &app
+}
+
 func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *alertmanager.Alertmanager {
 	client, err := c.config.Alertmanager.GetAlertmanagerInstance(name)
 	if err != nil {

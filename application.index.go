@@ -12,6 +12,11 @@ type ApplicationIndex struct {
 	*Server
 }
 
+func NewApplicationIndex(c *Server) *ApplicationIndex {
+	app := ApplicationIndex{Server: c}
+	return &app
+}
+
 func (c *Server) index(ctx iris.Context) {
 	user, err := c.getUser(ctx)
 

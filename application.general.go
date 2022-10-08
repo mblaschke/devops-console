@@ -16,6 +16,11 @@ type ApplicationGeneral struct {
 	*Server
 }
 
+func NewApplicationGeneral(c *Server) *ApplicationGeneral {
+	app := ApplicationGeneral{Server: c}
+	return &app
+}
+
 func (c *ApplicationGeneral) handleApiAppStats(ctx iris.Context, user *models.User) {
 	systemStats := response.NewGeneralStats("System stats")
 	systemStats.Add("Golang runtime", runtime.Version())

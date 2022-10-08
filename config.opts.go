@@ -18,6 +18,7 @@ type (
 		}
 
 		Azure struct {
+			Environment    string `long:"azure.environment"      env:"AZURE_ENVIRONMENT"       description:"Azure environment name"    default:"AZUREPUBLICCLOUD"`
 			SubscriptionId string `long:"azure.subscriptionid"   env:"AZURE_SUBSCRIPTION_ID"   description:"Azure subscription id"     required:"true"`
 			TenantId       string `long:"azure.tenantid"         env:"AZURE_TENANT_ID"         description:"Azure tenant id"           required:"true"`
 		}

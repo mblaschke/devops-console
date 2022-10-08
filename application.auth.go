@@ -19,6 +19,11 @@ type ApplicationAuth struct {
 	*Server
 }
 
+func NewApplicationAuth(c *Server) *ApplicationAuth {
+	app := ApplicationAuth{Server: c}
+	return &app
+}
+
 func (c *Server) Login(ctx iris.Context) {
 	s := c.recreateSession(ctx, func(ctx *context.Context, cookie *http.Cookie, op uint8) {
 		if op == 1 {

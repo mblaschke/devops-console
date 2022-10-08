@@ -36,6 +36,11 @@ type ApplicationSupport struct {
 	*Server
 }
 
+func NewApplicationSupport(c *Server) *ApplicationSupport {
+	app := ApplicationSupport{Server: c}
+	return &app
+}
+
 func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *models.User) {
 	var err error
 

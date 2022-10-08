@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/dustin/go-humanize"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/webdevops/go-common/utils/to"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -21,6 +21,11 @@ import (
 
 type ApplicationKubernetes struct {
 	*Server
+}
+
+func NewApplicationKubernetes(c *Server) *ApplicationKubernetes {
+	app := ApplicationKubernetes{Server: c}
+	return &app
 }
 
 func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernetes) {
