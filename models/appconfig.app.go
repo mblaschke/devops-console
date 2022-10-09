@@ -54,6 +54,7 @@ type (
 		UsernamePrefix string `yaml:"usernamePrefix"`
 		GroupPrefix    string `yaml:"groupPrefix"`
 
+		AuthUrl     string `yaml:"authUrl"`
 		RedirectUrl string `yaml:"redirectUrl"`
 
 		Azure struct {

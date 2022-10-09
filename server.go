@@ -51,6 +51,7 @@ func NewServer(pathList []string) *Server {
 	for _, config := range pathList {
 		server.setupConfig(config)
 	}
+	server.validateConfig()
 	server.setupKubernetes()
 	server.initApp()
 
@@ -99,7 +100,12 @@ func (c *Server) setupConfig(path string) {
 	if err := yaml.Unmarshal(tmplBytes.Bytes(), &c.config); err != nil {
 		panic(err)
 	}
+}
 
+func (c *Server) validateConfig() {
+	if c.config.App.Oauth.AuthUrl == "" {
+		panic(fmt.Sprintf("app.oauth.authurl (env: OAUTH_AUTH_URL) is not set"))
+	}
 }
 
 func (c *Server) setupKubernetes() {

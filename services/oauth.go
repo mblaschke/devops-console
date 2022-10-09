@@ -123,9 +123,7 @@ func (o *OAuth) buildConfig() (config *oauth2.Config) {
 
 	switch strings.ToLower(o.Config.Provider) {
 	case "azuread":
-		aadTenant := o.Config.Azure.Tenant
-
-		provider, err := oidc.NewProvider(ctx, fmt.Sprintf("https://sts.windows.net/%s/", aadTenant))
+		provider, err := oidc.NewProvider(ctx, o.Config.AuthUrl)
 		if err != nil {
 			o.error(fmt.Sprintf("oauth.provider AzureAD init failed: %s", err))
 		}
@@ -135,6 +133,7 @@ func (o *OAuth) buildConfig() (config *oauth2.Config) {
 		scopes = append(scopes, oidc.ScopeOpenID, "profile", "email", "user_principal_name")
 	default:
 		o.error(fmt.Sprintf("oauth.provider \"%s\" is not valid", OAuthProvider))
+		return
 	}
 
 	if o.Config.Azure.EndpointAuth != "" {
