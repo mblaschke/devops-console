@@ -9,8 +9,6 @@ import (
 
 	armauthorization "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2"
 	armresources "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-	//nolint:staticcheck
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,8 +26,6 @@ type (
 		*Server
 
 		armClient *armclient.ArmClient
-
-		authorizer *autorest.Authorizer
 
 		roleDefinitionMap map[string]string
 	}
