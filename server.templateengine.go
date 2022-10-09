@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"runtime"
 
-	azureSdkVersion "github.com/Azure/azure-sdk-for-go/version"
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/view"
 	"go.uber.org/zap"
@@ -21,7 +20,6 @@ func (c *Server) initTemplateEngine() {
 	c.tmpl.AddVar("appVersionCommit", gitCommit)
 	c.tmpl.AddVar("runtimeVersion", runtime.Version())
 	c.tmpl.AddVar("irisVersion", iris.Version)
-	c.tmpl.AddVar("azureSdkVersion", azureSdkVersion.Number)
 	c.tmpl.AddVar("appConfig", c.config.App)
 	c.tmpl.AddVar("appConfig", c.config.App)
 

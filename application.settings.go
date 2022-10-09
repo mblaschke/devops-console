@@ -7,11 +7,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
+	"github.com/webdevops/go-common/azuresdk/armclient"
 	"github.com/webdevops/go-common/utils/to"
 
 	"github.com/mblaschke/devops-console/models"
@@ -21,28 +21,41 @@ import (
 
 type ApplicationSettings struct {
 	*Server
-	vaultClient *keyvault.BaseClient
+
+	armClient *armclient.ArmClient
 }
 
 func NewApplicationSettings(c *Server) *ApplicationSettings {
 	app := ApplicationSettings{Server: c}
+
+	armClient, err := armclient.NewArmClientWithCloudName(opts.Azure.Environment, logrus.StandardLogger())
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	armClient.SetUserAgent(UserAgent + gitTag)
+
+	app.armClient = armClient
 	return &app
 }
 
 func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
-	var ret models.SettingsOverall
-
-	var wgFetch sync.WaitGroup
-	var wgProcess sync.WaitGroup
+	var (
+		ret       models.SettingsOverall
+		wgFetch   sync.WaitGroup
+		wgProcess sync.WaitGroup
+	)
 
 	secretChannel := make(chan models.SettingSecret)
+
+	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
 
 	ret.Settings = c.config.Settings
 	ret.User = map[string]string{}
 	ret.Team = map[string]map[string]string{}
 
 	for _, setting := range c.config.Settings.User {
-		ret.User[setting.Name] = c.getKeyvaultSecret(c.userSecretName(user, setting.Name))
+		ret.User[setting.Name] = c.getKeyvaultSecret(secretClient, c.userSecretName(user, setting.Name))
 	}
 
 	// fetch secret settings (backgrounded)
@@ -55,7 +68,7 @@ func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 				secretChannel <- models.SettingSecret{
 					TeamName:    teamName,
 					SettingName: settingName,
-					Secret:      c.getKeyvaultSecret(c.teamSecretName(teamName, settingName)),
+					Secret:      c.getKeyvaultSecret(secretClient, c.teamSecretName(teamName, settingName)),
 				}
 			}(team.Name, setting.Name)
 		}
@@ -81,6 +94,8 @@ func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 
 func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User) {
 	var err error
+
+	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
 
 	formData := formdata.GeneralSettings{}
 	err = ctx.ReadJSON(&formData)
@@ -116,6 +131,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 
 		if val, ok := formData[setting.Name]; ok {
 			err = c.setKeyvaultSecret(
+				secretClient,
 				c.userSecretName(user, setting.Name),
 				val,
 				secretTags,
@@ -140,6 +156,8 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 
 func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User) {
 	var err error
+
+	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
 
 	team := ctx.Params().GetString("team")
 	if team == "" {
@@ -187,6 +205,7 @@ func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User)
 
 		if val, ok := formData[setting.Name]; ok {
 			err = c.setKeyvaultSecret(
+				secretClient,
 				c.teamSecretName(team, setting.Name),
 				val,
 				secretTags,
@@ -217,52 +236,35 @@ func (c *ApplicationSettings) teamSecretName(team, name string) string {
 	return fmt.Sprintf("team---%s---%s", team, name)
 }
 
-func (c *ApplicationSettings) getKeyvaultClient() *keyvault.BaseClient {
-	var err error
-	var keyvaultAuth autorest.Authorizer
-
-	if c.vaultClient == nil {
-		keyvaultAuth, err = auth.NewAuthorizerFromEnvironmentWithResource("https://vault.azure.net")
-		if err != nil {
-			panic(err)
-		}
-
-		client := keyvault.New()
-		client.Authorizer = keyvaultAuth
-
-		c.vaultClient = &client
+func (c *ApplicationSettings) keyVaultClient(vaultUrl string) *azsecrets.Client {
+	secretOpts := azsecrets.ClientOptions{
+		ClientOptions: *c.armClient.NewAzCoreClientOptions(),
 	}
-
-	return c.vaultClient
+	return azsecrets.NewClient(vaultUrl, c.armClient.GetCred(), &secretOpts)
 }
 
-func (c *ApplicationSettings) setKeyvaultSecret(secretName, secretValue string, tags map[string]*string) error {
+func (c *ApplicationSettings) setKeyvaultSecret(client *azsecrets.Client, secretName, secretValue string, tags map[string]*string) error {
 	ctx := context.Background()
 	enabled := secretValue != ""
 
 	secretName = strings.Replace(secretName, "_", "-", -1)
-	secretParamSet := keyvault.SecretSetParameters{}
-	secretParamSet.Value = &secretValue
 
-	secretAttributs := keyvault.SecretAttributes{}
-	secretAttributs.Enabled = &enabled
-	secretParamSet.SecretAttributes = &secretAttributs
-
-	secretParamSet.Tags = tags
-
-	client := c.getKeyvaultClient()
-	_, err := client.SetSecret(ctx, c.config.Settings.Vault.Url, secretName, secretParamSet)
+	secretParams := azsecrets.SetSecretParameters{
+		SecretAttributes: &azsecrets.SecretAttributes{
+			Enabled: &enabled,
+		},
+		Value: &secretValue,
+		Tags:  tags,
+	}
+	_, err := client.SetSecret(ctx, secretName, secretParams, nil)
 
 	return err
 }
 
-func (c *ApplicationSettings) getKeyvaultSecret(secretName string) (secretValue string) {
-	var err error
-	var secretBundle keyvault.SecretBundle
+func (c *ApplicationSettings) getKeyvaultSecret(client *azsecrets.Client, secretName string) (secretValue string) {
 	ctx := context.Background()
 
-	client := c.getKeyvaultClient()
-	secretBundle, err = client.GetSecret(ctx, c.config.Settings.Vault.Url, secretName, "")
+	secretBundle, err := client.GetSecret(ctx, secretName, "", nil)
 
 	if err == nil {
 		secretValue = *secretBundle.Value
