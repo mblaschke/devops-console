@@ -53,10 +53,9 @@ application:
     redirectUrl: {{env "OAUTH_REDIRECT_URL" | default "" | toJson }}
 
     azuread:
-      tenant: {{env "OAUTH_AZUREAD_TENANT" | toJson }}
-      clientId: {{env "OAUTH_CLIENT_ID" | toJson }}
-      clientSecret: {{env "OAUTH_CLIENT_SECRET" | toJson }}
-
+      tenant: {{env "AZURE_TENANT_ID" | toJson }}
+      clientId: {{env "AZURE_CLIENT_ID" | toJson }}
+      clientSecret: {{env "AZURE_CLIENT_SECRET" | toJson }}
 
       endpointAuth: {{env "OAUTH_ENDPOINT_AUTH" | toJson }}
       endpointToken: {{env "OAUTH_ENDPOINT_TOKEN" | toJson }}
