@@ -48,7 +48,7 @@ func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 
 	secretChannel := make(chan models.SettingSecret)
 
-	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
+	secretClient := c.keyVaultClient(ctx, c.config.Settings.Vault.Url)
 
 	ret.Settings = c.config.Settings
 	ret.User = map[string]string{}
@@ -95,7 +95,7 @@ func (c *ApplicationSettings) Get(ctx iris.Context, user *models.User) {
 func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User) {
 	var err error
 
-	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
+	secretClient := c.keyVaultClient(ctx, c.config.Settings.Vault.Url)
 
 	formData := formdata.GeneralSettings{}
 	err = ctx.ReadJSON(&formData)
@@ -157,7 +157,7 @@ func (c *ApplicationSettings) ApiUpdateUser(ctx iris.Context, user *models.User)
 func (c *ApplicationSettings) ApiUpdateTeam(ctx iris.Context, user *models.User) {
 	var err error
 
-	secretClient := c.keyVaultClient(c.config.Settings.Vault.Url)
+	secretClient := c.keyVaultClient(ctx, c.config.Settings.Vault.Url)
 
 	team := ctx.Params().GetString("team")
 	if team == "" {
@@ -236,11 +236,16 @@ func (c *ApplicationSettings) teamSecretName(team, name string) string {
 	return fmt.Sprintf("team---%s---%s", team, name)
 }
 
-func (c *ApplicationSettings) keyVaultClient(vaultUrl string) *azsecrets.Client {
+func (c *ApplicationSettings) keyVaultClient(ctx iris.Context, vaultUrl string) *azsecrets.Client {
 	secretOpts := azsecrets.ClientOptions{
 		ClientOptions: *c.armClient.NewAzCoreClientOptions(),
 	}
-	return azsecrets.NewClient(vaultUrl, c.armClient.GetCred(), &secretOpts)
+
+	client, err := azsecrets.NewClient(vaultUrl, c.armClient.GetCred(), &secretOpts)
+	if err != nil {
+		c.respondError(ctx, err)
+	}
+	return client
 }
 
 func (c *ApplicationSettings) setKeyvaultSecret(client *azsecrets.Client, secretName, secretValue string, tags map[string]*string) error {
