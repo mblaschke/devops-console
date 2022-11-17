@@ -21,7 +21,6 @@ func (c *Server) initTemplateEngine() {
 	c.tmpl.AddVar("runtimeVersion", runtime.Version())
 	c.tmpl.AddVar("irisVersion", iris.Version)
 	c.tmpl.AddVar("appConfig", c.config.App)
-	c.tmpl.AddVar("appConfig", c.config.App)
 
 	c.tmpl.AddFunc("MainFeatureIsEnabled", func(args view.JetArguments) reflect.Value {
 		main := args.Get(0).String()
