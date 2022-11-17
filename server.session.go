@@ -4,6 +4,7 @@ import (
 	"math"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -152,22 +153,37 @@ func (c *Server) createRedisConnection() {
 		zap.String("session", "redis"),
 	)
 
-	// try connect to redis server (with retry)
+	wg := sync.WaitGroup{}
+
+	// connect to redis server (with retry)
 	for i := 0; i < 25; i++ {
 		durationTime := math.Min(15, float64(i*2))
 		retryTime := time.Duration(durationTime) * time.Second
 
-		c.redisConfig = &redis.Config{
-			Network:   "tcp",
-			Addr:      c.config.App.Session.Redis.Addr,
-			Password:  c.config.App.Session.Redis.Password,
-			Database:  c.config.App.Session.Redis.Database,
-			MaxActive: c.config.App.Session.Redis.MaxActive,
-			Timeout:   c.config.App.Session.Redis.Timeout,
-			Prefix:    c.config.App.Session.Redis.Prefix,
-		}
+		wg.Add(1)
+		go func() {
+			defer func() {
+				wg.Done()
+				if r := recover(); r != nil {
+					contextLogger.Errorf("catched redis panic: %v", r)
+					c.redisConfig = nil
+					c.redisConnection = nil
+				}
+			}()
 
-		c.redisConnection = redis.New(*c.redisConfig)
+			c.redisConfig = &redis.Config{
+				Network:   "tcp",
+				Addr:      c.config.App.Session.Redis.Addr,
+				Password:  c.config.App.Session.Redis.Password,
+				Database:  c.config.App.Session.Redis.Database,
+				MaxActive: c.config.App.Session.Redis.MaxActive,
+				Timeout:   c.config.App.Session.Redis.Timeout,
+				Prefix:    c.config.App.Session.Redis.Prefix,
+			}
+
+			c.redisConnection = redis.New(*c.redisConfig)
+		}()
+		wg.Wait()
 
 		if c.redisConnection != nil {
 			break
