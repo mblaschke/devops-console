@@ -135,7 +135,7 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	if c.config.App.Oauth.Filter.UsernameWhitelist != "" {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameWhitelist)
 		if !filterRegexp.MatchString(user.Username) {
-			ctx.ViewData("messageError", fmt.Sprintf("user %s is not allowed to use this application (username not allowed)", user.Username))
+			ctx.ViewData("messageError", fmt.Sprintf(`user "%s" is not allowed to use this application (username not allowed)`, user.Username))
 			c.templateLogin(ctx, true)
 			return
 		}
@@ -144,15 +144,18 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	if c.config.App.Oauth.Filter.UsernameBlacklist != "" {
 		filterRegexp := regexp.MustCompile(c.config.App.Oauth.Filter.UsernameBlacklist)
 		if filterRegexp.MatchString(c.config.App.Oauth.Filter.UsernameBlacklist) {
-			ctx.ViewData("messageError", fmt.Sprintf("user %s is not allowed to use this application (username blacklisted)", user.Username))
+			ctx.ViewData("messageError", fmt.Sprintf(`user "%s" is not allowed to use this application (username blacklisted)`, user.Username))
 			c.templateLogin(ctx, true)
 			return
 		}
 	}
 
+	// apply team mapping
+	user.ApplyAppConfig(&c.config)
+
 	// check groups
-	if len(user.Groups) == 0 {
-		ctx.ViewData("messageError", fmt.Sprintf("user %s is not allowed to use this application (no groups assignment found)", user.Username))
+	if len(user.Teams) == 0 {
+		ctx.ViewData("messageError", fmt.Sprintf(`user "%s" is not allowed to use this application (no team assignments/mappings found)`, user.Username))
 		c.templateLogin(ctx, true)
 		return
 	}

@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func (u *User) init(config *AppConfig) {
+func (u *User) ApplyAppConfig(config *AppConfig) {
 	u.initTeams(config)
 }
 
@@ -125,7 +125,7 @@ func (u *User) ToJson() (jsonString string, error error) {
 
 func UserCreateFromJson(jsonString string, config *AppConfig) (u *User, err error) {
 	if err = json.Unmarshal([]byte(jsonString), &u); err == nil {
-		u.init(config)
+		u.ApplyAppConfig(config)
 	}
 
 	return
