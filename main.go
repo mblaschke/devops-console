@@ -49,11 +49,10 @@ func main() {
 	log = logger.Sugar()
 	defer log.Sync() // nolint flushes buffer, if any
 
-	startPrometheus()
-
-	devopsConsole := NewServer(opts.Config.Path)
+	appServer := NewServer(opts.Config.Path)
+	startPrometheus(appServer)
 	startupDuration = time.Since(startupTime)
-	devopsConsole.Run(opts.Server.Bind)
+	appServer.Run(opts.Server.Bind)
 }
 
 // init argparser and parse/validate arguments
@@ -93,7 +92,7 @@ func initArgparser() {
 	}
 }
 
-func startPrometheus() {
+func startPrometheus(appServer *Server) {
 	PrometheusActions = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "devopsconsole_actions",
@@ -109,7 +108,10 @@ func startPrometheus() {
 	go func() {
 		mux := http.NewServeMux()
 
-		mux.Handle("/metrics", promhttp.Handler())
+		mux.Handle(
+			"/metrics",
+			appServer.PrometheusMetricsHandler(promhttp.Handler()),
+		)
 
 		srv := &http.Server{
 			Addr:         opts.MetricsServer.Bind,

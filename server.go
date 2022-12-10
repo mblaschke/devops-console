@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -193,4 +194,10 @@ func (c *Server) responseJson(ctx iris.Context, v interface{}) {
 	if err := ctx.JSON(v); err != nil {
 		c.logger.Error(err)
 	}
+}
+
+func (c *Server) PrometheusMetricsHandler(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeHTTP(w, r)
+	})
 }
