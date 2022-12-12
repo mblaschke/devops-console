@@ -17,6 +17,7 @@ func (c *Server) templateLogin(ctx iris.Context, logout bool) {
 	}
 
 	ctx.ViewData("title", "Login")
+	ctx.ViewData("redirectUrl", "")
 	if err := ctx.View("pages/login.jet"); err != nil {
 		c.logger.Error(err)
 	}

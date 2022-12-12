@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
@@ -42,6 +43,7 @@ func (c *Server) Login(ctx iris.Context) {
 
 	state := base64.URLEncoding.EncodeToString(b)
 	s.Set("oauth", state)
+	s.Set("loginRedirect", ctx.FormValue("redirect"))
 
 	oauth := c.newServiceOauth(ctx)
 	url := oauth.AuthCodeURL(state)
@@ -64,6 +66,8 @@ func (c *Server) LogoutForced(ctx iris.Context) {
 func (c *Server) LoginViaOauth(ctx iris.Context) {
 	s := c.getSession(ctx)
 	oauth := c.newServiceOauth(ctx)
+
+	redirectUrl := s.Get("loginRedirect")
 
 	if s.Get("oauth") == "" || s.Get("oauth") == nil {
 		ctx.ViewData("messageError", "OAuth pre check failed: invalid session")
@@ -174,7 +178,53 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 	}
 
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "login"}).Inc()
-	c.redirectHtml(ctx, "/home")
+
+	if loginRedirect, ok := redirectUrl.(string); ok && c.checkRedirectUrl(loginRedirect) {
+		c.redirectHtml(ctx, loginRedirect)
+	} else {
+		c.redirectHtml(ctx, "/home")
+	}
+}
+
+func (c *Server) checkRedirectUrl(url string) bool {
+	url = strings.TrimSpace(url)
+
+	// must not be empty
+	if url == "" {
+		return false
+	}
+
+	// must start with /
+	if !strings.HasPrefix(url, "/") {
+		return false
+	}
+
+	// must start with /login
+	if strings.HasPrefix(url, "/login") {
+		return false
+	}
+
+	// must start with /logout
+	if strings.HasPrefix(url, "/logout") {
+		return false
+	}
+
+	// must not contain query
+	if strings.Contains(url, "?") {
+		return false
+	}
+
+	// must not contain http://
+	if strings.Contains(url, "http://") {
+		return false
+	}
+
+	// must not contain https://
+	if strings.Contains(url, "https://") {
+		return false
+	}
+
+	return true
 }
 
 func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {

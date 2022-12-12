@@ -70,6 +70,7 @@ func (c *Server) handleErrorWithStatus(ctx iris.Context, statusCode int, err err
 
 		if logout {
 			ctx.ViewData("title", "Login")
+			ctx.ViewData("redirectUrl", ctx.GetCurrentRoute().Path())
 			if err := ctx.View("pages/login.jet"); err != nil {
 				c.logger.Error(err)
 			}
