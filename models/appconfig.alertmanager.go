@@ -29,7 +29,7 @@ type (
 	}
 )
 
-func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmanager.Alertmanager, error) {
+func (a *AppConfigAlertmanager) GetAlertmanagerInstance(name string) (*alertmanager.AlertmanagerAPI, error) {
 	var config *AppConfigAlertmanagerInstance
 
 	for _, row := range a.Instances {

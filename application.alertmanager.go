@@ -25,7 +25,7 @@ func NewApplicationAlertmanager(c *Server) *ApplicationAlertmanager {
 	return &app
 }
 
-func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *alertmanager.Alertmanager {
+func (c *ApplicationAlertmanager) getClient(ctx iris.Context, name string) *alertmanager.AlertmanagerAPI {
 	client, err := c.config.Alertmanager.GetAlertmanagerInstance(name)
 	if err != nil {
 		c.respondErrorWithPenalty(ctx, err)
