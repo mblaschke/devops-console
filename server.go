@@ -15,7 +15,7 @@ import (
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"github.com/kataras/iris/v12/view"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 	networkingV1 "k8s.io/api/networking/v1"
 
 	"github.com/mblaschke/devops-console/models"
