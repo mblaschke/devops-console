@@ -25,7 +25,6 @@
                         <ul>
                             <li><a href="https://golang.org/">{{runtimeVersion}}</a></li>
                             <li><a href="https://github.com/kataras/iris">Iris {{irisVersion}}</a></li>
-                            <li><a href="https://github.com/Azure/azure-sdk-for-go">AzureSDK {{azureSdkVersion}}</a></li>
                         </ul>
                     </dt>
                     <dd>Frontend</dd>
