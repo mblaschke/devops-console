@@ -2,7 +2,6 @@ application:
   features:
     kubernetes: true
     kubernetes-namespaces: true
-    kubernetes-access: true
 
     azure: true
     azure-resourcegroups: true
@@ -11,11 +10,7 @@ application:
     support: false
     support-pagerduty: false
 
-    monitoring: false
-    monitoring-alertmanagers: false
-
     general: true
-    general-settings: true
     general-about: true
 
 
@@ -67,13 +62,6 @@ application:
   notification:
     channels: {{ env "NOTIFICATION_CHANNELS" | splitList " " | toJson }}
     message: {{env "NOTIFICATION_MESSAGE" | default "%s: %s" | toJson }}
-
-settings:
-  vault:
-    url: {{env "AZURE_VAULT_URL" | toJson }}
-
-  user: [ ]
-  team: [ ]
 
 azure:
   roleassignment:
@@ -165,5 +153,3 @@ permissions:
   user: { }
   group: { }
   team: { }
-
-alertmanager: { }

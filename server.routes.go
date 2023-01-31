@@ -62,9 +62,7 @@ func (c *Server) initRoutes() {
 	contextLogger.Infof("init app routes")
 
 	applicationKubernetes := NewApplicationKubernetes(c)
-	applicationAlertmanager := NewApplicationAlertmanager(c)
 	applicationAzure := NewApplicationAzure(c)
-	applicationSettings := NewApplicationSettings(c)
 	applicationGeneral := NewApplicationGeneral(c)
 	applicationConfig := NewApplicationConfig(c)
 	applicationAuth := NewApplicationAuth(c)
@@ -90,19 +88,12 @@ func (c *Server) initRoutes() {
 	{
 		pageParty.Get("/home", func(ctx iris.Context) { c.home(ctx) })
 
-		if c.config.App.FeatureIsEnabled("general", "settings") {
-			pageParty.Get("/general/settings", func(ctx iris.Context) { c.react(ctx, "Settings") })
-		}
-
 		if c.config.App.FeatureIsEnabled("general", "about") {
 			pageParty.Get("/general/about", func(ctx iris.Context) { c.template(ctx, "About", "about.jet") })
 		}
+
 		if c.config.App.FeatureIsEnabled("kubernetes", "namespaces") {
 			pageParty.Get("/kubernetes/namespaces", func(ctx iris.Context) { c.react(ctx, "Kubernetes Namespaces") })
-		}
-
-		if c.config.App.FeatureIsEnabled("kubernetes", "access") {
-			pageParty.Get("/kubernetes/access", func(ctx iris.Context) { c.react(ctx, "Kubernetes Kubeconfig") })
 		}
 
 		if c.config.App.FeatureIsEnabled("azure", "resourcegroups") {
@@ -116,10 +107,6 @@ func (c *Server) initRoutes() {
 		if c.config.App.FeatureIsEnabled("support", "pagerduty") {
 			pageParty.Get("/support/pagerduty", func(ctx iris.Context) { c.react(ctx, "PagerDuty support") })
 		}
-
-		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {
-			pageParty.Get("/monitoring/alertmanager", func(ctx iris.Context) { c.react(ctx, "Alertmanager") })
-		}
 	}
 
 	apiParty := c.app.Party("/_webapi", requestLogger, c.defaultHeaders, c.csrfProtectionReferer, c.csrfProtectionToken)
@@ -132,23 +119,12 @@ func (c *Server) initRoutes() {
 
 		apiParty.Get("/app/config", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationConfig.handleApiAppConfig) })
 
-		if c.config.App.FeatureIsEnabled("general", "settings") {
-			apiParty.Get("/general/settings", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.Get) })
-			apiParty.Post("/general/settings/user", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateUser) })
-			apiParty.Post("/general/settings/team/{team:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSettings.ApiUpdateTeam) })
-		}
-
 		if c.config.App.FeatureIsEnabled("kubernetes", "namespaces") {
 			apiParty.Get("/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceList) })
 			apiParty.Post("/kubernetes/namespace", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceCreate) })
 			apiParty.Delete("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceDelete) })
 			apiParty.Put("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceUpdate) })
 			apiParty.Post("/kubernetes/namespace/{namespace:string}/reset", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.ApiNamespaceReset) })
-		}
-
-		if c.config.App.FeatureIsEnabled("kubernetes", "access") {
-			apiParty.Get("/kubernetes/kubeconfig", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.Kubeconfig) })
-			apiParty.Get("/kubernetes/kubeconfig/{name:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationKubernetes.KubeconfigDownload) })
 		}
 
 		if c.config.App.FeatureIsEnabled("azure", "resourcegroups") {
@@ -162,14 +138,6 @@ func (c *Server) initRoutes() {
 
 		if c.config.App.FeatureIsEnabled("support", "pagerduty") {
 			apiParty.Post("/support/pagerduty", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationSupport.ApiPagerDutyTicketCreate) })
-		}
-
-		if c.config.App.FeatureIsEnabled("monitoring", "alertmanagers") {
-			apiParty.Get("/alertmanager/{instance:string}/alerts", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiAlertsList) })
-			apiParty.Get("/alertmanager/{instance:string}/silences", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesList) })
-			apiParty.Delete("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesDelete) })
-			apiParty.Post("/alertmanager/{instance:string}/silence", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesCreate) })
-			apiParty.Put("/alertmanager/{instance:string}/silence/{silence:string}", func(ctx iris.Context) { c.ensureLoggedIn(ctx, applicationAlertmanager.ApiSilencesUpdate) })
 		}
 	}
 

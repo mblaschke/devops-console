@@ -93,11 +93,5 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 		)
 	}
 
-	// Alertmanager
-	ret.Alertmanager.Instances = []string{}
-	for _, alertmanagerInstance := range c.config.Alertmanager.Instances {
-		ret.Alertmanager.Instances = append(ret.Alertmanager.Instances, alertmanagerInstance.Name)
-	}
-
 	c.responseJson(ctx, ret)
 }

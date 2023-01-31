@@ -6,8 +6,6 @@ import K8sAccess from './kubernetes/access';
 import AzureResourceGroups from './azure/resourcegroup';
 import AzureRoleAssignment from './azure/roleassignment';
 import SupportPagerduty from "./support/pagerduty";
-import MonitoringAlertmanager from "./monitoring/alertmanager";
-import Settings from './general/settings';
 import GeneralStats from './general/stats';
 
 import $ from "jquery";
@@ -229,16 +227,12 @@ class App extends Base {
                     <div className="globalmessages">{this.renderGlobalMessages()}</div>
                     <Routes>
                         <Route path="/kubernetes/namespaces" element={<K8sNamespace/>}/>
-                        <Route path="/kubernetes/access" element={<K8sAccess/>}/>
 
                         <Route path="/azure/resourcegroup" element={<AzureResourceGroups/>}/>
                         <Route path="/azure/roleassignment" element={<AzureRoleAssignment/>}/>
 
                         <Route path="/support/pagerduty" element={<SupportPagerduty/>}/>
 
-                        <Route path="/monitoring/alertmanager" element={<MonitoringAlertmanager/>}/>
-
-                        <Route path="/general/settings" element={<Settings/>}/>
                         <Route path="/general/about" element={<GeneralStats/>}/>
                     </Routes>
                 </div>

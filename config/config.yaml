@@ -1,35 +1,3 @@
-settings:
-  vault:
-    url: {{env "AZURE_VAULT_URL" | toJson }}
-
-  kubeconfig:
-    default:
-      name: Default kubeconfig
-      description: This is the default configuration
-      content: |-
-        EXAMPLE KUBECONFIG
-    default2:
-      name: Default2 kubeconfig
-      description: This is the second default configuration
-      content: |-
-        EXAMPLE KUBECONFIG2
-
-  user:
-    - name: SshPubKey
-      label: SSH Public Key
-      type: input
-      validation:
-        regexp: "^ssh-(rsa|dsa) .+"
-
-  team:
-    - name: AlertingSlackApi
-      label: Slack/Mattermost Integration URL
-      type: input
-      validation:
-        regexp: "^https://.+"
-    - name: AlertingPagerdutyApi
-      label: Pagerduty API key
-      type: input
 azure:
   resourcegroup:
     validation:
@@ -241,18 +209,3 @@ permissions:
           groups:
             - "cf805c30-f000-baar-foba-123456789006"
           clusterrole: admin
-
-alertmanager:
-  instances:
-    - name: dev
-      url: http://localhost:9093/
-    - name: int
-      url: http://localhost:9093/
-    - name: prod
-      url: http://localhost:9093/
-    - name: with-auth
-      url: http://localhost:9094/
-      auth:
-        type: basic
-        username: foo
-        password: bar

@@ -106,14 +106,3 @@ func (c *Server) getUser(ctx iris.Context) (user *models.User, err error) {
 	}
 	return
 }
-
-func (c *Server) getUserOrStop(ctx iris.Context) (user *models.User) {
-	var err error
-	user, err = c.getUser(ctx)
-
-	if err != nil || user == nil {
-		c.handleError(ctx, errors.New("invalid session or not logged in"), true)
-	}
-
-	return
-}

@@ -7,9 +7,6 @@
                 {{ if FeatureIsEnabled("kubernetes", "namespaces") }}
                     {{yield navigationItem(title="Namespaces", href="/kubernetes/namespaces")}}
                 {{ end }}
-                {{ if FeatureIsEnabled("kubernetes", "access") }}
-                    {{yield navigationItem(title="Kubeconfig", href="/kubernetes/access")}}
-                {{ end }}
             {{ end }}
 
             {{ if MainFeatureIsEnabled("azure") }}
@@ -30,18 +27,8 @@
                 {{ end }}
             {{ end }}
 
-            {{ if MainFeatureIsEnabled("monitoring") }}
-                <div class="sb-sidenav-menu-heading">Monitoring</div>
-                {{ if FeatureIsEnabled("monitoring", "alertmanagers") }}
-                    {{yield navigationItem(title="Alertmanager", href="/monitoring/alertmanager")}}
-                {{ end }}
-            {{ end }}
-
             {{ if MainFeatureIsEnabled("general") }}
                 <div class="sb-sidenav-menu-heading">General</div>
-                {{ if FeatureIsEnabled("general", "settings") }}
-                {{yield navigationItem(title="Settings", href="/general/settings")}}
-                {{ end }}
                 {{ if FeatureIsEnabled("general", "about") }}
                 {{yield navigationItem(title="About", href="/general/about")}}
                 {{ end }}

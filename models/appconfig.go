@@ -12,13 +12,11 @@ import (
 
 type (
 	AppConfig struct {
-		App          Application           `yaml:"application"`
-		Settings     AppConfigSettings     `yaml:"settings"`
-		Azure        AppConfigAzure        `yaml:"azure"`
-		Kubernetes   AppConfigKubernetes   `yaml:"kubernetes"`
-		Permissions  AppConfigPermissions  `yaml:"permissions"`
-		Support      AppConfigSupport      `yaml:"support"`
-		Alertmanager AppConfigAlertmanager `yaml:"alertmanager"`
+		App         Application          `yaml:"application"`
+		Azure       AppConfigAzure       `yaml:"azure"`
+		Kubernetes  AppConfigKubernetes  `yaml:"kubernetes"`
+		Permissions AppConfigPermissions `yaml:"permissions"`
+		Support     AppConfigSupport     `yaml:"support"`
 	}
 
 	AppInputValidation struct {

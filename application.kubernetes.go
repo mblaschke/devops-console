@@ -40,27 +40,6 @@ func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernete
 	return
 }
 
-func (c *ApplicationKubernetes) Kubeconfig(ctx iris.Context, user *models.User) {
-	ret := c.config.Settings.Kubeconfig
-	c.responseJson(ctx, ret)
-}
-
-func (c *ApplicationKubernetes) KubeconfigDownload(ctx iris.Context, user *models.User) {
-	name := ctx.Params().GetString("name")
-
-	if val, ok := c.config.Settings.Kubeconfig[name]; ok {
-		PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "downloadKubeconfig"}).Inc()
-
-		ctx.Header("ContentType", "text/yaml")
-		ctx.Header("Content-Disposition", "attachment; filename=\"kubeconfig.yaml\"")
-		if _, err := ctx.Binary([]byte(val.Content)); err != nil {
-			c.logger.Error(err)
-		}
-	} else {
-		c.respondError(ctx, fmt.Errorf("kubeconfig name not valid"))
-	}
-}
-
 func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.User) {
 	nsList, err := c.serviceKubernetes().NamespaceList()
 	if err != nil {
