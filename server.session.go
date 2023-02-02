@@ -104,23 +104,17 @@ func (c *Server) initSession() {
 	contextLogger.Infof("cookie name: %v", c.config.App.Session.CookieName)
 	contextLogger.Infof("session expiry: %v", c.config.App.Session.Expiry)
 
+	c.createRedisConnection()
+
 	switch c.config.App.Session.Type {
-	case "internal", "memory":
-		config := c.createSessionConfig()
-		c.session = sessions.New(config)
-	case "securecookie", "internal+securecookie", "memory+securecookie":
-		config := c.createSessionConfigWithSecureCookie()
-		c.session = sessions.New(config)
 	case "redis":
-		c.createRedisConnection()
 		config := c.createSessionConfig()
 		c.session = sessions.New(config)
-		c.session.UseDatabase(c.redisConnection)
+		c.session.UseDatabase(c.redisSession)
 	case "redis+securecookie":
-		c.createRedisConnection()
 		config := c.createSessionConfigWithSecureCookie()
 		c.session = sessions.New(config)
-		c.session.UseDatabase(c.redisConnection)
+		c.session.UseDatabase(c.redisSession)
 	default:
 		panic("invalid session type defined")
 	}
@@ -155,7 +149,7 @@ func (c *Server) createRedisConnection() {
 
 	wg := sync.WaitGroup{}
 
-	// connect to redis server (with retry)
+	// connect to redisSession server (with retry)
 	for i := 0; i < 25; i++ {
 		durationTime := math.Min(15, float64(i*2))
 		retryTime := time.Duration(durationTime) * time.Second
@@ -165,12 +159,13 @@ func (c *Server) createRedisConnection() {
 			defer func() {
 				wg.Done()
 				if r := recover(); r != nil {
-					contextLogger.Errorf("catched redis panic: %v", r)
+					contextLogger.Errorf("catched redisSession panic: %v", r)
 					c.redisConfig = nil
-					c.redisConnection = nil
+					c.redisSession = nil
 				}
 			}()
 
+			client := redis.GoRedisDriver{}
 			c.redisConfig = &redis.Config{
 				Network:   "tcp",
 				Addr:      c.config.App.Session.Redis.Addr,
@@ -178,22 +173,24 @@ func (c *Server) createRedisConnection() {
 				Database:  c.config.App.Session.Redis.Database,
 				MaxActive: c.config.App.Session.Redis.MaxActive,
 				Timeout:   c.config.App.Session.Redis.Timeout,
-				Prefix:    c.config.App.Session.Redis.Prefix,
+				Prefix:    "session:",
+				Driver:    &client,
 			}
 
-			c.redisConnection = redis.New(*c.redisConfig)
+			c.redisSession = redis.New(*c.redisConfig)
+			c.redis = client.Client
 		}()
 		wg.Wait()
 
-		if c.redisConnection != nil {
+		if c.redisSession != nil {
 			break
 		}
 
-		contextLogger.Errorf("redis connection failed, retrying in %v", retryTime.String())
+		contextLogger.Errorf("redisSession connection failed, retrying in %v", retryTime.String())
 		time.Sleep(retryTime)
 	}
 
-	if c.redisConnection == nil {
+	if c.redisSession == nil {
 		contextLogger.Fatal("redis connection failed, cannot connect to session database")
 	}
 
@@ -201,7 +198,7 @@ func (c *Server) createRedisConnection() {
 
 	// Close connection when control+C/cmd+C
 	iris.RegisterOnInterrupt(func() {
-		if err := c.redisConnection.Close(); err != nil {
+		if err := c.redisSession.Close(); err != nil {
 			contextLogger.Error(err)
 		}
 	})

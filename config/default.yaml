@@ -37,7 +37,6 @@ application:
       maxActive: {{env "SESSION_REDIS_MAXACTIVE"  | default "10" | int }}
       password: {{env "SESSION_REDIS_PASSWORD"  | default "" | toJson }}
       database: {{env "SESSION_REDIS_DATABASE"  | default "" | toJson }}
-      prefix: {{env "SESSION_REDIS_PREFIX"  | default "" | toJson }}
       delim: {{env "SESSION_REDIS_DELIM"  | default "|" | toJson }}
 
   oauth:
@@ -144,7 +143,8 @@ kubernetes:
 support:
   pagerduty:
     authToken: {{env "PAGERDUTY_AUTH_TOKEN"  | toJson }}
-    integrationKey: {{env "PAGERDUTY_INTEGRATION_KEY"  | toJson }}
+    clientURL: https://events.eu.pagerduty.com/v2/enqueue
+    endpoints: {}
 
 permissions:
   default:

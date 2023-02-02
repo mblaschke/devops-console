@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
@@ -27,8 +28,9 @@ type Server struct {
 
 	session *sessions.Sessions
 
-	redisConnection *redis.Database
-	redisConfig     *redis.Config
+	redis        redis.GoRedisClient
+	redisSession *redis.Database
+	redisConfig  *redis.Config
 
 	config models.AppConfig
 
@@ -98,7 +100,11 @@ func (c *Server) setupConfig(path string) {
 
 	contextLogger.Info("parsing with yaml")
 
-	if err := yaml.Unmarshal(tmplBytes.Bytes(), &c.config); err != nil {
+	reader := strings.NewReader(tmplBytes.String())
+	yamlParser := yaml.NewDecoder(reader)
+	yamlParser.KnownFields(true)
+
+	if err := yamlParser.Decode(&c.config); err != nil {
 		panic(err)
 	}
 }

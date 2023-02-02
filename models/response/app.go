@@ -2,12 +2,12 @@ package response
 
 type (
 	ResponseConfig struct {
-		User         ResponseConfigUser         `json:"user"`
-		Teams        []ResponseConfigTeam       `json:"teams"`
-		Quota        map[string]int             `json:"quota"`
-		Azure        ResponseConfigAzure        `json:"azure"`
-		Kubernetes   ResponseConfigKubernetes   `json:"kubernetes"`
-		Alertmanager ResponseConfigAlertmanager `json:"alertmanager"`
+		User       ResponseConfigUser       `json:"user"`
+		Teams      []ResponseConfigTeam     `json:"teams"`
+		Quota      map[string]int           `json:"quota"`
+		Azure      ResponseConfigAzure      `json:"azure"`
+		Kubernetes ResponseConfigKubernetes `json:"kubernetes"`
+		Support    ResponseConfigSupport    `json:"support"`
 	}
 
 	ResponseConfigUser struct {
@@ -77,7 +77,11 @@ type (
 		Description string `json:"description"`
 	}
 
-	ResponseConfigAlertmanager struct {
-		Instances []string `json:"instances"`
+	ResponseConfigSupport struct {
+		Pagerduty ResponseConfigSupportPagerduty `json:"pagerduty"`
+	}
+
+	ResponseConfigSupportPagerduty struct {
+		Endpoints []string `json:"endpoints"`
 	}
 )

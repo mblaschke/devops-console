@@ -93,5 +93,13 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 		)
 	}
 
+	ret.Support.Pagerduty.Endpoints = []string{}
+	for endpointName := range c.config.Support.Pagerduty.Endpoints {
+		ret.Support.Pagerduty.Endpoints = append(
+			ret.Support.Pagerduty.Endpoints,
+			endpointName,
+		)
+	}
+
 	c.responseJson(ctx, ret)
 }

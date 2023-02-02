@@ -31,7 +31,6 @@ type (
 				MaxActive int           `yaml:"maxActive"`
 				Password  string        `yaml:"password"`
 				Database  string        `yaml:"database"`
-				Prefix    string        `yaml:"prefix"`
 				Delim     string        `yaml:"delim"`
 			} `yaml:"redis"`
 		}

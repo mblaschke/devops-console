@@ -14,7 +14,7 @@ func NewApplicationSystem(c *Server) *ApplicationSystem {
 }
 
 func (c *Server) Healthz(ctx iris.Context) {
-	if c.redisConnection != nil && c.redisConfig != nil {
+	if c.redisSession != nil && c.redisConfig != nil {
 		redisSuccess, redisError := c.redisConfig.Driver.PingPong()
 		if redisError != nil {
 			c.logger.Error("healthz: redis error: ", redisSuccess)

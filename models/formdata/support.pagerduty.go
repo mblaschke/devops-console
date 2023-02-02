@@ -7,6 +7,7 @@ import (
 type (
 	SupportPagerduty struct {
 		Team          string `yaml:"team"`
+		Endpoint      string `yaml:"endpoint"`
 		ResourceType  string `yaml:"resourceType"`
 		Location      string `yaml:"location"`
 		ResourceGroup string `yaml:"resourceGroup"`
@@ -22,6 +23,10 @@ func (a *SupportPagerduty) Validate() (ret *SupportPagerduty, err error) {
 
 	if ret.Team == "" {
 		return nil, errors.New("invalid or empty team")
+	}
+
+	if ret.Endpoint == "" {
+		return nil, errors.New("invalid or empty endpoint")
 	}
 
 	if ret.ResourceType == "" {

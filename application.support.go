@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/PagerDuty/go-pagerduty"
+	pagerduty "github.com/PagerDuty/go-pagerduty"
 	iris "github.com/kataras/iris/v12"
 
 	"github.com/mblaschke/devops-console/models"
@@ -58,8 +58,14 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 		return
 	}
 
+	if _, exists := c.config.Support.Pagerduty.Endpoints[formData.Endpoint]; !exists {
+		c.respondError(ctx, fmt.Errorf(`invalid endpoint selected`))
+		return
+	}
+
 	event := pagerduty.V2Event{
-		RoutingKey: c.config.Support.Pagerduty.IntegrationKey,
+		RoutingKey: c.config.Support.Pagerduty.Endpoints[formData.Endpoint].RoutingKey,
+		ClientURL:  c.config.Support.Pagerduty.ClientURL,
 		Action:     "trigger",
 		Payload: &pagerduty.V2Payload{
 			Summary:  fmt.Sprintf("emergency support request from %v (request by %v)", formData.Team, user.Email),

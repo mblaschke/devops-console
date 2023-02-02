@@ -12,6 +12,7 @@ class SupportPagerduty extends BaseComponent {
 
             form: {
                 team: "",
+                endpoint: "",
             }
         };
     }
@@ -36,6 +37,7 @@ class SupportPagerduty extends BaseComponent {
             state = "disabled";
         } else if (
             this.state.form.team === ""
+            || this.state.form.endpoint === ""
             || this.state.form.resourceType === ""
             || this.state.form.resourceGroup === ""
             || this.state.form.location === ""
@@ -66,6 +68,7 @@ class SupportPagerduty extends BaseComponent {
             let state = this.state;
             state.form = {
                 location: "",
+                endpoint: "",
                 resourceType: "",
                 resourceGroup: "",
                 resource: "",
@@ -107,22 +110,42 @@ class SupportPagerduty extends BaseComponent {
                         </div>
 
                         <form method="post">
-                            <div className="form-group">
-                                <label htmlFor="inputNsAreaTeam">Request assistance for team</label>
-                                <select name="nsAreaTeam" id="inputNsAreaTeam"
-                                        className="form-control namespace-area-team" value={this.getValue("form.team")}
-                                        onChange={this.setTeam.bind(this, "form.team")}>
-                                    <option key="" value="">- please select -</option>
-                                    {this.state.config.teams.map((row, value) =>
-                                        <option key={row.Id} value={row.name}>{row.name}</option>
-                                    )}
-                                </select>
+                            <div className="row">
+                                <div className="col col-5">
+                                    <div className="form-group">
+                                        <label htmlFor="inputTeam">Request assistance for team</label>
+                                        <select name="inputTeam" id="inputTeam"
+                                                className="form-control" value={this.getValue("form.team")}
+                                                onChange={this.setTeam.bind(this, "form.team")}>
+                                            <option key="" value="">- please select -</option>
+                                            {this.state.config.teams.map((row, value) =>
+                                                <option key={row.Id} value={row.name}>{row.name}</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="col col-2 d-flex align-items-center justify-content-center">
+                                    <i className="fa-solid fa-right-long size-2rem"></i>
+                                </div>
+                                <div className="col col-5">
+                                    <div className="form-group">
+                                        <label htmlFor="inputEndpoint">PagerDuty service</label>
+                                        <select name="inputEndpoint" id="inputEndpoint"
+                                                className="form-control" value={this.getValue("form.endpoint")}
+                                                onChange={this.setValue.bind(this, "form.endpoint")}>
+                                            <option key="" value="">- please select -</option>
+                                            {this.state.config.support.pagerduty.endpoints.map((row, value) =>
+                                                <option key={row} value={row}>{row}</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="form-group">
                                 <label htmlFor="inputResourceType" className="inputResourceType">Resource type</label>
-                                <select name="nsAreaTeam" id="inputNsAreaTeam"
-                                        className="form-control namespace-area-team"
+                                <select name="inputResourceType" id="inputResourceType"
+                                        className="form-control"
                                         value={this.getValue("form.resourceType")}
                                         onChange={this.setValue.bind(this, "form.resourceType")}>
                                     <option key="" value="">- please select -</option>
