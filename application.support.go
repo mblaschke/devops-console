@@ -2,17 +2,24 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	pagerduty "github.com/PagerDuty/go-pagerduty"
+	"github.com/go-redis/redis/v8"
 	iris "github.com/kataras/iris/v12"
 
 	"github.com/mblaschke/devops-console/models"
 	"github.com/mblaschke/devops-console/models/formdata"
 	"github.com/mblaschke/devops-console/models/response"
+	"github.com/mblaschke/devops-console/services"
 )
 
 const (
+	RedisPagerDutyEndpointList = `support:pagerduty:endpoint:list`
+	RedisPagerDutyEndpointLock = `support:pagerduty:endpoint:lock`
+
 	SupportPagerdutyEventComponent = `
 Type: %v
 Location: %v
@@ -38,7 +45,65 @@ type ApplicationSupport struct {
 
 func NewApplicationSupport(c *Server) *ApplicationSupport {
 	app := ApplicationSupport{Server: c}
+	app.init()
+
 	return &app
+}
+
+func (c *ApplicationSupport) init() {
+	if c.config.Support.Pagerduty.AuthToken != "" {
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					c.logger.Errorf(`failed to update pagerduty endpoints: %v`, r)
+				}
+			}()
+
+			for {
+				c.updatePagerDutyEndpoints()
+				time.Sleep(1 * time.Minute)
+			}
+		}()
+	}
+}
+
+func (c *ApplicationSupport) updatePagerDutyEndpoints() {
+	var err error
+	endpointList := map[string]models.PagerDutyEndpoint{}
+
+	ctx := context.Background()
+
+	forceUpdate := false
+
+	_, err = c.redis.Get(ctx, RedisPagerDutyEndpointLock).Result()
+	if err == redis.Nil {
+		forceUpdate = true
+	}
+
+	val, err := c.redis.Get(ctx, RedisPagerDutyEndpointList).Result()
+	if err == redis.Nil {
+		forceUpdate = true
+	} else {
+		err := json.Unmarshal([]byte(val), &endpointList)
+		if err == nil {
+			c.logger.Infof(`updating PagerDuty endpoint list from redis, got %v endpoints`, len(endpointList))
+			services.PagerDutySetEndpointList(endpointList)
+		} else {
+			forceUpdate = true
+		}
+	}
+
+	if forceUpdate {
+		c.logger.Info(`updating PagerDuty endpoint list`)
+		services.PagerDutyUpdateEndpointList(ctx, c.config)
+		endpointList := services.PagerDutyGetEndpointList()
+		c.logger.Infof(`found %v PagerDuty endpoints`, len(endpointList))
+		c.redis.Set(ctx, RedisPagerDutyEndpointLock, 1, 30*time.Minute)
+
+		if val, err := json.Marshal(endpointList); err == nil {
+			c.redis.Set(ctx, RedisPagerDutyEndpointList, val, 3000*time.Hour)
+		}
+	}
 }
 
 func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *models.User) {
@@ -58,13 +123,14 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 		return
 	}
 
-	if _, exists := c.config.Support.Pagerduty.Endpoints[formData.Endpoint]; !exists {
+	endpointList := services.PagerDutyGetEndpointList()
+	if _, exists := endpointList[formData.Endpoint]; !exists {
 		c.respondError(ctx, fmt.Errorf(`invalid endpoint selected`))
 		return
 	}
 
 	event := pagerduty.V2Event{
-		RoutingKey: c.config.Support.Pagerduty.Endpoints[formData.Endpoint].RoutingKey,
+		RoutingKey: endpointList[formData.Endpoint].RoutingKey,
 		ClientURL:  c.config.Support.Pagerduty.ClientURL,
 		Action:     "trigger",
 		Payload: &pagerduty.V2Payload{
@@ -93,7 +159,7 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 
 	if pagerdutyResponse, err := pagerduty.ManageEventWithContext(context.Background(), event); err == nil {
 		resp := response.GeneralMessage{
-			Message: fmt.Sprintf("%v", pagerdutyResponse.Message),
+			Message: fmt.Sprintf(`PagerDuty response: %v`, pagerdutyResponse.Message),
 		}
 		c.responseJson(ctx, resp)
 	} else {

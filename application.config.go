@@ -5,6 +5,7 @@ import (
 
 	"github.com/mblaschke/devops-console/models"
 	"github.com/mblaschke/devops-console/models/response"
+	"github.com/mblaschke/devops-console/services"
 )
 
 type ApplicationConfig struct {
@@ -93,11 +94,14 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 		)
 	}
 
-	ret.Support.Pagerduty.Endpoints = []string{}
-	for endpointName := range c.config.Support.Pagerduty.Endpoints {
+	ret.Support.Pagerduty.Endpoints = []response.ResponseConfigSupportPagerdutyEndpoint{}
+	for key, row := range services.PagerDutyGetEndpointList() {
 		ret.Support.Pagerduty.Endpoints = append(
 			ret.Support.Pagerduty.Endpoints,
-			endpointName,
+			response.ResponseConfigSupportPagerdutyEndpoint{
+				Id:   key,
+				Name: row.Name,
+			},
 		)
 	}
 

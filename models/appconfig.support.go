@@ -6,9 +6,11 @@ type (
 	}
 
 	AppConfigSupportPagerduty struct {
-		AuthToken string                                       `yaml:"authToken"`
-		ClientURL string                                       `yaml:"clientURL"`
-		Endpoints map[string]AppConfigSupportPagerdutyEndpoint `yaml:"endpoints"`
+		AuthToken                 string `yaml:"authToken"`
+		ClientURL                 string `yaml:"clientURL"`
+		EndpointNameTemplate      string `yaml:"endpointNameTemplate"`
+		EndpointServiceRegexp     string `yaml:"endpointServiceRegexp"`
+		EndpointIntegrationRegexp string `yaml:"endpointIntegrationRegexp"`
 	}
 
 	AppConfigSupportPagerdutyEndpoint struct {

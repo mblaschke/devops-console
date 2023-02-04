@@ -144,7 +144,13 @@ support:
   pagerduty:
     authToken: {{env "PAGERDUTY_AUTH_TOKEN"  | toJson }}
     clientURL: https://events.eu.pagerduty.com/v2/enqueue
-    endpoints: {}
+
+    endpointNameTemplate: |-
+      %s (%s)
+    endpointServiceRegexp: |-
+      (?i).+
+    endpointIntegrationRegexp: |-
+      ^(?i)(escalation|support|devops[-_ ]?console)$
 
 permissions:
   default:

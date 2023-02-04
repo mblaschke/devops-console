@@ -135,7 +135,7 @@ class SupportPagerduty extends BaseComponent {
                                                 onChange={this.setValue.bind(this, "form.endpoint")}>
                                             <option key="" value="">- please select -</option>
                                             {this.state.config.support.pagerduty.endpoints.map((row, value) =>
-                                                <option key={row} value={row}>{row}</option>
+                                                <option key={row.id} value={row.id}>{row.name}</option>
                                             )}
                                         </select>
                                     </div>

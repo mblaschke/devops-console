@@ -82,6 +82,11 @@ type (
 	}
 
 	ResponseConfigSupportPagerduty struct {
-		Endpoints []string `json:"endpoints"`
+		Endpoints []ResponseConfigSupportPagerdutyEndpoint `json:"endpoints"`
+	}
+
+	ResponseConfigSupportPagerdutyEndpoint struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
 	}
 )

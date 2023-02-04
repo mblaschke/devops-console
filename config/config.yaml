@@ -214,10 +214,3 @@ permissions:
           groups:
             - "cf805c30-f000-baar-foba-123456789006"
           clusterrole: admin
-
-
-support:
-  pagerduty:
-    endpoints:
-      default:
-        routingKey: {{env "PAGERDUTY_INTEGRATION_KEY"  | toJson }}
