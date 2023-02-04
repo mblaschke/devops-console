@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -76,14 +77,12 @@ func (c *ApplicationSupport) updatePagerDutyEndpoints() {
 	forceUpdate := false
 
 	_, err = c.redis.Get(ctx, RedisPagerDutyEndpointLock).Result()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		forceUpdate = true
 	}
 
 	val, err := c.redis.Get(ctx, RedisPagerDutyEndpointList).Result()
-	if err == redis.Nil {
-		forceUpdate = true
-	} else {
+	if err == nil {
 		err := json.Unmarshal([]byte(val), &endpointList)
 		if err == nil {
 			c.logger.Infof(`updating PagerDuty endpoint list from redis, got %v endpoints`, len(endpointList))
