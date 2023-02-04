@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/dustin/go-humanize"
 	iris "github.com/kataras/iris/v12"
@@ -17,6 +18,10 @@ import (
 	"github.com/mblaschke/devops-console/models/formdata"
 	"github.com/mblaschke/devops-console/models/response"
 	"github.com/mblaschke/devops-console/services"
+)
+
+const (
+	RedisKubernetesNamespaceList = `kubernetes:namespace:list`
 )
 
 type ApplicationKubernetes struct {
@@ -41,10 +46,21 @@ func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernete
 }
 
 func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.User) {
-	nsList, err := c.serviceKubernetes().NamespaceList()
-	if err != nil {
-		c.respondError(ctx, fmt.Errorf("unable to contact Kubernetes cluster"))
-		return
+	var (
+		err    error
+		nsList map[string]coreV1.Namespace
+	)
+
+	if ok := c.redisCacheLoad(RedisKubernetesNamespaceList, &nsList); !ok {
+		nsList, err = c.serviceKubernetes().NamespaceList()
+		if err != nil {
+			c.respondError(ctx, fmt.Errorf("unable to contact Kubernetes cluster"))
+			return
+		}
+
+		if err := c.redisCacheSet(RedisKubernetesNamespaceList, nsList, 30*time.Second); err != nil {
+			c.logger.Errorf(`unable to save Kubernetes namespaces to cache: %v`, err)
+		}
 	}
 
 	ret := []response.KubernetesNamespace{}
@@ -430,6 +446,7 @@ func (c *ApplicationKubernetes) ApiNamespaceDelete(ctx iris.Context, user *model
 		c.respondError(ctx, err)
 		return
 	}
+	c.redisCacheInvalidate(RedisKubernetesNamespaceList)
 
 	c.notificationMessage(ctx, fmt.Sprintf("namespace \"%s\" deleted", namespace.Name))
 	c.auditLog(ctx, fmt.Sprintf("namespace \"%s\" deleted", namespace.Name), 1)
@@ -498,6 +515,8 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		return
 	}
 
+	c.redisCacheInvalidate(RedisKubernetesNamespaceList)
+
 	c.notificationMessage(ctx, fmt.Sprintf("namespace \"%s\" updated", namespace.Name))
 	c.auditLog(ctx, fmt.Sprintf("namespace \"%s\" updated", namespace.Name), 1)
 	PrometheusActions.With(prometheus.Labels{"scope": "k8s", "type": "updateNamepace"}).Inc()
@@ -546,22 +565,21 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 }
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace, force bool) (*models.KubernetesNamespace, error) {
-	doUpdate := force
-
 	// add env label
 	if _, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment]; !ok {
 		parts := strings.Split(namespace.Name, "-")
 
 		if len(parts) > 1 {
 			namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment] = parts[0]
-			doUpdate = true
+			force = true
 		}
 	}
 
-	if doUpdate {
+	if force {
 		if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 			return namespace, err
 		}
+		c.redisCacheInvalidate(RedisKubernetesNamespaceList)
 	}
 
 	return namespace, nil
@@ -646,6 +664,7 @@ func (c *ApplicationKubernetes) kubernetesNamespaceCheckOwnership(ctx iris.Conte
 }
 
 func (c *ApplicationKubernetes) updateNamespaceSettings(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) (error error) {
+
 	if err := c.kubernetesNamespacePermissionsUpdate(ctx, namespace, user); err != nil {
 		return err
 	}
@@ -657,6 +676,8 @@ func (c *ApplicationKubernetes) updateNamespaceSettings(ctx iris.Context, namesp
 	if err := c.updateNamespaceNetworkPolicy(namespace); err != nil {
 		return err
 	}
+
+	c.redisCacheInvalidate(RedisKubernetesNamespaceList)
 
 	return
 }
