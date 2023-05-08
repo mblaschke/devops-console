@@ -23,7 +23,7 @@ var (
 	opts      ConfigOpts
 	log       *zap.SugaredLogger
 
-	logConfig = zap.NewProductionConfig()
+	logConfig = zap.NewDevelopmentConfig()
 
 	PrometheusActions *prometheus.GaugeVec
 	startupTime       time.Time

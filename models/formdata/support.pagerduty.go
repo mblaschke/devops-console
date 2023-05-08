@@ -19,7 +19,6 @@ type (
 
 func (a *SupportPagerduty) Validate() (ret *SupportPagerduty, err error) {
 	ret = a
-	err = nil
 
 	if ret.Team == "" {
 		return nil, errors.New("invalid or empty team")

@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/go-uuid"
 	iris "github.com/kataras/iris/v12"
 	"github.com/prometheus/client_golang/prometheus"
-	logrus "github.com/sirupsen/logrus"
 	"github.com/webdevops/go-common/azuresdk/armclient"
 	"github.com/webdevops/go-common/utils/to"
 
@@ -41,7 +40,7 @@ type (
 func NewApplicationAzure(c *Server) *ApplicationAzure {
 	app := ApplicationAzure{Server: c}
 
-	armClient, err := armclient.NewArmClientWithCloudName(opts.Azure.Environment, logrus.StandardLogger())
+	armClient, err := armclient.NewArmClientWithCloudName(opts.Azure.Environment, c.logger)
 	if err != nil {
 		log.Panic(err.Error())
 	}
