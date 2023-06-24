@@ -145,6 +145,14 @@ support:
     authToken: {{env "PAGERDUTY_AUTH_TOKEN"  | toJson }}
     clientURL: https://events.eu.pagerduty.com/v2/enqueue
 
+{{ if (env "PAGERDUTY_INTEGRATION_KEY") }}
+    services:
+      - name: {{env "PAGERDUTY_INTEGRATION_NAME" | default "Emergency ticket" | toJson }}
+        integrationKey: {{env "PAGERDUTY_INTEGRATION_KEY" | toJson }}
+{{ else }}
+    service: []
+{{ end }}
+
     endpointNameTemplate: |-
       %s (%s)
     endpointServiceRegexp: |-

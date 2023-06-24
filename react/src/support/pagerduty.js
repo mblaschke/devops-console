@@ -84,6 +84,19 @@ class SupportPagerduty extends BaseComponent {
         });
     }
 
+    serviceList() {
+        let ret = []
+
+        this.state.config.support.pagerduty.endpoints.map((row, value) => {
+            ret.push(row)
+        })
+        console.log("SET", ret)
+
+        ret = this.sortDataset(ret);
+        console.log("RET", ret)
+        return ret;
+    }
+
     render() {
         if (this.state.isStartup) {
             return (
@@ -134,7 +147,7 @@ class SupportPagerduty extends BaseComponent {
                                                 className="form-control" value={this.getValue("form.endpoint")}
                                                 onChange={this.setValue.bind(this, "form.endpoint")}>
                                             <option key="" value="">- please select -</option>
-                                            {this.state.config.support.pagerduty.endpoints.map((row, value) =>
+                                            {this.serviceList().map((row) =>
                                                 <option key={row.id} value={row.id}>{row.name}</option>
                                             )}
                                         </select>

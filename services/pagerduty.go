@@ -19,7 +19,24 @@ var (
 		endpointList: map[string]models.PagerDutyEndpoint{},
 		lock:         sync.RWMutex{},
 	}
+
+	pagerDutyStaticEndpoints map[string]models.PagerDutyEndpoint
 )
+
+func PagerDutySetStaticEndpoints(config models.AppConfig) {
+	list := map[string]models.PagerDutyEndpoint{}
+
+	// add static config
+	for _, pagerdutyService := range config.Support.Pagerduty.Services {
+		key := "__static__:" + pagerdutyService.Name
+		list[key] = models.PagerDutyEndpoint{
+			Name:       pagerdutyService.Name,
+			RoutingKey: pagerdutyService.IntegrationKey,
+		}
+	}
+
+	pagerDutyStaticEndpoints = list
+}
 
 func PagerDutyUpdateEndpointList(ctx context.Context, config models.AppConfig) {
 	list := map[string]models.PagerDutyEndpoint{}
@@ -81,7 +98,19 @@ func PagerDutyGetEndpointList() map[string]models.PagerDutyEndpoint {
 	pagerDuty.lock.RLock()
 	defer pagerDuty.lock.RUnlock()
 
-	return pagerDuty.endpointList
+	list := map[string]models.PagerDutyEndpoint{}
+
+	// add static config
+	for key, row := range pagerDutyStaticEndpoints {
+		list[key] = row
+	}
+
+	// add dynamic config
+	for key, row := range pagerDuty.endpointList {
+		list[key] = row
+	}
+
+	return list
 }
 
 func PagerDutySetEndpointList(list map[string]models.PagerDutyEndpoint) {

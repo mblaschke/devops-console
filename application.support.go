@@ -52,6 +52,8 @@ func NewApplicationSupport(c *Server) *ApplicationSupport {
 }
 
 func (c *ApplicationSupport) init() {
+	services.PagerDutySetStaticEndpoints(c.config)
+
 	if c.config.Support.Pagerduty.AuthToken != "" {
 		go func() {
 			defer func() {
