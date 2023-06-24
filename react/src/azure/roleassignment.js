@@ -129,9 +129,33 @@ class Roleassignment extends BaseComponent {
                 <div className="card mb-3">
                     <div className="card-header">
                         <i className="fas fa-box"></i>
-                        Create Azure RoleAssignment
+                        Azure JIT access (via Azure RoleAssignment)
                     </div>
                     <div className="card-body">
+                        <div className="alert alert-warning" role="alert">
+                            <h4 className="alert-heading">How to JIT access</h4>
+                            <p>
+                                Azure RoleAssignments in general might take some minutes to be active, might not
+                                automatically grant data access to Azure PaaS services by default and might require
+                                additional steps:
+                            </p>
+                            <p>
+                                <dl>
+                                    <dt>Azure KeyVaults</dt>
+                                    <dd>
+                                        Data access (secrets, certificates, ...) is not granted automatically if KeyVault
+                                        is deployed in "Vault access policy" mode.
+                                        In this mode access must be granted explicit inside KeyVaults "Access Policies"
+                                        with Contributor permissions.
+                                    </dd>
+                                    <dt>Azure CosmosDB</dt>
+                                    <dd>
+                                        For data access Contributor permissions are required and might take several
+                                        minutes to be effective.
+                                    </dd>
+                                </dl>
+                            </p>
+                        </div>
                         <form method="post">
                             <div className="form-group">
                                 <label htmlFor="inputResourceId" className="inputResourceId">Azure ResourceID</label>
