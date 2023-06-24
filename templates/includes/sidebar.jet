@@ -16,7 +16,7 @@
                 {{ end }}
 
                 {{ if FeatureIsEnabled("azure", "roleassignments") }}
-                    {{yield navigationItem(title="RoleAssignment", href="/azure/roleassignment")}}
+                    {{yield navigationItem(title="JIT access", href="/azure/roleassignment")}}
                 {{ end }}
             {{ end }}
 

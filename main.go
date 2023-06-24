@@ -73,6 +73,7 @@ func initArgparser() {
 	}
 
 	logConfig.Encoding = "console"
+	logConfig.DisableStacktrace = true
 
 	// verbose level
 	if opts.Logger.Verbose {
