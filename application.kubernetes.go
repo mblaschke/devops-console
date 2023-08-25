@@ -733,7 +733,8 @@ func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.Kuberne
 	}
 
 	if kubeObjectList != nil {
-		for _, kubeObject := range *kubeObjectList {
+		for _, row := range *kubeObjectList {
+			kubeObject := row
 			error = c.serviceKubernetes().EnsureResourceInNamespace(namespace.Name, &kubeObject.Object)
 			if error != nil {
 				return

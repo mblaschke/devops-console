@@ -161,7 +161,9 @@ func (c *ApplicationAzure) createRoleAssignmentOnScope(scopeId string, list []az
 	}
 
 	// create RoleAssignments on scope
-	for _, roleAssignment := range list {
+	for _, row := range list {
+		roleAssignment := row
+
 		// create uuid
 		roleAssignmentId, err := uuid.GenerateUUID()
 		if err != nil {
