@@ -118,8 +118,15 @@ class SupportPagerduty extends BaseComponent {
                         Create PagerDuty emergency ticket
                     </div>
                     <div className="card-body">
-                        <div className="alert alert-warning" role="alert">
-                            You are about to create an emergency support ticket!
+                        <div className="alert alert-warning col-md-8 offset-md-2 align-self-center" role="alert">
+                            <h4 className="alert-heading">🚨 Emergency ticket 🚨</h4>
+                            <p>Emergency tickets will trigger an immediate response from the respective team,
+                                use with caution and <strong>only for emergencies</strong> eg. critical outages, bugs or if you need urgent assistance in <strong>production only</strong>!<br />
+                            </p>
+                            <hr />
+                            <p className="text-center">This is <strong>NOT</strong> a support ticket system,<br />
+                                <strong>DO NOT</strong> use emergency tickets for feature or bug tickets <br />
+                                or for issues in development or staging environments!</p>
                         </div>
 
                         <form method="post">
@@ -209,7 +216,7 @@ class SupportPagerduty extends BaseComponent {
 
                             <div className="toolbox">
                                 <button type="button" className="btn btn-primary" disabled={this.stateButton()}
-                                        onClick={this.create.bind(this)}>Create emergency ticket
+                                        onClick={this.create.bind(this)}>Create 🚨 emergency ticket 🚨
                                 </button>
                             </div>
                         </form>

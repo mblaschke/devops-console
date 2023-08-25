@@ -132,13 +132,14 @@ class Roleassignment extends BaseComponent {
                         Azure JIT access (via Azure RoleAssignment)
                     </div>
                     <div className="card-body">
-                        <div className="alert alert-warning" role="alert">
+                        <div className="alert alert-warning col-md-8 offset-md-2" role="alert">
                             <h4 className="alert-heading">How to JIT access</h4>
                             <p>
                                 Azure RoleAssignments in general might take some minutes to be active, might not
                                 automatically grant data access to Azure PaaS services by default and might require
                                 additional steps:
                             </p>
+                            <hr />
                             <p>
                                 <dl>
                                     <dt>Azure KeyVaults</dt>
