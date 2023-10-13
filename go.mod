@@ -9,7 +9,6 @@ require (
 	github.com/PagerDuty/go-pagerduty v1.7.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gorilla/securecookie v1.1.1
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
@@ -20,6 +19,7 @@ require (
 	github.com/oauth2-proxy/oauth2-proxy/v7 v7.5.2-0.20231002092658-b78c391adc6d
 	github.com/prometheus/alertmanager v0.26.0
 	github.com/prometheus/client_golang v1.17.0
+	github.com/redis/go-redis/v9 v9.2.1
 	github.com/webdevops/go-common v0.0.0-20231007150209-2fbd6bf4bfe2
 	go.uber.org/zap v1.26.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -122,7 +122,6 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
-	github.com/redis/go-redis/v9 v9.2.1 // indirect
 	github.com/remeh/sizedwaitgroup v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect

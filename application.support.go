@@ -8,8 +8,8 @@ import (
 	"time"
 
 	pagerduty "github.com/PagerDuty/go-pagerduty"
-	"github.com/go-redis/redis/v8"
 	iris "github.com/kataras/iris/v12"
+	redis "github.com/redis/go-redis/v9"
 
 	"github.com/mblaschke/devops-console/models"
 	"github.com/mblaschke/devops-console/models/formdata"
@@ -78,7 +78,7 @@ func (c *ApplicationSupport) updatePagerDutyEndpoints() {
 
 	forceUpdate := false
 
-	_, err = c.redis.Get(ctx, RedisPagerDutyEndpointLock).Result()
+	err = c.redis.Get(ctx, RedisPagerDutyEndpointLock).Err()
 	if errors.Is(err, redis.Nil) {
 		forceUpdate = true
 	}
