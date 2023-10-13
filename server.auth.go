@@ -75,7 +75,7 @@ func (c *Server) ensureServiceUser(ctx iris.Context, callback func(ctx iris.Cont
 	}
 
 	ctx.ViewData("user", user)
-	ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
+	ctx.Values().Set("userIdentification", fmt.Sprintf("upn:%v oid:%v", user.Username, user.Uuid))
 	callback(ctx, user)
 }
 
@@ -88,7 +88,7 @@ func (c *Server) ensureLoggedIn(ctx iris.Context, callback func(ctx iris.Context
 	}
 
 	ctx.ViewData("user", user)
-	ctx.Values().Set("userIdentification", fmt.Sprintf("%v[%v]", user.Username, user.Uuid))
+	ctx.Values().Set("userIdentification", fmt.Sprintf("upn:%v oid:%v", user.Username, user.Uuid))
 	callback(ctx, user)
 }
 

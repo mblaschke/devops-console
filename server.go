@@ -110,9 +110,7 @@ func (c *Server) setupConfig(path string) {
 }
 
 func (c *Server) validateConfig() {
-	if c.config.App.Oauth.AuthUrl == "" {
-		panic("app.oauth.authurl (env: OAUTH_AUTH_URL) is not set")
-	}
+	// todo
 }
 
 func (c *Server) setupKubernetes() {

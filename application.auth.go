@@ -1,31 +1,106 @@
 package main
 
 import (
-	"crypto/rand"
 	"encoding/base64"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
+	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
+	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/encryption"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/mblaschke/devops-console/services"
+	providers "github.com/oauth2-proxy/oauth2-proxy/v7/providers"
+
+	"github.com/mblaschke/devops-console/models"
 )
 
 type ApplicationAuth struct {
 	*Server
+
+	provider *providers.AzureProvider
 }
 
 func NewApplicationAuth(c *Server) *ApplicationAuth {
 	app := ApplicationAuth{Server: c}
+
+	var (
+		azureLoginURL, azureRedeemURL, azureProfileURL *url.URL
+	)
+
+	switch strings.ToLower(opts.Azure.Environment) {
+	case "azurecloud", "azurepubliccloud":
+		azureLoginURL = &url.URL{
+			Scheme: "https",
+			Host:   "login.microsoftonline.com",
+			Path:   fmt.Sprintf("/%v/oauth2/v2.0/authorize", c.config.App.Oauth.Azure.Tenant),
+		}
+
+		azureRedeemURL = &url.URL{
+			Scheme: "https",
+			Host:   "login.microsoftonline.com",
+			Path:   fmt.Sprintf("/%v/oauth2/v2.0/token", c.config.App.Oauth.Azure.Tenant),
+		}
+
+		azureProfileURL = &url.URL{
+			Scheme: "https",
+			Host:   "graph.microsoft.com",
+			Path:   "/v1.0/me",
+		}
+
+	case "azurechina", "azurechinacloud":
+		azureLoginURL = &url.URL{
+			Scheme: "https",
+			Host:   "login.partner.microsoftonline.cn",
+			Path:   fmt.Sprintf("/%v/oauth2/v2.0/authorize", c.config.App.Oauth.Azure.Tenant),
+		}
+
+		azureRedeemURL = &url.URL{
+			Scheme: "https",
+			Host:   "login.partner.microsoftonline.cn",
+			Path:   fmt.Sprintf("/%v/oauth2/v2.0/token", c.config.App.Oauth.Azure.Tenant),
+		}
+
+		azureProfileURL = &url.URL{
+			Scheme: "https",
+			Host:   "microsoftgraph.chinacloudapi.cn",
+			Path:   "/v1.0/me",
+		}
+	default:
+		panic(fmt.Sprintf(`Azure environment "%v" not supported`, opts.Azure.Environment))
+	}
+
+	providerData := providers.ProviderData{
+		ProviderName:                  "",
+		LoginURL:                      azureLoginURL,
+		RedeemURL:                     azureRedeemURL,
+		ProfileURL:                    azureProfileURL,
+		ProtectedResource:             nil,
+		ValidateURL:                   nil,
+		ClientID:                      c.config.App.Oauth.Azure.ClientId,
+		ClientSecret:                  c.config.App.Oauth.Azure.ClientSecret,
+		ClientSecretFile:              "",
+		Scope:                         "",
+		CodeChallengeMethod:           "",
+		SupportedCodeChallengeMethods: nil,
+		AllowUnverifiedEmail:          false,
+		Verifier:                      nil,
+		AllowedGroups:                 nil,
+	}
+	azureOpts := options.AzureOptions{
+		Tenant:          c.config.App.Oauth.Azure.Tenant,
+		GraphGroupField: "",
+	}
+	app.provider = providers.NewAzureProvider(&providerData, azureOpts)
 	return &app
 }
 
-func (c *Server) Login(ctx iris.Context) {
+func (c *ApplicationAuth) Login(ctx iris.Context) {
 	s := c.recreateSession(ctx, func(ctx *context.Context, cookie *http.Cookie, op uint8) {
 		if op == 1 {
 			// need lax mode for oauth redirect
@@ -33,24 +108,29 @@ func (c *Server) Login(ctx iris.Context) {
 		}
 	})
 
-	randReader := rand.Reader
-	b := make([]byte, 16)
-	if _, err := randReader.Read(b); err != nil {
-		c.logger.Error(err)
-		c.respondError(ctx, errors.New("unable to start oauth"))
+	state, err := encryption.GenerateRandomASCIIString(96)
+	if err != nil {
+		ctx.ViewData("messageError", "OAuth failed: unable to create challenge state")
+		c.templateLogin(ctx, true)
 		return
 	}
+	s.Set("oauth:state", state)
+	s.Set("oauth:redirect", ctx.FormValue("redirect"))
 
-	state := base64.URLEncoding.EncodeToString(b)
-	s.Set("oauth", state)
-	s.Set("loginRedirect", ctx.FormValue("redirect"))
+	loginUrl := c.config.App.Oauth.RedirectUrl
+	loginUrl = strings.ReplaceAll(loginUrl, "$host", ctx.Host())
 
-	oauth := c.newServiceOauth(ctx)
-	url := oauth.AuthCodeURL(state)
+	loginURL := c.provider.GetLoginURL(
+		loginUrl,
+		// encryption.HashNonce(state),
+		string(state),
+		"",
+		url.Values{},
+	)
 
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "start"}).Inc()
 
-	ctx.Redirect(url)
+	ctx.Redirect(loginURL)
 }
 
 func (c *Server) Logout(ctx iris.Context) {
@@ -63,13 +143,18 @@ func (c *Server) LogoutForced(ctx iris.Context) {
 	c.templateLogin(ctx, true)
 }
 
-func (c *Server) LoginViaOauth(ctx iris.Context) {
+func (c *ApplicationAuth) LoginViaOauth(ctx iris.Context) {
 	s := c.getSession(ctx)
-	oauth := c.newServiceOauth(ctx)
 
-	redirectUrl := s.Get("loginRedirect")
+	loginUrl := c.config.App.Oauth.RedirectUrl
+	loginUrl = strings.ReplaceAll(loginUrl, "$host", ctx.Host())
 
-	if s.Get("oauth") == "" || s.Get("oauth") == nil {
+	redirectUrl := ""
+	if val, ok := s.Get("oauth:redirect").(string); ok {
+		redirectUrl = val
+	}
+
+	if s.Get("oauth:state") == "" || s.Get("oauth:state") == nil {
 		ctx.ViewData("messageError", "OAuth pre check failed: invalid session")
 		c.templateLogin(ctx, true)
 		return
@@ -101,32 +186,51 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 		return
 	}
 
-	if state != s.Get("oauth") {
+	if state != s.Get("oauth:state") {
 		ctx.ViewData("messageError", "OAuth pre check failed: state mismatch")
 		c.templateLogin(ctx, true)
 		return
 	}
 
-	tkn, err := oauth.Exchange(code)
+	oauthSess, err := c.provider.Redeem(ctx, loginUrl, code, "")
 	if err != nil {
 		c.logger.Error(err)
-		ctx.ViewData("messageError", "OAuth check failed: failed getting token from provider")
+		ctx.ViewData("messageError", fmt.Sprintf("OAuth redeem failed: %v", err))
 		c.templateLogin(ctx, true)
 		return
 	}
 
-	if !tkn.Valid() {
-		ctx.ViewData("messageError", "OAuth check failed: invalid token")
+	err = c.provider.EnrichSession(ctx, oauthSess)
+	if err != nil {
+		c.logger.Error(err)
+		ctx.ViewData("messageError", fmt.Sprintf("OAuth check failed: %v", err))
 		c.templateLogin(ctx, true)
 		return
 	}
 
-	user, err := oauth.FetchUserInfo(tkn)
-	if err != nil {
-		c.logger.Error(err)
-		ctx.ViewData("messageError", "OAuth check failed: unable to get user information")
-		c.templateLogin(ctx, true)
-		return
+	user := models.User{
+		Uuid:     "",
+		Id:       "",
+		Username: "",
+		Email:    oauthSess.Email,
+		Teams:    nil,
+		Groups:   oauthSess.Groups,
+		IsAdmin:  false,
+	}
+
+	// extract information from accessToken
+	tokenUserInfoData := strings.Split(oauthSess.AccessToken, ".")[1]
+	if val, err := base64.RawURLEncoding.DecodeString(tokenUserInfoData); err == nil {
+		jwtData := struct {
+			Oid string `json:"oid"`
+			Upn string `json:"upn"`
+		}{}
+
+		if err := json.Unmarshal(val, &jwtData); err == nil {
+			user.Uuid = jwtData.Oid
+			user.Id = jwtData.Oid
+			user.Username = jwtData.Upn
+		}
 	}
 
 	// check username
@@ -179,8 +283,8 @@ func (c *Server) LoginViaOauth(ctx iris.Context) {
 
 	PrometheusActions.With(prometheus.Labels{"scope": "oauth", "type": "login"}).Inc()
 
-	if loginRedirect, ok := redirectUrl.(string); ok && c.checkRedirectUrl(loginRedirect) {
-		c.redirectHtml(ctx, loginRedirect)
+	if redirectUrl != "" && c.checkRedirectUrl(redirectUrl) {
+		c.redirectHtml(ctx, redirectUrl)
 	} else {
 		c.redirectHtml(ctx, "/home")
 	}
@@ -225,10 +329,4 @@ func (c *Server) checkRedirectUrl(url string) bool {
 	}
 
 	return true
-}
-
-func (c *Server) newServiceOauth(ctx iris.Context) services.OAuth {
-	oauth := services.OAuth{Host: ctx.Host()}
-	oauth.Config = c.config.App.Oauth
-	return oauth
 }

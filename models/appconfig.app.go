@@ -53,16 +53,12 @@ type (
 		UsernamePrefix string `yaml:"usernamePrefix"`
 		GroupPrefix    string `yaml:"groupPrefix"`
 
-		AuthUrl     string `yaml:"authUrl"`
 		RedirectUrl string `yaml:"redirectUrl"`
 
 		Azure struct {
 			Tenant       string `yaml:"tenant"`
 			ClientId     string `yaml:"clientId"`
 			ClientSecret string `yaml:"clientSecret"`
-
-			EndpointAuth  string `yaml:"endpointAuth"`
-			EndpointToken string `yaml:"endpointToken"`
 		} `yaml:"azuread"`
 
 		Filter struct {

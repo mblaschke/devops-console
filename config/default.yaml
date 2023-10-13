@@ -43,7 +43,6 @@ application:
     provider: {{env "OAUTH_PROVIDER" | toJson }}
     usernamePrefix: {{env "OAUTH_USERNAME_PREFIX" | toJson }}
     groupPrefix: {{env "OAUTH_GROUPS_PREFIX" | default ""  | toJson }}
-    authUrl:  {{env "OAUTH_AUTH_URL" | toJson }}
     redirectUrl: {{env "OAUTH_REDIRECT_URL" | default "" | toJson }}
 
     azuread:
@@ -51,8 +50,6 @@ application:
       clientId: {{env "AZURE_CLIENT_ID" | toJson }}
       clientSecret: {{env "AZURE_CLIENT_SECRET" | toJson }}
 
-      endpointAuth: {{env "OAUTH_ENDPOINT_AUTH" | toJson }}
-      endpointToken: {{env "OAUTH_ENDPOINT_TOKEN" | toJson }}
 
     filter:
       usernameWhitelist: {{env "OAUTH_USERNAME_FILTER_WHITELIST" | toJson }}
