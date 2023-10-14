@@ -85,18 +85,22 @@ kubernetes:
     annotations: { }
     labels: { }
 
-  environments: [ ]
-
   namespace:
     filter:
-      access: {{env "K8S_NAMESPACE_ACCESS_FILTER" | default "^(dev|test|int|isa|load|play|prod|team|user)\\-([a-zA-Z0-9]+\\-[a-zA-Z0-9]+|[a-zA-Z0-9]+)$" | toJson }}
-      delete: {{env "K8S_NAMESPACE_DELETE_FILTER" | default "^(team|user)\\-.*$" | toJson }}
-      user: {{env "K8S_NAMESPACE_USER_FILTER" | default "^user\\-%s\\-" | toJson }}
-      team: {{env "K8S_NAMESPACE_TEAM_FILTER" | default "^team\\-%s\\-" | toJson }}
+      access:
+        allow: {{env "K8S_NAMESPACE_FILTER_ACCESS_ALLOW" | default "^.+$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-).+$" | toJson }}
+      delete:
+        allow: {{env "K8S_NAMESPACE_FILTER_ACCESS_ALLOW" | default "^.+$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-).+$" | toJson }}
 
     validation:
-      app: {{env "K8S_NAMESPACE_VALIDATION_APP" | default "^[a-zA-Z0-9][-a-zA-Z0-9]{2,}$" | toJson }}
-      team: {{env "K8S_NAMESPACE_VALIDATION_TEAM" | default "^[a-zA-Z0-9]{3,}$" | toJson }}
+      namespace:
+        allow: {{env "K8S_NAMESPACE_VALIDATION_NAMESPACE_ALLOW" | default "^[a-zA-Z0-9][-a-zA-Z0-9]{2,}$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_VALIDATION_NAMESPACE_DENY" | default "" | toJson }}
+      team:
+        allow: {{env "K8S_NAMESPACE_VALIDATION_TEAM_ALLOW" | default "^[a-zA-Z0-9]{3,}$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_VALIDATION_TEAM_DENY" | default "" | toJson }}
 
     annotations:
       description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
@@ -104,18 +108,12 @@ kubernetes:
       networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
 
     labels:
-      name: {{env "K8S_LABEL_NAME" | default "name" | toJson }}
-      user: {{env "K8S_LABEL_USER" | default "user" | toJson }}
-      team: {{env "K8S_LABEL_TEAM" | default "team" | toJson }}
-      environment: {{env "K8S_LABEL_ENV" | default "env" | toJson }}
+      team: {{env "K8S_LABEL_TEAM" | default "owner" | toJson }}
 
     role:
       team: {{env "K8S_TEAM_NAMESPACEROLE" | default "admin" | toJson }}
-      user: {{env "K8S_USER_NAMESPACEROLE" | default "admin" | toJson }}
-      private: {{env "K8S_USER_NAMESPACEROLE_PRIVATE" |default "true" }}
 
     quota:
-      user: {{env "K8S_NAMESPACE_USER_QUOTA" | default "0" | int }}
       team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
 
     settings: [ ]

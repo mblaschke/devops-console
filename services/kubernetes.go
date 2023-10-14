@@ -32,7 +32,7 @@ type Kubernetes struct {
 	Config models.AppConfig
 
 	Filter struct {
-		Namespace *regexp.Regexp
+		Namespace models.AppConfigFilter
 	}
 }
 
@@ -407,7 +407,7 @@ func (k *Kubernetes) RoleBindingCreateNamespaceServiceAccount(namespace, service
 }
 
 func (k *Kubernetes) namespaceValidate(name string) (err error) {
-	if k.Filter.Namespace != nil && !k.Filter.Namespace.MatchString(name) {
+	if !k.Filter.Namespace.Validate(name) {
 		err = fmt.Errorf("namespace %v not allowed", name)
 	}
 

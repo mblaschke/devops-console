@@ -116,9 +116,8 @@ class NamespaceEdit extends BaseComponent {
                                 </div>
                                 <div className="modal-body">
                                     <div className="form-group">
-                                        <label htmlFor="inputNsApp" className="inputRg">Namespace</label>
-                                        <input className="form-control" type="text" value={this.state.form.name}
-                                               readOnly/>
+                                        <label htmlFor="inputNsName" className="inputRg">Namespace</label>
+                                        <input className="form-control" id="inputNsName" type="text" value={this.state.form.name} readOnly/>
                                     </div>
 
                                     <div className="form-group">

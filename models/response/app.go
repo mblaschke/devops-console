@@ -45,8 +45,7 @@ type (
 	}
 
 	ResponseConfigKubernetes struct {
-		Namespace    ResponseConfigKubernetesNamespace               `json:"namespace"`
-		Environments []ResponseConfigKubernetesNamespaceEnvironments `json:"environments"`
+		Namespace ResponseConfigKubernetesNamespace `json:"namespace"`
 	}
 
 	ResponseConfigKubernetesNamespaceEnvironments struct {

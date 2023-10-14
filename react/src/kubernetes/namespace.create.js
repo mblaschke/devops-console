@@ -9,15 +9,11 @@ class NamespaceCreate extends BaseComponent {
         super(props);
 
         this.state = {
-            namespacePreview: "",
             buttonText: "Create namespace",
-
-            environment: {},
 
             requestRunning: false,
             form: {
-                environment: "",
-                app: "",
+                name: "",
                 team: "",
                 description: "",
                 settings: {}
@@ -61,34 +57,11 @@ class NamespaceCreate extends BaseComponent {
 
         if (this.state.requestRunning) {
             state = "disabled";
-        } else if (this.state.form.environment === "" || this.state.form.app === "" || this.state.form.team === "") {
+        } else if (this.state.form.name === "" || this.state.form.team === "") {
             state = "disabled"
         }
 
         return state
-    }
-
-    previewNamespace() {
-        let namespace = "";
-
-        let selectedEnv = this.state.form.environment;
-        let envConfig = false;
-
-        this.props.config.kubernetes.environments.forEach((row) => {
-            if (row.environment === selectedEnv) {
-                envConfig = row;
-            }
-        });
-
-        if (envConfig && envConfig.template) {
-            namespace = envConfig.template;
-            namespace = namespace.replace("{env}", selectedEnv);
-            namespace = namespace.replace("{user}", this.props.config.user.username);
-            namespace = namespace.replace("{team}", this.state.form.team);
-            namespace = namespace.replace("{app}", this.state.form.app);
-        }
-
-        return namespace.toLowerCase().replace(/_/g, "");
     }
 
     componentWillMount() {
@@ -100,9 +73,8 @@ class NamespaceCreate extends BaseComponent {
 
         if (!state.form) {
             state.form = {
+                name: "",
                 team: "",
-                environment: "",
-                app: "",
                 description: ""
             };
         }
@@ -115,19 +87,12 @@ class NamespaceCreate extends BaseComponent {
                     state.form.team = lastSelectedTeam;
                 }
             });
-        } catch (e) {
-        }
+        } catch (e) {}
 
         // select first team if no selection available
         if (!state.form.team || state.form.team === "") {
             if (this.props.config.teams.length > 0) {
                 state.form.team = this.props.config.teams[0].name;
-            }
-        }
-
-        if (!state.form.environment) {
-            if (this.props.config.kubernetes.environments.length > 0) {
-                state.form.environment = this.props.config.kubernetes.environments[0].environment;
             }
         }
 
@@ -169,37 +134,18 @@ class NamespaceCreate extends BaseComponent {
                                 <div className="modal-body">
                                     <div className="row">
                                         <div className="col">
-                                            <div className="p-3 mb-2 bg-light text-dark">
-                                                <div className="button-copy-box">
-                                                    <i>Preview: </i><span
-                                                    id="namespacePreview">{this.previewNamespace()}</span>
-                                                    <CopyToClipboard text={this.previewNamespace()}>
-                                                        <button className="button-copy"
-                                                                onClick={this.handlePreventEvent.bind(this)}><i
-                                                            className="far fa-copy"></i></button>
-                                                    </CopyToClipboard>
-                                                </div>
-                                            </div>
+                                            <label htmlFor="inputNsName" className="inputRg">Namespace</label>
+                                            <input type="text" id="inputNsName" name="nsName" className="form-control"
+                                                   placeholder="Namespace" value={this.getValue("form.name")}
+                                                   onChange={this.setValue.bind(this, "form.name")}/>
                                         </div>
                                     </div>
 
                                     <div className="row">
                                         <div className="col">
-                                            <label htmlFor="inputNsEnvironment">Environment</label>
-                                            <select name="nsEnvironment" id="inputNsEnvironment"
-                                                    className="form-control" required
-                                                    value={this.getValue("form.environment")}
-                                                    onChange={this.setValue.bind(this, "form.environment")}>
-                                                {this.props.config.kubernetes.environments.map((row) =>
-                                                    <option key={row.environment}
-                                                            value={row.environment}>{row.environment} ({row.description})</option>
-                                                )}
-                                            </select>
-                                        </div>
-                                        <div className="col">
-                                            <label htmlFor="inputNsAreaTeam">Team</label>
-                                            <select name="nsAreaTeam" id="inputNsAreaTeam"
-                                                    className="form-control namespace-area-team"
+                                            <label htmlFor="inputNsTeamr">Team</label>
+                                            <select name="nsTeam" id="inputNsTeam"
+                                                    className="form-control namespace-team"
                                                     value={this.getValue("form.team")}
                                                     onChange={this.setValue.bind(this, "form.team")}>
                                                 {this.props.config.teams.map((row, value) =>
@@ -207,17 +153,12 @@ class NamespaceCreate extends BaseComponent {
                                                 )}
                                             </select>
                                         </div>
-                                        <div className="col">
-                                            <label htmlFor="inputNsApp" className="inputNsApp">Application</label>
-                                            <input type="text" name="nsApp" id="inputNsApp" className="form-control"
-                                                   placeholder="Name" required value={this.getValue("form.app")}
-                                                   onChange={this.setValue.bind(this, "form.app")}/>
-                                        </div>
                                     </div>
 
                                     <div className="row">
                                         <div className="col">
-                                            <input type="text" name="nsDescription" className="form-control"
+                                            <label htmlFor="inputNsDescription">Description</label>
+                                            <input type="text" id="inputNsDescription" name="nsDescription" className="form-control"
                                                    placeholder="Description" value={this.getValue("form.description")}
                                                    onChange={this.setValue.bind(this, "form.description")}/>
                                         </div>

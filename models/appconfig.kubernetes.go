@@ -10,8 +10,6 @@ type (
 
 		RoleBinding AppConfigKubernetesRoleBindingMetaData `yaml:"roleBinding"`
 
-		Environments []AppConfigKubernetesEnvironment `yaml:"environments"`
-
 		Namespace AppConfigKubernetesNamespace
 	}
 
@@ -36,15 +34,13 @@ type (
 
 	AppConfigKubernetesNamespace struct {
 		Filter struct {
-			Access string
-			Delete string
-			User   string
-			Team   string
+			Access AppConfigFilter
+			Delete AppConfigFilter
 		}
 
 		Validation struct {
-			App  string
-			Team string
+			Namespace AppConfigFilter
+			Team      AppConfigFilter
 		}
 
 		Annotations struct {
@@ -54,10 +50,7 @@ type (
 		}
 
 		Labels struct {
-			Name        string
-			User        string
-			Team        string
-			Environment string
+			Team string
 		}
 
 		Role struct {
@@ -67,7 +60,6 @@ type (
 		}
 
 		Quota struct {
-			User int
 			Team int
 		}
 

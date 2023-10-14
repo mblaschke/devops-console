@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 
@@ -37,10 +36,7 @@ func (c *ApplicationKubernetes) serviceKubernetes() (service *services.Kubernete
 	service = &services.Kubernetes{
 		Config: c.config,
 	}
-
-	if c.config.Kubernetes.Namespace.Filter.Access != "" {
-		service.Filter.Namespace = regexp.MustCompile(c.config.Kubernetes.Namespace.Filter.Access)
-	}
+	service.Filter.Namespace = c.config.Kubernetes.Namespace.Filter.Access
 
 	return
 }
@@ -73,20 +69,13 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			continue
 		}
 
-		namespaceParts := strings.Split(namespace.Name, "-")
-		environment := ""
-		if len(namespaceParts) > 2 {
-			environment = namespaceParts[0]
-		}
-
 		row := response.KubernetesNamespace{
-			Name:        namespace.Name,
-			Environment: environment,
-			Status:      fmt.Sprintf("%v", namespace.Status.Phase),
-			Created:     namespace.CreationTimestamp.UTC().String(),
-			CreatedAgo:  humanize.Time(namespace.CreationTimestamp.UTC()),
-			Deleteable:  c.kubernetesNamespaceDeleteAllowed(ctx, &namespace, user),
-			Settings:    namespace.SettingsExtract(c.config.Kubernetes),
+			Name:       namespace.Name,
+			Status:     fmt.Sprintf("%v", namespace.Status.Phase),
+			Created:    namespace.CreationTimestamp.UTC().String(),
+			CreatedAgo: humanize.Time(namespace.CreationTimestamp.UTC()),
+			Deleteable: c.kubernetesNamespaceDeleteAllowed(ctx, &namespace, user),
+			Settings:   namespace.SettingsExtract(c.config.Kubernetes),
 		}
 
 		if opts.Kubernetes.EnableNamespacePodCount {
@@ -101,12 +90,8 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			row.NetworkPolicy = val
 		}
 
-		if val, ok := namespace.Labels["team"]; ok {
+		if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 			row.OwnerTeam = val
-		}
-
-		if val, ok := namespace.Labels["user"]; ok {
-			row.OwnerUser = val
 		}
 
 		ret = append(ret, row)
@@ -138,20 +123,8 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 		return
 	}
 
-	// environment detection
-	if formData.Environment == nil {
-		if val := c.detectEnvironmentFromNamespaceName(namespaceName); val != nil {
-			formData.Environment = val
-		}
-	}
-	if formData.Environment == nil {
-		c.respondError(ctx, fmt.Errorf("no environment set"))
-		return
-	}
-
 	labels := map[string]string{
-		c.config.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
-		c.config.Kubernetes.Namespace.Labels.Team:        *formData.Team,
+		c.config.Kubernetes.Namespace.Labels.Team: *formData.Team,
 	}
 
 	// validation
@@ -162,9 +135,6 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 	}
 
 	labels[c.config.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
-
-	// set name label
-	labels[c.config.Kubernetes.Namespace.Labels.Name] = namespaceName
 
 	namespace := models.KubernetesNamespace{Namespace: &coreV1.Namespace{}}
 	namespace.Name = namespaceName
@@ -201,10 +171,8 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 		if !c.kubernetesNamespaceCheckOwnership(ctx, existingNs, user) {
 			message := fmt.Sprintf("namespace \"%s\" already exists (owned by system)", namespace.Name)
 
-			if existingNsTeam, ok := existingNs.Labels["team"]; ok {
+			if existingNsTeam, ok := existingNs.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 				message = fmt.Sprintf("namespace \"%s\" already exists (owned by team \"%s\")", namespace.Name, existingNsTeam)
-			} else if existingNsUser, ok := existingNs.Labels["user"]; ok {
-				message = fmt.Sprintf("namespace \"%s\" already exists (owned by user \"%s\")", namespace.Name, existingNsUser)
 			}
 			c.respondError(ctx, fmt.Errorf(message))
 			return
@@ -227,10 +195,6 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 
 		if namespace.Labels == nil {
 			existingNs.Labels = map[string]string{}
-		}
-
-		if formData.Environment != nil {
-			existingNs.Labels[c.config.Kubernetes.Namespace.Labels.Environment] = *formData.Environment
 		}
 
 		if _, err = c.updateNamespace(existingNs, true); err != nil {
@@ -267,7 +231,6 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 
 func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *models.User) {
 	var namespaceName string
-	var kubernetesEnvironment *models.AppConfigKubernetesEnvironment
 
 	formData, err := c.getJsonFromFormData(ctx)
 	if err != nil {
@@ -275,47 +238,25 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 		return
 	}
 
-	if formData.Settings == nil || formData.Description == nil || formData.App == nil || formData.Environment == nil || formData.Team == nil {
+	if formData.Settings == nil || formData.Description == nil || formData.Name == nil || formData.Team == nil {
 		c.respondError(ctx, fmt.Errorf("invalid form data"))
 		return
 	}
 
-	username := user.Username
-
-	if !regexp.MustCompile(c.config.Kubernetes.Namespace.Validation.App).MatchString(*formData.App) {
-		c.respondError(ctx, fmt.Errorf("invalid app value"))
+	// team filter check
+	if !c.config.Kubernetes.Namespace.Validation.Team.Validate(*formData.Team) {
+		c.respondError(ctx, fmt.Errorf("invalid team value"))
 		return
 	}
 
 	labels := map[string]string{
-		c.config.Kubernetes.Namespace.Labels.Environment: *formData.Environment,
+		c.config.Kubernetes.Namespace.Labels.Team: *formData.Team,
 	}
 
 	// validation
 	nsSettings, validationMessages := c.validateSettings(*formData.Settings)
 	if len(validationMessages) >= 1 {
 		c.respondError(ctx, fmt.Errorf(strings.Join(validationMessages, "\n")))
-		return
-	}
-
-	// check if environment is allowed
-	environmentAllowed := false
-	for _, env := range c.config.Kubernetes.Environments {
-		if env.Name == *formData.Environment {
-			envVal := env
-			environmentAllowed = true
-			kubernetesEnvironment = &envVal
-			break
-		}
-	}
-	if !environmentAllowed || kubernetesEnvironment == nil {
-		c.respondError(ctx, fmt.Errorf("environment \"%s\" not allowed in this cluster", *formData.Environment))
-		return
-	}
-
-	// team filter check
-	if !regexp.MustCompile(c.config.Kubernetes.Namespace.Validation.Team).MatchString(*formData.Team) {
-		c.respondError(ctx, fmt.Errorf("invalid team value"))
 		return
 	}
 
@@ -326,38 +267,19 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	}
 
 	// quota check
-	switch kubernetesEnvironment.Quota {
-	case "team":
-		// quota check
-		if err := c.checkNamespaceTeamQuota(*formData.Team); err != nil {
-			c.respondError(ctx, err)
-			return
-		}
-	case "user":
-		// quota check
-		if err := c.checkNamespaceUserQuota(username); err != nil {
-			c.respondError(ctx, err)
-			return
-		}
-
-		labels[c.config.Kubernetes.Namespace.Labels.User] = strings.ToLower(username)
+	if err := c.checkNamespaceTeamQuota(*formData.Team); err != nil {
+		c.respondError(ctx, err)
+		return
 	}
 
 	// build namespace name
-	namespaceName = kubernetesEnvironment.Template
-	namespaceName = strings.Replace(namespaceName, "{env}", kubernetesEnvironment.Name, -1)
-	namespaceName = strings.Replace(namespaceName, "{user}", username, -1)
-	namespaceName = strings.Replace(namespaceName, "{team}", *formData.Team, -1)
-	namespaceName = strings.Replace(namespaceName, "{app}", *formData.App, -1)
+	namespaceName = *formData.Name
 
 	// namespace filtering
 	namespaceName = strings.ToLower(namespaceName)
 	namespaceName = strings.Replace(namespaceName, "_", "", -1)
 
 	labels[c.config.Kubernetes.Namespace.Labels.Team] = strings.ToLower(*formData.Team)
-
-	// set name label
-	labels[c.config.Kubernetes.Namespace.Labels.Name] = namespaceName
 
 	namespace := models.KubernetesNamespace{Namespace: &coreV1.Namespace{}}
 	namespace.Name = namespaceName
@@ -388,10 +310,8 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	existingNs, _ := service.NamespaceGet(namespace.Name)
 	if existingNs != nil && existingNs.GetUID() != "" {
 		message := ""
-		if existingNsTeam, ok := existingNs.Labels["team"]; ok {
+		if existingNsTeam, ok := existingNs.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 			message = fmt.Sprintf("namespace \"%s\" already exists (owned by team \"%s\")", namespace.Name, existingNsTeam)
-		} else if existingNsUser, ok := existingNs.Labels["user"]; ok {
-			message = fmt.Sprintf("namespace \"%s\" already exists (owned by user \"%s\")", namespace.Name, existingNsUser)
 		} else {
 			message = fmt.Sprintf("namespace \"%s\" already exists", namespace.Name)
 		}
@@ -565,16 +485,6 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 }
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace, force bool) (*models.KubernetesNamespace, error) {
-	// add env label
-	if _, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment]; !ok {
-		parts := strings.Split(namespace.Name, "-")
-
-		if len(parts) > 1 {
-			namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment] = parts[0]
-			force = true
-		}
-	}
-
 	if force {
 		if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 			return namespace, err
@@ -590,22 +500,7 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 		return false
 	}
 
-	username := strings.ToLower(user.Username)
-	username = strings.Replace(username, "_", "", -1)
-
-	// USER namespace
-	regexpUser := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
-	if regexpUser.MatchString(namespace.Name) {
-		return true
-	}
-
-	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; ok {
-		if val == user.Username {
-			return true
-		}
-	}
-
-	// ENV namespace (team labels)
+	// check team
 	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		for _, team := range user.Teams {
 			if val == team.Name {
@@ -614,20 +509,11 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 		}
 	}
 
-	// TEAM namespace
-	teamsQuoted := []string{}
-	for _, team := range user.Teams {
-		teamsQuoted = append(teamsQuoted, regexp.QuoteMeta(team.Name))
-	}
-
-	regexpTeamStr := fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.Team, "("+strings.Join(teamsQuoted, "|")+")")
-	regexpTeam := regexp.MustCompile(regexpTeamStr)
-
-	return regexpTeam.MatchString(namespace.Name)
+	return false
 }
 
 func (c *ApplicationKubernetes) kubernetesNamespaceDeleteAllowed(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) bool {
-	ret := regexp.MustCompile(c.config.Kubernetes.Namespace.Filter.Delete).MatchString(namespace.Name)
+	ret := c.config.Kubernetes.Namespace.Filter.Delete.Validate(namespace.Name)
 
 	if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Immortal]; ok {
 		if val == "true" {
@@ -647,13 +533,7 @@ func (c *ApplicationKubernetes) kubernetesNamespaceCheckOwnership(ctx iris.Conte
 		return false
 	}
 
-	username := user.Username
-
-	if labelUserVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; ok {
-		if labelUserVal == username {
-			return true
-		}
-	} else if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
+	if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		// Team rolebinding
 		if _, err := user.GetTeam(labelTeamVal); err == nil {
 			return true
@@ -687,20 +567,7 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 		return fmt.Errorf("namespace \"%s\" not owned by current user", namespace.Name)
 	}
 
-	username := user.Username
-	k8sUsername := user.Id
-
-	if labelUserVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.User]; c.config.Kubernetes.Namespace.Role.Private && ok {
-		if labelUserVal == username {
-			// User rolebinding
-			role := c.config.Kubernetes.Namespace.Role.User
-			if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceUser(namespace.Name, username, k8sUsername, role); err != nil {
-				return err
-			}
-		} else {
-			return fmt.Errorf("namespace \"%s\" not owned by current user", namespace.Name)
-		}
-	} else if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
+	if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		// Team rolebinding
 		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
 			for _, permission := range namespaceTeam.K8sPermissions {
@@ -718,12 +585,6 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 
 func (c *ApplicationKubernetes) updateNamespaceObjects(namespace *models.KubernetesNamespace) (error error) {
 	var kubeObjectList *models.KubernetesObjectList
-
-	if environment, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Environment]; ok {
-		if configObjects, ok := c.config.Kubernetes.ObjectsList[environment]; ok {
-			kubeObjectList = &configObjects
-		}
-	}
 
 	// if empty, try default
 	if kubeObjectList == nil {
@@ -787,40 +648,22 @@ func (c *ApplicationKubernetes) checkNamespaceTeamQuota(team string) (err error)
 		return
 	}
 
-	regexp := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.Team, regexp.QuoteMeta(team)))
-
-	count, err = c.serviceKubernetes().NamespaceCount(regexp)
+	namespaceList, err := c.serviceKubernetes().NamespaceList()
 	if err != nil {
 		return
+	}
+
+	for _, namespace := range namespaceList {
+		if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
+			if strings.EqualFold(labelTeamVal, team) {
+				count++
+			}
+		}
 	}
 
 	if count >= quota {
 		// quota exceeded
 		err = fmt.Errorf("team namespace quota of %v namespaces exceeded ", quota)
-	}
-
-	return
-}
-
-func (c *ApplicationKubernetes) checkNamespaceUserQuota(username string) (err error) {
-	var count int
-	quota := c.config.Kubernetes.Namespace.Quota.User
-
-	if quota <= 0 {
-		// no quota
-		return
-	}
-
-	regexp := regexp.MustCompile(fmt.Sprintf(c.config.Kubernetes.Namespace.Filter.User, regexp.QuoteMeta(username)))
-
-	count, err = c.serviceKubernetes().NamespaceCount(regexp)
-	if err != nil {
-		return
-	}
-
-	if count >= quota {
-		// quota exceeded
-		err = fmt.Errorf("personal namespace quota of %v namespaces exceeded ", quota)
 	}
 
 	return
@@ -872,23 +715,6 @@ func (c *ApplicationKubernetes) getNamespace(ctx iris.Context, namespaceName str
 	}
 
 	return
-}
-
-func (c *ApplicationKubernetes) detectEnvironmentFromNamespaceName(namespaceName string) (ret *string) {
-	for _, env := range c.config.Kubernetes.Environments {
-		envName := env.Name
-		envPattern := env.Template
-		envPattern = strings.Replace(envPattern, "{env}", envName, -1)
-		envPattern = regexp.QuoteMeta(envPattern)
-		envPattern = regexp.MustCompile(`{[^\\}]+}`).ReplaceAllString(envPattern, ".+")
-
-		if regexp.MustCompile(envPattern).MatchString(namespaceName) {
-			ret = &envName
-			return
-		}
-	}
-
-	return nil
 }
 
 func (c *ApplicationKubernetes) getJsonFromFormData(ctx iris.Context) (formData *formdata.KubernetesNamespaceCreate, err error) {

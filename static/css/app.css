@@ -433,6 +433,14 @@ table.table thead th {
     border-radius: 0.1rem !important;
 }
 
+dl dt {
+    font-weight: bold;
+}
+
+dl dd {
+    padding-left: 1rem;
+}
+
 .spinner-area {
     position: relative;
 }

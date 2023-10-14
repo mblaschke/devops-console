@@ -9,9 +9,20 @@
                   </a>
                   <div class="dropdown-menu dropdown-menu-lg-end p-4 text-muted" aria-labelledby="navbarProfile">
                     <p>
-                      <strong>UserID:</strong><br>{{user.Uuid}}<br>
-                      <strong>Username:</strong><br>{{user.Username}}<br>
-                      <strong>Groups:</strong><br>{{user.Groups}}<br>
+                        <dl>
+                          <dt>User ID</dt>
+                          <dd>{{user.Uuid}}</dd>
+
+                          <dt>Username</dt>
+                          <dd>{{user.Username}}</dd>
+
+                          <dt>Groups</dt>
+                          <dd>
+                            {{range user.Groups}}
+                              {{ . }} <br>
+                            {{ end }}
+                          </dd>
+                        </dl>
                     </p>
                   </div>
                 </li>

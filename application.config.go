@@ -31,7 +31,6 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 
 	ret.Quota = map[string]int{
 		"team": c.config.Kubernetes.Namespace.Quota.Team,
-		"user": c.config.Kubernetes.Namespace.Quota.User,
 	}
 
 	// azure
@@ -55,17 +54,6 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 
 	// kubernetes
 	ret.Kubernetes = response.ResponseConfigKubernetes{}
-
-	for _, row := range c.config.Kubernetes.Environments {
-		ret.Kubernetes.Environments = append(
-			ret.Kubernetes.Environments,
-			response.ResponseConfigKubernetesNamespaceEnvironments{
-				Environment: row.Name,
-				Description: row.Description,
-				Template:    row.Template,
-			},
-		)
-	}
 
 	for _, row := range c.config.Kubernetes.Namespace.Settings {
 		ret.Kubernetes.Namespace.Settings = append(
