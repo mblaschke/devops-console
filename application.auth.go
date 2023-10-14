@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -13,6 +11,7 @@ import (
 	"github.com/kataras/iris/v12/context"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/encryption"
+	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/requests"
 	"github.com/prometheus/client_golang/prometheus"
 
 	providers "github.com/oauth2-proxy/oauth2-proxy/v7/providers"
@@ -85,7 +84,7 @@ func NewApplicationAuth(c *Server) *ApplicationAuth {
 		ClientID:                      c.config.App.Oauth.Azure.ClientId,
 		ClientSecret:                  c.config.App.Oauth.Azure.ClientSecret,
 		ClientSecretFile:              "",
-		Scope:                         "",
+		Scope:                         "openid profile",
 		CodeChallengeMethod:           "",
 		SupportedCodeChallengeMethods: nil,
 		AllowUnverifiedEmail:          false,
@@ -208,6 +207,21 @@ func (c *ApplicationAuth) LoginViaOauth(ctx iris.Context) {
 		return
 	}
 
+	// fetch profile from azuread
+	profileResp, err := requests.New(c.provider.ProfileURL.String()).
+		WithContext(ctx).
+		WithHeaders(http.Header{
+			"Authorization": []string{"Bearer " + oauthSess.AccessToken},
+		}).
+		Do().
+		UnmarshalSimpleJSON()
+	if err != nil {
+		c.logger.Error(err)
+		ctx.ViewData("messageError", fmt.Sprintf("OAuth profile fetch failed: %v", err))
+		c.templateLogin(ctx, true)
+		return
+	}
+
 	user := models.User{
 		Uuid:     "",
 		Id:       "",
@@ -218,24 +232,19 @@ func (c *ApplicationAuth) LoginViaOauth(ctx iris.Context) {
 		IsAdmin:  false,
 	}
 
-	// extract information from accessToken
-	tokenUserInfoData := strings.Split(oauthSess.AccessToken, ".")[1]
-	if val, err := base64.RawURLEncoding.DecodeString(tokenUserInfoData); err == nil {
-		jwtData := struct {
-			Oid string `json:"oid"`
-			Upn string `json:"upn"`
-		}{}
-
-		if err := json.Unmarshal(val, &jwtData); err == nil {
-			user.Uuid = jwtData.Oid
-			user.Id = jwtData.Oid
-			user.Username = jwtData.Upn
-		}
+	if val, err := profileResp.Get("id").String(); err == nil && val != "" {
+		user.Uuid = val
+		user.Id = val
+	} else {
+		ctx.ViewData("messageError", "OAuth login failed: provided uuid is empty")
+		c.templateLogin(ctx, true)
+		return
 	}
 
-	// check username
-	if user.Username == "" {
-		ctx.ViewData("messageError", "OAuth login failed: provided username is empty")
+	if val, err := profileResp.Get("userPrincipalName").String(); err == nil && val != "" {
+		user.Username = val
+	} else {
+		ctx.ViewData("messageError", "OAuth login failed: provided userPrincipalName is empty")
 		c.templateLogin(ctx, true)
 		return
 	}

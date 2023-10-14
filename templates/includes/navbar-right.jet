@@ -1,6 +1,23 @@
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
         <li class="nav-item">
-            <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">{{user.Username}}</a>
+
+            <div class="collapse navbar-collapse">
+              <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarProfile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Profile
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-lg-end p-4 text-muted" aria-labelledby="navbarProfile">
+                    <p>
+                      <strong>UserID:</strong><br>{{user.Uuid}}<br>
+                      <strong>Username:</strong><br>{{user.Username}}<br>
+                      <strong>Groups:</strong><br>{{user.Groups}}<br>
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
         </li>
+
         <a href="/logout" class="btn btn-outline-danger" role="button"><i class="fas fa-power-off"></i></a>
     </ul>
