@@ -5,9 +5,6 @@ application:
 
 azure:
   resourcegroup:
-    validation:
-      regexp: "^(.+)-rg$"
-
     tags:
       - name: Foo
         label: Barfoo

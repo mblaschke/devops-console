@@ -204,8 +204,8 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 	}
 
 	// validate name
-	if !c.config.Azure.ResourceGroup.Validation.Validate(formData.Name) {
-		validationMessages = append(validationMessages, fmt.Sprintf("validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Validation.HumanizeString()))
+	if !c.config.Azure.ResourceGroup.Filter.Name.Validate(formData.Name) {
+		validationMessages = append(validationMessages, fmt.Sprintf("validation of ResourceGroup name \"%v\" failed (%v)", formData.Name, c.config.Azure.ResourceGroup.Filter.Name.String()))
 	}
 
 	// membership check
@@ -364,6 +364,11 @@ func (c *ApplicationAzure) handleRoleAssignmentAction(ctx iris.Context, user *mo
 	formData.Reason = strings.TrimSpace(formData.Reason)
 	if formData.Reason == "" {
 		c.respondError(ctx, fmt.Errorf("no Reason specified"))
+		return
+	}
+
+	if !c.config.Azure.RoleAssignment.Filter.ResourceId.Validate(formData.ResourceId) {
+		c.respondError(ctx, fmt.Errorf("resource id not allowed (%v)", c.config.Azure.RoleAssignment.Filter.ResourceId.String()))
 		return
 	}
 

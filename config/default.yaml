@@ -61,6 +61,10 @@ application:
 
 azure:
   roleassignment:
+    filter:
+      resourceId:
+        allow: {{env "AZURE_ROLEASSIGNMENT_RESOURCEID_FILTER_ALLOW" | default "^/subscriptions/.+$" | toJson }}
+        deny: {{env "AZURE_ROLEASSIGNMENT_RESOURCEID_FILTER_DENY" | default "" | toJson }}
     roledefinitions:
       - Owner
       - Contributor
@@ -72,8 +76,10 @@ azure:
       - 8h
 
   resourcegroup:
-    validation:
-      regexp: "^(.+)-rg$"
+    filter:
+      name:
+        allow: {{env "AZURE_RESOURCEGROUP_NAME_FILTER_ALLOW" | default "^.+-rg$" | toJson }}
+        deny: {{env "AZURE_RESOURCEGROUP_NAME_FILTER_DENY" | default "" | toJson }}
 
     tags: [ ]
 

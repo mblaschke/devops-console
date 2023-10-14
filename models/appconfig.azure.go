@@ -3,13 +3,20 @@ package models
 type (
 	AppConfigAzure struct {
 		RoleAssignment struct {
+			Filter struct {
+				ResourceId AppConfigFilter `yaml:"resourceId"`
+			}
+
 			RoleDefinitions []string
 			Ttl             []string
 		}
 
 		ResourceGroup struct {
-			Validation AppInputValidation
-			Tags       []AppConfigAzureResourceGroupTag
+			Filter struct {
+				Name AppConfigFilter `yaml:"name"`
+			}
+
+			Tags []AppConfigAzureResourceGroupTag
 		}
 	}
 

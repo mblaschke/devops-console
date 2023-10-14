@@ -245,7 +245,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// team filter check
 	if !c.config.Kubernetes.Namespace.Validation.Team.Validate(*formData.Team) {
-		c.respondError(ctx, fmt.Errorf("invalid team value"))
+		c.respondError(ctx, fmt.Errorf("invalid team value (%v)", c.config.Kubernetes.Namespace.Validation.Team.String()))
 		return
 	}
 

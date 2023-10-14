@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 )
 
@@ -58,4 +59,19 @@ func (f *AppConfigFilter) Validate(val string) bool {
 	}
 
 	return true
+}
+
+func (f *AppConfigFilter) String() (ret string) {
+	if f.Allow != "" {
+		ret += fmt.Sprintf(` allow:%v `, f.Allow)
+	}
+
+	if f.Deny != "" {
+		ret += fmt.Sprintf(` deny:%v `, f.Deny)
+	}
+
+	if ret == "" {
+		ret = "no filter set"
+	}
+	return
 }
