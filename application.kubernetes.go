@@ -20,7 +20,8 @@ import (
 )
 
 const (
-	RedisKubernetesNamespaceList = `kubernetes:namespace:list`
+	RedisKubernetesNamespaceList           = `kubernetes:namespace:list`
+	KubernetesNamespaceAnnotationManagedBy = `devops-console`
 )
 
 type ApplicationKubernetes struct {
@@ -69,11 +70,21 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 			continue
 		}
 
+		managedBy := ""
+		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy]; ok {
+			// only show if managed by different source
+			if !strings.EqualFold(val, KubernetesNamespaceAnnotationManagedBy) {
+				managedBy = val
+			}
+		}
+
 		row := response.KubernetesNamespace{
 			Name:       namespace.Name,
 			Status:     fmt.Sprintf("%v", namespace.Status.Phase),
 			Created:    namespace.CreationTimestamp.UTC().String(),
 			CreatedAgo: humanize.Time(namespace.CreationTimestamp.UTC()),
+			ManagedBy:  managedBy,
+			Editable:   c.kubernetesNamespaceEditAllowed(ctx, &namespace, user),
 			Deleteable: c.kubernetesNamespaceDeleteAllowed(ctx, &namespace, user),
 			Settings:   namespace.SettingsExtract(c.config.Kubernetes),
 		}
@@ -153,6 +164,7 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 	if formData.Description != nil {
 		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
+	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
 		c.respondError(ctx, fmt.Errorf("access to namespace \"%s\" denied", namespace.Name))
@@ -174,6 +186,12 @@ func (c *ApplicationKubernetes) ApiServiceNamespaceEnsure(ctx iris.Context, user
 			if existingNsTeam, ok := existingNs.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 				message = fmt.Sprintf("namespace \"%s\" already exists (owned by team \"%s\")", namespace.Name, existingNsTeam)
 			}
+			c.respondError(ctx, fmt.Errorf(message))
+			return
+		}
+
+		if !c.kubernetesNamespaceEditAllowed(ctx, existingNs, user) {
+			message := fmt.Sprintf("namespace \"%s\" exists and not managed by devops-console", namespace.Name)
 			c.respondError(ctx, fmt.Errorf(message))
 			return
 		}
@@ -298,6 +316,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	if formData.Description != nil {
 		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
+	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
 		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to namespace \"%s\" denied", namespace.Name))
@@ -400,6 +419,12 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 		return
 	}
 
+	if !c.kubernetesNamespaceEditAllowed(ctx, namespace, user) {
+		message := fmt.Sprintf("namespace \"%s\" exists and not managed by devops-console", namespace.Name)
+		c.respondError(ctx, fmt.Errorf(message))
+		return
+	}
+
 	if namespace.Annotations == nil {
 		namespace.Annotations = map[string]string{}
 	}
@@ -411,6 +436,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	if formData.NetworkPolicy != nil {
 		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
+	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
 
 	// labels
 	if formData.Settings != nil {
@@ -463,6 +489,12 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 		return
 	}
 
+	if !c.kubernetesNamespaceEditAllowed(ctx, namespace, user) {
+		message := fmt.Sprintf("namespace \"%s\" exists and not managed by devops-console", namespace.Name)
+		c.respondError(ctx, fmt.Errorf(message))
+		return
+	}
+
 	if namespace, err = c.updateNamespace(namespace, false); err != nil {
 		c.respondError(ctx, err)
 		return
@@ -486,6 +518,11 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace, force bool) (*models.KubernetesNamespace, error) {
 	if force {
+		if namespace.Annotations == nil {
+			namespace.Annotations = map[string]string{}
+		}
+		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
+
 		if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 			return namespace, err
 		}
@@ -512,6 +549,24 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 	return false
 }
 
+func (c *ApplicationKubernetes) kubernetesNamespaceEditAllowed(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) bool {
+	ret := false
+
+	if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy]; ok {
+		if val == "" || strings.EqualFold(val, KubernetesNamespaceAnnotationManagedBy) {
+			ret = true
+		}
+	} else {
+		// no annotation set, it's ok
+		ret = true
+	}
+
+	if !c.kubernetesNamespaceCheckOwnership(ctx, namespace, user) {
+		ret = false
+	}
+
+	return ret
+}
 func (c *ApplicationKubernetes) kubernetesNamespaceDeleteAllowed(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) bool {
 	ret := c.config.Kubernetes.Namespace.Filter.Delete.Validate(namespace.Name)
 

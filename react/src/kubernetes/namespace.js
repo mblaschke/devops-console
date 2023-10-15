@@ -393,6 +393,8 @@ class Namespace extends BaseComponent {
                                                      {row.description ? this.highlight(row.description) : <i>no description set</i>}
                                                  </small>
                                             )()}
+                                            <br/>
+                                            <span className={row.managedBy ? 'badge bg-secondary' : 'hidden'}>managed by {row.managedBy}</span>
                                         </td>
                                         <td>
                                             <p className="text-right">{row.podCount !== null ? row.podCount : "n/a"}</p>
@@ -431,36 +433,36 @@ class Namespace extends BaseComponent {
                                             })()}
                                             <br/>
                                             <span className={row.deleteable ? 'hidden' : 'badge bg-info'}>Not deletable</span>
+                                            <span className={row.editable ? 'hidden' : 'badge bg-info'}>Not editable</span>
                                         </td>
                                         <td className="toolbox">
                                             {(() => {
-                                                switch (row.status) {
-                                                    case "Terminating":
-                                                        return <div></div>
-                                                    default:
-                                                        return (
-                                                            <div className="btn-group" role="group">
-                                                                <button id={'btnGroupDrop-' + row.name} type="button"
-                                                                        className="btn btn-secondary dropdown-toggle"
-                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                        aria-expanded="false">
-                                                                    Action
-                                                                </button>
-                                                                <ul className="dropdown-menu"
-                                                                    aria-labelledby={'btnGroupDrop-' + row.name}>
-                                                                    <li><a className="dropdown-item"
-                                                                           onClick={self.editNamespace.bind(self, row)}>Edit</a>
-                                                                    </li>
-                                                                    <li><a className="dropdown-item"
-                                                                           onClick={self.resetNamespace.bind(self, row)}>Reset
-                                                                        Settings/RBAC</a></li>
-                                                                    <li><a
-                                                                        className={row.deleteable ? 'dropdown-item' : 'hidden'}
-                                                                        onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        );
+                                                if (row.Status !== "Terminating" && row.editable) {
+                                                    return (
+                                                        <div className="btn-group" role="group">
+                                                            <button id={'btnGroupDrop-' + row.name} type="button"
+                                                                    className="btn btn-secondary dropdown-toggle"
+                                                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                    aria-expanded="false">
+                                                                Action
+                                                            </button>
+                                                            <ul className="dropdown-menu"
+                                                                aria-labelledby={'btnGroupDrop-' + row.name}>
+                                                                <li><a className="dropdown-item"
+                                                                       onClick={self.editNamespace.bind(self, row)}>Edit</a>
+                                                                </li>
+                                                                <li><a className="dropdown-item"
+                                                                       onClick={self.resetNamespace.bind(self, row)}>Reset
+                                                                    Settings/RBAC</a></li>
+                                                                <li><a
+                                                                    className={row.deleteable ? 'dropdown-item' : 'hidden'}
+                                                                    onClick={self.deleteNamespace.bind(self, row)}>Delete</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    );
+                                                } else {
+                                                    return <div></div>
                                                 }
                                             })()}
                                         </td>

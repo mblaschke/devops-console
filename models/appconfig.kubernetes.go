@@ -33,6 +33,8 @@ type (
 	}
 
 	AppConfigKubernetesNamespace struct {
+		LabelSelector string `yaml:"labelSelector"`
+
 		Filter struct {
 			Access AppConfigFilter
 			Delete AppConfigFilter
@@ -46,6 +48,7 @@ type (
 		Annotations struct {
 			Description   string
 			Immortal      string
+			ManagedBy     string `yaml:"managedBy"`
 			NetworkPolicy string `yaml:"networkPolicy"`
 		}
 

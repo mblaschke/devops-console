@@ -92,13 +92,15 @@ kubernetes:
     labels: { }
 
   namespace:
+    labelSelector: {{env "K8S_NAMESPACE_LABELSELECTOR" | default "" | toJson }}
+
     filter:
       access:
-        allow: {{env "K8S_NAMESPACE_FILTER_ACCESS_ALLOW" | default "^.+$" | toJson }}
-        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-).+$" | toJson }}
+        allow: {{env "K8S_NAMESPACE_FILTER_ACCESS_ALLOW" | default "^[a-z][a-z0-9-]+[a-z0-9]$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-|default).+$" | toJson }}
       delete:
         allow: {{env "K8S_NAMESPACE_FILTER_ACCESS_ALLOW" | default "^.+$" | toJson }}
-        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-).+$" | toJson }}
+        deny: {{env "K8S_NAMESPACE_FILTER_ACCESS_DENY" | default "^(kube-|calico-|gatekeeper-|default).+$" | toJson }}
 
     validation:
       namespace:
@@ -111,6 +113,7 @@ kubernetes:
     annotations:
       description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
       immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
+      managedBy: {{env "K8S_ANNOTATION_NAMESPACE_MANAGEDBY" | default "stable.webdevops.io/managed-by" | toJson }}
       networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
 
     labels:

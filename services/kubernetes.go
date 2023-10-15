@@ -109,7 +109,10 @@ func (k *Kubernetes) findGVR(gvk schema.GroupVersionKind) (*meta.RESTMapping, er
 func (k *Kubernetes) NamespaceList() (nsList map[string]coreV1.Namespace, err error) {
 	ctx := context.Background()
 
-	result, kubeErr := k.Client().CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+	opts := metav1.ListOptions{
+		LabelSelector: k.Config.Kubernetes.Namespace.LabelSelector,
+	}
+	result, kubeErr := k.Client().CoreV1().Namespaces().List(ctx, opts)
 
 	if kubeErr == nil {
 		nsList = make(map[string]coreV1.Namespace, len(result.Items))

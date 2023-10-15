@@ -10,6 +10,8 @@ type (
 		Status        string            `json:"status"`
 		Created       string            `json:"created"`
 		CreatedAgo    string            `json:"createdAgo"`
+		ManagedBy     string            `json:"managedBy"`
+		Editable      bool              `json:"editable"`
 		Deleteable    bool              `json:"deleteable"`
 		Settings      map[string]string `json:"settings"`
 	}
