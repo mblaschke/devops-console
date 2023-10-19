@@ -216,10 +216,17 @@ func (c *ApplicationAzure) ApiResourceGroupCreate(ctx iris.Context, user *models
 
 	roleAssignmentList := []azureRoleAssignment{}
 	if teamObj, err := user.GetTeam(formData.Team); err == nil {
-		for _, teamRoleAssignemnt := range teamObj.AzureRoleAssignments {
+		if teamObj.Azure.Group != nil {
 			roleAssignmentList = append(roleAssignmentList, azureRoleAssignment{
-				RoleDefinitionName: teamRoleAssignemnt.Role,
-				PrincipalId:        teamRoleAssignemnt.PrincipalId,
+				RoleDefinitionName: c.config.Azure.ResourceGroup.RoleDefinitionName,
+				PrincipalId:        *teamObj.Azure.Group,
+			})
+		}
+
+		if teamObj.Azure.ServicePrincipal != nil {
+			roleAssignmentList = append(roleAssignmentList, azureRoleAssignment{
+				RoleDefinitionName: c.config.Azure.ResourceGroup.RoleDefinitionName,
+				PrincipalId:        *teamObj.Azure.ServicePrincipal,
 			})
 		}
 	}

@@ -21,7 +21,7 @@ func (c *ApplicationConfig) handleApiAppConfig(ctx iris.Context, user *models.Us
 	ret := response.ResponseConfig{}
 	ret.User.Username = user.Username
 
-	for _, team := range user.Teams {
+	for _, team := range user.GetTeams() {
 		row := response.ResponseConfigTeam{
 			Id:   team.Name,
 			Name: team.Name,

@@ -76,6 +76,7 @@ azure:
       - 8h
 
   resourcegroup:
+    roleDefinitionName:  {{env "AZURE_RESOURCEGROUP_ROLEDEFINITIONNAME" | default "contributor" | toJson }}
     filter:
       name:
         allow: {{env "AZURE_RESOURCEGROUP_NAME_FILTER_ALLOW" | default "^.+-rg$" | toJson }}
@@ -92,6 +93,8 @@ kubernetes:
     labels: { }
 
   namespace:
+    clusterRoleName:  {{env "K8S_NAMESPACE_CLUSTERROLENAME" | default "admin" | toJson }}
+
     labelSelector: {{env "K8S_NAMESPACE_LABELSELECTOR" | default "" | toJson }}
 
     filter:
@@ -118,9 +121,6 @@ kubernetes:
 
     labels:
       team: {{env "K8S_LABEL_TEAM" | default "owner" | toJson }}
-
-    role:
-      team: {{env "K8S_TEAM_NAMESPACEROLE" | default "admin" | toJson }}
 
     quota:
       team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
@@ -165,9 +165,5 @@ support:
       ^(?i)(escalation|support|devops[-_ ]?console)$
 
 permissions:
-  default:
-    teams: [ ]
-
-  user: { }
-  group: { }
-  team: { }
+  adminGroups: []
+  teams: { }

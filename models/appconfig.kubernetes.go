@@ -33,6 +33,8 @@ type (
 	}
 
 	AppConfigKubernetesNamespace struct {
+		ClusterRoleName string `yaml:"clusterRoleName"`
+
 		LabelSelector string `yaml:"labelSelector"`
 
 		Filter struct {
@@ -54,12 +56,6 @@ type (
 
 		Labels struct {
 			Team string
-		}
-
-		Role struct {
-			Team    string
-			User    string
-			Private bool
 		}
 
 		Quota struct {

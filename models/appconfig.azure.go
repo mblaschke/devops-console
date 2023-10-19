@@ -12,6 +12,8 @@ type (
 		}
 
 		ResourceGroup struct {
+			RoleDefinitionName string `yaml:"roleDefinitionName"`
+
 			Filter struct {
 				Name AppConfigFilter `yaml:"name"`
 			}

@@ -288,9 +288,11 @@ func (k *Kubernetes) RoleBindingCreateNamespaceUser(namespace, username, userid,
 }
 
 // Create rolebinding for group to gain access to namespace
-func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName string, permission models.TeamK8sPermissions) (roleBinding *rbacV1.RoleBinding, error error) {
+func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, team *models.AppConfigTeam) (roleBinding *rbacV1.RoleBinding, error error) {
 	ctx := context.Background()
-	roleBindName := fmt.Sprintf("team:%s:%s", teamName, permission.Name)
+
+	clusterRoleName := k.Config.Kubernetes.Namespace.ClusterRoleName
+	roleBindName := "devops-console"
 
 	if rb, _ := k.Client().RbacV1().RoleBindings(namespace).Get(ctx, roleBindName, metav1.GetOptions{}); rb != nil && rb.GetUID() != "" {
 		err := k.Client().RbacV1().RoleBindings(namespace).Delete(ctx, roleBindName, metav1.DeleteOptions{})
@@ -300,31 +302,21 @@ func (k *Kubernetes) RoleBindingCreateNamespaceTeam(namespace string, teamName s
 	}
 
 	annotations := k.Config.Kubernetes.RoleBinding.Annotations
-	annotations["team"] = strings.ToLower(teamName)
+	annotations[k.Config.Kubernetes.Namespace.Labels.Team] = strings.ToLower(team.Name)
 
 	labels := k.Config.Kubernetes.RoleBinding.Labels
 
 	subjectList := []rbacV1.Subject{}
-	for _, group := range permission.Groups {
-		subjectList = append(subjectList, rbacV1.Subject{Kind: "Group", Name: group})
+	if team.Azure.Group != nil {
+		subjectList = append(subjectList, rbacV1.Subject{Kind: "Group", Name: *team.Azure.Group})
 	}
-
-	for _, user := range permission.Users {
-		subjectList = append(subjectList, rbacV1.Subject{Kind: "User", Name: user})
-	}
-
-	for _, serviceAccount := range permission.ServiceAccounts {
-		if serviceAccount.Namespace == "" {
-			// default is local namespace
-			serviceAccount.Namespace = namespace
-		}
-
-		subjectList = append(subjectList, rbacV1.Subject{Kind: "ServiceAccount", Name: serviceAccount.Name, Namespace: serviceAccount.Namespace})
+	if team.Azure.ServicePrincipal != nil {
+		subjectList = append(subjectList, rbacV1.Subject{Kind: "User", Name: *team.Azure.ServicePrincipal})
 	}
 
 	role := rbacV1.RoleRef{}
 	role.Kind = "ClusterRole"
-	role.Name = permission.ClusterRole
+	role.Name = clusterRoleName
 
 	roleBinding = &rbacV1.RoleBinding{}
 	roleBinding.SetAnnotations(annotations)

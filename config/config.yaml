@@ -56,135 +56,24 @@ kubernetes:
         k8sname: static-label
         k8svalue: "foobar2"
 
+
 permissions:
-  default:
-    teams:
-      - devteam0
-      - devteam5
-
-  user:
-    blascma:
-      teams:
-        - devteam1
-        - devteam3
-
-    userfoo:
-      teams:
-        - devteam1
-        - devteam2
-        - devteam3
-
-  group:
+  adminGroups: [01fab9bf-e71e-42e0-b936-0f90c5616e7c]
+  teams:
     01fab9bf-e71e-42e0-b936-0f90c5616e7c:
-      teams:
-        - devops
+      name: admin
+      azure:
+        group: 01fab9bf-e71e-42e0-b936-0f90c5616e7c
+        servicePrincipal: 827dc3a3-ae49-4a5a-b632-28ad35079d7e
 
-    "bargroup":
-      teams:
-        - devteam5
-        - devteam8
 
-    "foogroup":
-      teams:
-        - devteam6
+    995031e1-ede7-4162-91b8-c68bdc44e955:
+      name: devopsteam1
+      azure:
+        group: 995031e1-ede7-4162-91b8-c68bdc44e955
 
-    "bazgroup":
-      teams:
-        - devteam7
+    e1a8deaf-58d1-4bbe-a80c-3cb34d72da98:
+      name: devopsteam2
+      azure:
+        group: e1a8deaf-58d1-4bbe-a80c-3cb34d72da98
 
-  team:
-    devops:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "01fab9bf-e71e-42e0-b936-0f90c5616e7c"
-          serviceaccounts:
-            - name: tiller
-              namespace: foobar
-            - name: tiller
-              namespace: foobar2
-          clusterrole: admin
-      azureroleassignment:
-        - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
-          role: contributor
-      serviceconnection:
-        - { token: "923eh2ihrwpihfg9s0gh0923423ih42po" }
-
-    devteam0:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789000"
-          serviceaccounts:
-            - name: tiller
-              namespace: foobar
-            - name: tiller
-              namespace: foobar2
-          clusterrole: admin
-      azureroleassignment:
-        - principalid: "827dc3a3-ae49-4a5a-b632-28ad35079d7e"
-          role: contributor
-      serviceconnection:
-        - { token: "923eh2ihrwpihfg9s0gh0923423ih42po" }
-
-    devteam1:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789000"
-          clusterrole: admin
-
-    devteam2:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789002"
-          clusterrole: admin
-        - name: "view"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789004"
-            - "cf805c30-f000-baar-foba-123456789005"
-            - "cf805c30-f000-baar-foba-123456789006"
-          clusterrole: admin
-
-    devteam3:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789003"
-          clusterrole: admin
-
-    devteam4:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789004"
-          clusterrole: admin
-
-    devteam5:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789005"
-          clusterrole: admin
-
-    devteam6:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789006"
-          clusterrole: admin
-
-    devteam7:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789007"
-          clusterrole: admin
-
-    devteam8:
-      rolebinding:
-        - name: "general"
-          groups:
-            - "cf805c30-f000-baar-foba-123456789006"
-          clusterrole: admin

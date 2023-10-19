@@ -404,11 +404,9 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 	}
 
 	// check team
-	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
-		for _, team := range user.Teams {
-			if val == team.Name {
-				return true
-			}
+	if labelVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
+		if team, err := user.GetTeam(labelVal); team != nil && err == nil {
+			return true
 		}
 	}
 
@@ -491,10 +489,8 @@ func (c *ApplicationKubernetes) kubernetesNamespacePermissionsUpdate(ctx iris.Co
 	if labelTeamVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
 		// Team rolebinding
 		if namespaceTeam, err := user.GetTeam(labelTeamVal); err == nil {
-			for _, permission := range namespaceTeam.K8sPermissions {
-				if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceTeam(namespace.Name, labelTeamVal, permission); err != nil {
-					return err
-				}
+			if _, err := c.serviceKubernetes().RoleBindingCreateNamespaceTeam(namespace.Name, namespaceTeam); err != nil {
+				return err
 			}
 		}
 	} else {

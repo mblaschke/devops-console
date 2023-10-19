@@ -16,10 +16,10 @@
                           <dt>Username</dt>
                           <dd>{{user.Username}}</dd>
 
-                          <dt>Groups</dt>
+                          <dt>Teams</dt>
                           <dd>
-                            {{range user.Groups}}
-                              {{ . }} <br>
+                            {{range user.GetTeams()}}
+                              {{ .Name }} <br>
                             {{ end }}
                           </dd>
                         </dl>

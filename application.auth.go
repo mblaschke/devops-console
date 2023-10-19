@@ -227,7 +227,6 @@ func (c *ApplicationAuth) LoginViaOauth(ctx iris.Context) {
 		Id:       "",
 		Username: "",
 		Email:    oauthSess.Email,
-		Teams:    nil,
 		Groups:   oauthSess.Groups,
 		IsAdmin:  false,
 	}
@@ -271,7 +270,7 @@ func (c *ApplicationAuth) LoginViaOauth(ctx iris.Context) {
 	user.ApplyAppConfig(&c.config)
 
 	// check groups
-	if len(user.Teams) == 0 {
+	if len(user.GetTeams()) == 0 {
 		ctx.ViewData("messageError", fmt.Sprintf(`user "%s" is not allowed to use this application (no team assignments/mappings found)`, user.Username))
 		c.templateLogin(ctx, true)
 		return
