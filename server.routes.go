@@ -141,13 +141,6 @@ func (c *Server) initRoutes() {
 		}
 	}
 
-	apiServiceParty := c.app.Party("/api", requestLogger, c.defaultHeaders)
-	{
-		if c.config.App.FeatureIsEnabled("kubernetes", "namespaces") {
-			apiServiceParty.Post("/kubernetes/namespace/{namespace:string}", func(ctx iris.Context) { c.ensureServiceUser(ctx, applicationKubernetes.ApiServiceNamespaceEnsure) })
-		}
-	}
-
 	c.app.OnErrorCode(iris.StatusNotFound, c.defaultHeaders, c.notFound)
 }
 
