@@ -38,12 +38,17 @@ jobs:
             target: "final-static"
             suffix: ""
             latest: "auto"
+          -
+            Dockerfile: Dockerfile
+            target: "final-azcli"
+            suffix: "-azcli"
+            latest: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
+        uses: pierotofy/set-swap-space@49819abfb41bd9b44fb781159c033dba90353a7c
         with:
           swap-size-gb: 12
 

@@ -60,3 +60,25 @@ COPY --from=test /app .
 USER 1000:1000
 EXPOSE 9000 9001
 ENTRYPOINT ["/app/devops-console"]
+
+#############################################
+# final-static
+#############################################
+FROM gcr.io/distroless/static as final-static
+ENV LOG_JSON=1
+WORKDIR /app
+COPY --from=test /app .
+USER 1000:1000
+EXPOSE 9000 9001
+ENTRYPOINT ["/app/devops-console"]
+
+#############################################
+# final-azcli
+#############################################
+FROM mcr.microsoft.com/azure-cli:latest as final-azcli
+ENV LOG_JSON=1
+WORKDIR /app
+COPY --from=test /app .
+USER 1000:1000
+EXPOSE 9000 9001
+ENTRYPOINT ["/app/devops-console"]
