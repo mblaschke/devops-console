@@ -76,6 +76,10 @@ ENTRYPOINT ["/app/devops-console"]
 # final-azcli
 #############################################
 FROM mcr.microsoft.com/azure-cli:latest as final-azcli
+
+RUN apk upgrade --no-cache \
+    && az aks install-cli
+
 ENV LOG_JSON=1
 WORKDIR /app
 COPY --from=test /app .
