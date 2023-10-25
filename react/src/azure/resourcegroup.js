@@ -153,7 +153,7 @@ class Resourcegroup extends BaseComponent {
                                 <select name="nsAreaTeam" id="inputNsAreaTeam"
                                         className="form-control namespace-area-team" value={this.getValue("form.team")}
                                         onChange={this.setValue.bind(this, "form.team")}>
-                                    {this.state.config.teams.map((row, value) =>
+                                    {this.getTeams().map((row, value) =>
                                         <option key={row.Id} value={row.name}>{row.name}</option>
                                     )}
                                 </select>

@@ -138,7 +138,7 @@ class SupportPagerduty extends BaseComponent {
                                                 className="form-control" value={this.getValue("form.team")}
                                                 onChange={this.setTeam.bind(this, "form.team")}>
                                             <option key="" value="">- please select -</option>
-                                            {this.state.config.teams.map((row, value) =>
+                                            {this.getTeams().map((row, value) =>
                                                 <option key={row.Id} value={row.name}>{row.name}</option>
                                             )}
                                         </select>

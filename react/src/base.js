@@ -15,6 +15,16 @@ class Base extends Component {
         this.startHeartbeat();
     }
 
+    getTeams() {
+        let teams = this.state.config.teams;
+
+        teams.sort(function(a, b) {
+            return a.name - b.name;
+        });
+
+        return this.state.config.teams;
+    }
+
     buildAppConfig() {
         return {
             user: {
@@ -324,7 +334,7 @@ class Base extends Component {
             <select className="form-control" id={htmlId} value={this.getValue("team")}
                     onChange={this.setTeam.bind(this, "team")}>
                 <option key="*" value="*">All teams</option>
-                {this.state.config.teams.map((row, value) =>
+                {this.getTeams().map((row, value) =>
                     <option key={row.Id} value={row.name}>{row.name}</option>
                 )}
             </select>
