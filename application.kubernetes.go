@@ -146,7 +146,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 
 	// membership check
 	if !user.IsMemberOf(*formData.Team) {
-		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to team \"%s\" denied", *formData.Team))
+		c.respondError(ctx, fmt.Errorf("access to team \"%s\" denied", *formData.Team))
 		return
 	}
 
@@ -185,7 +185,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
 
 	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
-		c.respondErrorWithPenalty(ctx, fmt.Errorf("access to namespace \"%s\" denied", namespace.Name))
+		c.respondError(ctx, fmt.Errorf("access to namespace \"%s\" denied", namespace.Name))
 		return
 	}
 
