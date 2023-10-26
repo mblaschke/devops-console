@@ -71,7 +71,7 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 		}
 
 		managedBy := ""
-		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Labels.ManagedBy]; ok {
+		if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.ManagedBy]; ok {
 			// only show if managed by different source
 			if !strings.EqualFold(val, KubernetesNamespaceLabelManagedBy) {
 				managedBy = val
