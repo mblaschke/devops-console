@@ -62,17 +62,6 @@ EXPOSE 9000 9001
 ENTRYPOINT ["/app/devops-console"]
 
 #############################################
-# final-static
-#############################################
-FROM gcr.io/distroless/static as final-static
-ENV LOG_JSON=1
-WORKDIR /app
-COPY --from=test /app .
-USER 1000:1000
-EXPOSE 9000 9001
-ENTRYPOINT ["/app/devops-console"]
-
-#############################################
 # final-azcli
 #############################################
 FROM mcr.microsoft.com/azure-cli:latest as final-azcli
@@ -83,6 +72,19 @@ RUN apk upgrade --no-cache \
 ENV LOG_JSON=1
 WORKDIR /app
 COPY --from=test /app .
+USER 1000:1000
+EXPOSE 9000 9001
+ENTRYPOINT ["/app/devops-console"]
+
+#############################################
+# final-static
+#############################################
+FROM gcr.io/distroless/static as final-static
+ENV LOG_JSON=1 \
+    PATH=/app
+WORKDIR /app
+COPY --from=test /app .
+COPY --from=final-azcli /usr/local/bin/kubelogin /app/kubelogin
 USER 1000:1000
 EXPOSE 9000 9001
 ENTRYPOINT ["/app/devops-console"]
