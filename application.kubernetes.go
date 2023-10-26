@@ -400,7 +400,7 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 
 	// check team
 	if labelVal, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.Team]; ok {
-		if team, err := user.GetTeam(labelVal); team != nil && err == nil {
+		if user.IsMemberOf(labelVal) {
 			return true
 		}
 	}

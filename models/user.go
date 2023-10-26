@@ -53,6 +53,15 @@ func (u *User) GetTeams() (teamList []*AppConfigTeam) {
 }
 
 func (u *User) GetTeam(name string) (*AppConfigTeam, error) {
+	if u.IsAdmin {
+		for _, row := range u.config.Permissions.Teams {
+			team := row
+			if team.Name == name {
+				return team, nil
+			}
+		}
+	}
+
 	for _, groupId := range u.Groups {
 		if team, exists := u.config.Permissions.Teams[groupId]; exists {
 			if team.Name == name {
