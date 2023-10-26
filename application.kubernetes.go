@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	RedisKubernetesNamespaceList           = `kubernetes:namespace:list`
-	KubernetesNamespaceAnnotationManagedBy = `devops-console`
+	RedisKubernetesNamespaceList      = `kubernetes:namespace:list`
+	KubernetesNamespaceLabelManagedBy = `devops-console`
 )
 
 type ApplicationKubernetes struct {
@@ -71,9 +71,9 @@ func (c *ApplicationKubernetes) ApiNamespaceList(ctx iris.Context, user *models.
 		}
 
 		managedBy := ""
-		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy]; ok {
+		if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Labels.ManagedBy]; ok {
 			// only show if managed by different source
-			if !strings.EqualFold(val, KubernetesNamespaceAnnotationManagedBy) {
+			if !strings.EqualFold(val, KubernetesNamespaceLabelManagedBy) {
 				managedBy = val
 			}
 		}
@@ -182,7 +182,7 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	if formData.Description != nil {
 		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.Description] = *formData.Description
 	}
-	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
+	namespace.Labels[c.config.Kubernetes.Namespace.Labels.ManagedBy] = KubernetesNamespaceLabelManagedBy
 
 	service := c.serviceKubernetes()
 
@@ -297,7 +297,7 @@ func (c *ApplicationKubernetes) ApiNamespaceUpdate(ctx iris.Context, user *model
 	if formData.NetworkPolicy != nil {
 		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.NetworkPolicy] = *formData.NetworkPolicy
 	}
-	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
+	namespace.Labels[c.config.Kubernetes.Namespace.Labels.ManagedBy] = KubernetesNamespaceLabelManagedBy
 
 	// labels
 	if formData.Settings != nil {
@@ -379,10 +379,10 @@ func (c *ApplicationKubernetes) ApiNamespaceReset(ctx iris.Context, user *models
 
 func (c *ApplicationKubernetes) updateNamespace(namespace *models.KubernetesNamespace, force bool) (*models.KubernetesNamespace, error) {
 	if force {
-		if namespace.Annotations == nil {
-			namespace.Annotations = map[string]string{}
+		if namespace.Labels == nil {
+			namespace.Labels = map[string]string{}
 		}
-		namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
+		namespace.Labels[c.config.Kubernetes.Namespace.Labels.ManagedBy] = KubernetesNamespaceLabelManagedBy
 
 		if _, err := c.serviceKubernetes().NamespaceUpdate(namespace.Namespace); err != nil {
 			return namespace, err
@@ -411,8 +411,8 @@ func (c *ApplicationKubernetes) kubernetesNamespaceAccessAllowed(ctx iris.Contex
 func (c *ApplicationKubernetes) kubernetesNamespaceEditAllowed(ctx iris.Context, namespace *models.KubernetesNamespace, user *models.User) bool {
 	ret := false
 
-	if val, ok := namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy]; ok {
-		if val == "" || strings.EqualFold(val, KubernetesNamespaceAnnotationManagedBy) {
+	if val, ok := namespace.Labels[c.config.Kubernetes.Namespace.Labels.ManagedBy]; ok {
+		if val == "" || strings.EqualFold(val, KubernetesNamespaceLabelManagedBy) {
 			ret = true
 		}
 	} else {

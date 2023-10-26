@@ -50,12 +50,12 @@ type (
 		Annotations struct {
 			Description   string
 			Immortal      string
-			ManagedBy     string `yaml:"managedBy"`
 			NetworkPolicy string `yaml:"networkPolicy"`
 		}
 
 		Labels struct {
-			Team string
+			Team      string
+			ManagedBy string `yaml:"managedBy"`
 		}
 
 		Quota struct {

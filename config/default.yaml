@@ -116,11 +116,11 @@ kubernetes:
     annotations:
       description: {{env "K8S_ANNOTATION_NAMESPACE_DESCRIPTION" | default "stable.webdevops.io/description" | toJson }}
       immortal: {{env "K8S_ANNOTATION_NAMESPACE_IMMORTAL" | default "stable.webdevops.io/immortal" | toJson }}
-      managedBy: {{env "K8S_ANNOTATION_NAMESPACE_MANAGEDBY" | default "stable.webdevops.io/managed-by" | toJson }}
       networkPolicy: {{env "K8S_ANNOTATION_NAMESPACE_NETWORKPOLICY" | default "stable.webdevops.io/networkPolicy" | toJson }}
 
     labels:
-      team: {{env "K8S_LABEL_TEAM" | default "owner" | toJson }}
+      team: {{env "K8S_LABEL_NAMESPACE_TEAM" | default "owner" | toJson }}
+      managedBy: {{env "K8S_LABEL_NAMESPACE_MANAGEDBY" | default "stable.webdevops.io/managed-by" | toJson }}
 
     quota:
       team: {{env "K8S_NAMESPACE_TEAM_QUOTA" | default "0" | int }}
