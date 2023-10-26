@@ -18,11 +18,12 @@ class Base extends Component {
     getTeams() {
         let teams = this.state.config.teams;
 
-        teams.sort(function(a, b) {
-            return a.name - b.name;
+        teams.sort((a, b) => {
+            var x = a.name; var y = b.name;
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
         });
 
-        return this.state.config.teams;
+        return teams;
     }
 
     buildAppConfig() {
@@ -55,7 +56,7 @@ class Base extends Component {
     }
 
 
-    loadConfig() {
+    loadConfig(callback) {
         this.ajax({
             type: "GET",
             url: '/_webapi/app/config'
@@ -283,6 +284,7 @@ class Base extends Component {
 
     initTeamSelection(field) {
         let selectedTeam = this.getValue(field)
+console.log("field", selectedTeam)
         if (selectedTeam) {
             // team already selected
             return
@@ -293,18 +295,21 @@ class Base extends Component {
             let lastSelectedTeam = "" + localStorage.getItem("team");
             this.state.config.teams.map((row, value) => {
                 if (row.name === lastSelectedTeam) {
+
+                    console.log("localstorage", selectedTeam)
                     this.setValue(field, lastSelectedTeam);
                     selectedTeam = lastSelectedTeam
                 }
             });
             if (selectedTeam) {
+                // stop here
                 return
             }
-        } catch (e) {
-        }
+        } catch (e) {}
 
         // select first team if no selection available
         if (this.state.config.teams.length > 0) {
+            console.log("autoselect", selectedTeam)
             this.setValue(field, this.state.config.teams[0].name)
         }
     }
@@ -329,6 +334,8 @@ class Base extends Component {
         if (!htmlId) {
             htmlId = this.generateHtmlId("formTeamSelector");
         }
+
+        console.log("render", this.getValue("team"))
 
         return (
             <select className="form-control" id={htmlId} value={this.getValue("team")}
