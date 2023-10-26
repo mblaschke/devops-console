@@ -184,11 +184,6 @@ func (c *ApplicationKubernetes) ApiNamespaceCreate(ctx iris.Context, user *model
 	}
 	namespace.Annotations[c.config.Kubernetes.Namespace.Annotations.ManagedBy] = KubernetesNamespaceAnnotationManagedBy
 
-	if !c.kubernetesNamespaceAccessAllowed(ctx, namespace, user) {
-		c.respondError(ctx, fmt.Errorf("access to namespace \"%s\" denied", namespace.Name))
-		return
-	}
-
 	service := c.serviceKubernetes()
 
 	// check if already exists
