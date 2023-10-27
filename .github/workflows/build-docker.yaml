@@ -35,6 +35,10 @@ jobs:
             target: "final-azcli"
             suffix: ""
             latest: "auto"
+          - Dockerfile: Dockerfile
+            target: "final-static"
+            suffix: ""
+            latest: "auto"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
