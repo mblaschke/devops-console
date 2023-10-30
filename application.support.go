@@ -160,7 +160,7 @@ func (c *ApplicationSupport) ApiPagerDutyTicketCreate(ctx iris.Context, user *mo
 					formData.Location,
 					formData.ResourceGroup,
 					formData.Resource,
-					frmData.Message,
+					formData.Message,
 					formData.Contact,
 				),
 			},
