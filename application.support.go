@@ -32,6 +32,11 @@ Resource: %v
 Requested by:
 %v for %v
 
+Type: %v
+Location: %v
+Group/Namespace: %v
+Resource: %v
+
 Message:
 %v
 

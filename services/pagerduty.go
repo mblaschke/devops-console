@@ -47,9 +47,10 @@ func PagerDutyUpdateEndpointList(ctx context.Context, config models.AppConfig) {
 	client := pagerduty.NewClient(config.Support.Pagerduty.AuthToken)
 
 	opts := pagerduty.ListServiceOptions{
-		Limit: 100,
+		Limit:    100,
+		Includes: []string{"integrations"},
 	}
-	response, err := client.ListServicesWithContext(ctx, pagerduty.ListServiceOptions{Includes: []string{"integrations"}})
+	response, err := client.ListServicesWithContext(ctx, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -68,9 +69,11 @@ func PagerDutyUpdateEndpointList(ctx context.Context, config models.AppConfig) {
 				key := fmt.Sprintf(`%v:%v`, service.ID, integration.ID)
 				name := fmt.Sprintf(config.Support.Pagerduty.EndpointNameTemplate, service.Name, integration.Summary)
 
-				list[key] = models.PagerDutyEndpoint{
-					Name:       name,
-					RoutingKey: integration.IntegrationKey,
+				if integration.IntegrationKey != "" {
+					list[key] = models.PagerDutyEndpoint{
+						Name:       name,
+						RoutingKey: integration.IntegrationKey,
+					}
 				}
 			}
 		}
