@@ -82,7 +82,7 @@ func (u *User) IsMemberOf(name string) bool {
 		return true
 	}
 
-	if name == "" {
+	if name != "" {
 		if team, err := u.GetTeam(name); team != nil && err == nil {
 			return true
 		}
