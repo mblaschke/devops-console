@@ -16,7 +16,7 @@ require (
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/kataras/golog v0.1.11
 	github.com/kataras/iris/v12 v12.2.7
-	github.com/oauth2-proxy/oauth2-proxy/v7 v7.5.2-0.20231002092658-b78c391adc6d
+	github.com/oauth2-proxy/oauth2-proxy/v7 v7.5.2-0.20231101101234-66bfd8ebd57d
 	github.com/prometheus/alertmanager v0.26.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/redis/go-redis/v9 v9.3.0
