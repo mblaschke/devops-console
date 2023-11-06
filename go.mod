@@ -9,13 +9,13 @@ require (
 	github.com/PagerDuty/go-pagerduty v1.7.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/securecookie v1.1.2
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/kataras/golog v0.1.11
-	github.com/kataras/iris/v12 v12.2.7
+	github.com/kataras/iris/v12 v12.2.8
 	github.com/oauth2-proxy/oauth2-proxy/v7 v7.5.2-0.20231101101234-66bfd8ebd57d
 	github.com/prometheus/alertmanager v0.26.0
 	github.com/prometheus/client_golang v1.17.0
@@ -133,8 +133,8 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.17.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/tdewolff/minify/v2 v2.20.5 // indirect
-	github.com/tdewolff/parse/v2 v2.7.3 // indirect
+	github.com/tdewolff/minify/v2 v2.20.6 // indirect
+	github.com/tdewolff/parse/v2 v2.7.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -146,10 +146,10 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.13.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.4.0 // indirect
 	google.golang.org/api v0.149.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231030173426-d783a09b4405 // indirect
