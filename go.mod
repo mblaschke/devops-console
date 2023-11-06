@@ -9,7 +9,7 @@ require (
 	github.com/PagerDuty/go-pagerduty v1.7.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/securecookie v1.1.2
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/jessevdk/go-flags v1.5.0
