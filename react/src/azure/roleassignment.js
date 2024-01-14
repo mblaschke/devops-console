@@ -161,7 +161,7 @@ class Roleassignment extends BaseComponent {
                             <div className="form-group">
                                 <label htmlFor="inputResourceId" className="inputResourceId">Azure ResourceID</label>
                                 <input type="text" name="resourceId" id="inputResourceId" className="form-control"
-                                       placeholder="/subscriptions/xxxxx-xxxx-xxxx-xxxx/resourceGroups/xxxxxxxx/..."
+                                       placeholder="/subscriptions/xxxxx-xxxx-xxxx-xxxx/resourceGroups/xxxxxxxx"
                                        required value={this.getValue("form.resourceId")}
                                        onChange={this.setValue.bind(this, "form.resourceId")}/>
                             </div>
