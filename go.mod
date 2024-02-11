@@ -1,6 +1,6 @@
 module github.com/mblaschke/devops-console
 
-go 1.21
+go 1.22
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2 v2.2.0
