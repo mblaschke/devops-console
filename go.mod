@@ -19,7 +19,7 @@ require (
 	github.com/oauth2-proxy/oauth2-proxy/v7 v7.5.2-0.20231101101234-66bfd8ebd57d
 	github.com/prometheus/alertmanager v0.26.0
 	github.com/prometheus/client_golang v1.18.0
-	github.com/redis/go-redis/v9 v9.4.0
+	github.com/redis/go-redis/v9 v9.5.1
 	github.com/webdevops/go-common v0.0.0-20240210120128-6531d37585c1
 	go.uber.org/zap v1.26.0
 	gopkg.in/yaml.v2 v2.4.0
